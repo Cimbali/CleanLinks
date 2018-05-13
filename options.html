@@ -27,6 +27,8 @@
 </head>
 
 <body>
+	<h3>Options</h3>
+	<h4>Link cleaning</h4>
 	<label i18n_title="skipwhen_tooltip"><span i18n_text="skipwhen_title"></span>
 		<br /><input type="text" name="skipwhen" value="" />
 	</label>
@@ -36,15 +38,11 @@
 	<label i18n_title="skipdoms_tooltip"><span i18n_text="skipdoms_title"></span>
 		<br /><textarea name="skipdoms"></textarea>
 	</label>
-	<label><span i18n_text="highlight_title"></span>
-		<input type="checkbox" name="highlight" value="" />
+	<label i18n_title="ignhttp_tooltip"><span i18n_text="ignhttp_title"></span>
+		<input type="checkbox" name="ignhttp" value="" />
 	</label>
-	<label i18n_title="hlstyle_content"><span i18n_text="hlstyle_title"></span>
-		<br /><input type="text" name="hlstyle" i18n_title="hlstyle_emptytext" />
-	</label>
-	<label i18n_title="repdelay_tooltip"><span i18n_text="repdelay_title"></span>
-		<input type="number" name="repdelay" value="" />
-	</label>
+
+	<h4>Features</h4>
 	<label i18n_title="evdm_tooltip"><span i18n_text="evdm_title"></span>
 		<input type="checkbox" name="evdm" value="" />
 	</label>
@@ -66,13 +64,22 @@
 	<label i18n_title="textcl_tooltip"><span i18n_text="textcl_title"></span>
 		<input type="checkbox" name="textcl" value="" />
 	</label>
-	<label i18n_title="ignhttp_tooltip"><span i18n_text="ignhttp_title"></span>
-		<input type="checkbox" name="ignhttp" value="" />
-	</label>
 	<label><span i18n_text="cltrack_title"></span>
 		<input type="checkbox" name="cltrack" />
 	</label>
+	<label i18n_title="repdelay_tooltip"><span i18n_text="repdelay_title"></span>
+		<input type="number" name="repdelay" value="" />
+	</label>
 
+	<h4>Display</h4>
+	<label><span i18n_text="highlight_title"></span>
+		<input type="checkbox" name="highlight" value="" />
+	</label>
+	<label i18n_title="hlstyle_content"><span i18n_text="hlstyle_title"></span>
+		<br /><input type="text" name="hlstyle" i18n_title="hlstyle_emptytext" />
+	</label>
+
+	<h4>Reset</h4>
 	<p><button name="reset" i18n_text="reset_label" i18n_title="reset_tooltip"></button></p>
 
 	<script src="cleanlink.js"></script>
