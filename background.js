@@ -60,14 +60,20 @@ function handleMessage(message, sender)
 
 	else if ('url' in message)
 	{
-		var p = browser.notifications.create(message.url,
+		var p;
+		if (prefValues.notifications)
 		{
-			type: 'basic',
-			iconUrl: browser.extension.getURL('icon.png'),
-			title: 'Link cleaned!',
-			message: message.url
-		});
-		browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + 800});
+			p = browser.notifications.create(message.url,
+			{
+				type: 'basic',
+				iconUrl: browser.extension.getURL('icon.png'),
+				title: 'Link cleaned!',
+				message: message.url
+			});
+			browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + 800});
+		}
+		else
+			p = Promise.resolve(null)
 
 		if (prefValues.cltrack)
 			historyCleanedLinks.push(Object.assign({}, message));

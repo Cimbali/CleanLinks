@@ -186,5 +186,13 @@
 "switchToTab_tooltip": {
 	"message": "When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present.",
 	"description": ""
+},
+"notifications_title": {
+	"message": "Show notifications for cleaned links",
+	"description": ""
+},
+"notifications_tooltip": {
+	"message": "Show the cleaned link in a popup when either a clicked link is cleaned or an HTTP request is cleaned.",
+	"description": ""
 }
 }
