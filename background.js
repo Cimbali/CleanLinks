@@ -161,6 +161,7 @@ function handleAlarm(alarm)
 
 browser.alarms.onAlarm.addListener(handleAlarm);
 browser.runtime.onMessage.addListener(handleMessage);
+browser.browserAction.setBadgeBackgroundColor({color: 'rgba(0, 0, 0, 0)'});
 
 loadOptions().then(() =>
 {
