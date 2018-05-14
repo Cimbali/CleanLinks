@@ -70,7 +70,7 @@ function handleMessage(message, sender)
 				title: 'Link cleaned!',
 				message: message.url
 			});
-			browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + 800});
+			browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + prefValues.notiftime});
 		}
 		else
 			p = Promise.resolve(null)
