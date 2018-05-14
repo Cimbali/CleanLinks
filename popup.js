@@ -95,6 +95,12 @@ function populate_popup()
 			})
 		);
 	}
+
+	document.querySelector('#options').onclick = () =>
+	{
+		browser.runtime.openOptionsPage();
+		window.close();
+	}
 }
 
 loadOptions().then(() => populate_popup());
