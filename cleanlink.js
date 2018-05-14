@@ -89,7 +89,9 @@ function loadOptions()
 	{
 		if ('configuration' in data) {
 			for (var param in data.configuration) {
-				if (typeof prefValues[param] != 'object')
+				if (typeof prefValues[param] == 'number')
+					prefValues[param] = parseInt(data.configuration[param]);
+				else if (typeof prefValues[param] == 'string')
 					prefValues[param] = data.configuration[param];
 				else if (prefValues[param] instanceof RegExp)
 					prefValues[param] = new RegExp(data.configuration[param]);
@@ -106,7 +108,7 @@ function highlightLink(node, remove)
 	// parse and apply ;-separated list of key:val style properties
 	('' + prefValues.hlstyle).split(';').forEach(function (r)
 	{
-		let [prop, val] = r.split(':').map(String.trim);
+		let [prop, val] = r.split(':').map(s => s.trim());
 		node.style.setProperty(prop, remove ? '' : val, 'important');
 	});
 }
@@ -215,7 +217,7 @@ function cleanLink(link, base)
 		if ((pos = link.indexOf('&')) !== -1)
 			link = link.substr(0, pos);
 		link = decodeURIComponent(link);
-		console.log('decoded URI Component =', link)
+		log('decoded URI Component =', link)
 
 		if ((pos = link.indexOf('html&')) !== -1 || (pos = link.indexOf('html%')) !== -1)
 			link = link.substr(0, pos + 4);
@@ -254,7 +256,7 @@ function cleanLink(link, base)
 			ht = link.substr(pos), link = link.substr(0, pos);
 
 		link = link.replace(/&amp;/g, '&').replace(prefValues.remove, '').replace(/[?&]$/, '')
-			+ (ht && /^[\w\/#!-]+$/.test(ht) ? ht : (this.cleanOnClick ? '' : '#'));
+			+ (ht && /^[\w\/#!-]+$/.test(ht) ? ht : (prefValues.evdm ? '' : '#'));
 	}
 
 	log('cleaning', origLink, ':', link)
