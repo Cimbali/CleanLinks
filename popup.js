@@ -23,6 +23,7 @@ function add_option(orig, clean)
 	if (option.value == '-1') {
 		option.disabled = true;
 	}
+	option.setAttribute('title', orig + '\n----- Cleaned to -----\n' + clean);
 
 	var span = document.createElement('span');
 	span.append(document.createTextNode(orig))
