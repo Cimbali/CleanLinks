@@ -4,31 +4,32 @@
 <head>
 	<meta charset="utf-8">
 	<style>
-		html {
+		* {
 			background: white;
+			color: black;
 		}
 		select {
 			display: block;
 			width: 100%;
 			padding: 0;
 		}
-		select option[value="-1"] {
-			font-weight: bold;
-			color: white;
-		}
-		select option[value="-1"] span {
-			border: white thin solid;
-			padding: 2px 5px;
+		option {
 			margin: 0;
+			padding: 0;
 		}
 		option span {
 			display: inline-block;
 			width: 50%;
-			margin: 2px 5px;
+			margin: 2px 0px;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			background-right: white thin solid;
+		}
+		select option[value="-1"] span {
+			font-weight: bold;
+			border: thin solid;
+			padding: 2px 5px;
+			margin: 0;
 		}
 		#icon {
 			float: left;
