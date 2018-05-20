@@ -34,7 +34,7 @@ const new_window = 2;
 var prefValues = {
 	enabled   : true,
 	skipwhen  : new RegExp('/ServiceLogin|imgres\\?|searchbyimage\\?|watch%3Fv|auth\\?client_id|signup|bing\\.com/widget|'
-		+ 'oauth|openid\\.ns|\\.mcstatic\\.com|sVidLoc|[Ll]ogout|submit\\?url=|magnet:'),
+		+ 'oauth|openid\\.ns|\\.mcstatic\\.com|sVidLoc|[Ll]ogout|submit\\?url=|magnet:|google\\.com/recaptcha/'),
 	remove    : /(?:ref|aff)\\w*|utm_\\w+|(?:merchant|programme|media)ID/,
 	skipdoms  : ['accounts.google.com', 'docs.google.com', 'translate.google.com',
 				'login.live.com', 'plus.google.com', 'twitter.com',
