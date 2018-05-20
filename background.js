@@ -76,7 +76,11 @@ function handleMessage(message, sender)
 			p = Promise.resolve(null)
 
 		if (prefValues.cltrack)
+		{
 			historyCleanedLinks.push(Object.assign({}, message));
+			if (historyCleanedLinks.length > 100)
+				historyCleanedLinks.splice(0, historyCleanedLinks.length - 100);
+		}
 
 		return p;
 	}
