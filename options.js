@@ -12,6 +12,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+function update_page(prefs)
+{
+	// if evdm is enabled, don't inject cleaning code into the document -- so don't repeat
+	document.querySelector('input[name="repdelay"]').disabled = prefs.evdm;
+}
+
 function save_options()
 {
 	var prefs = Array.from(document.querySelectorAll('input, textarea')).reduce((prefs, field) =>
@@ -20,8 +26,13 @@ function save_options()
 		return prefs
 	}, {})
 
-	browser.storage.local.set({configuration: prefs})
-	browser.runtime.sendMessage({ 'options': Date.now() })
+	update_page(prefs);
+
+	browser.storage.local.set({configuration: prefs}).then(() =>
+	{
+		browser.runtime.sendMessage({ 'options': Date.now() })
+		loadOptions();
+	});
 }
 
 
@@ -77,7 +88,8 @@ function populate_option_page()
 		input.onkeyup = delayed_save
 	}
 
-	document.querySelector('button[name="reset"]').onclick = reset_options
+	document.querySelector('button[name="reset"]').onclick = reset_options;
+	update_page(prefValues);
 }
 
 loadOptions().then(() => populate_option_page());

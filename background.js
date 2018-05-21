@@ -116,32 +116,39 @@ function handleMessage(message, sender)
 
 	else if ('options' in message)
 	{
+		var oldPrefValues = Object.assign({}, prefValues);
 		return loadOptions().then(() =>
 		{
 			if (!prefValues.cltrack)
 				historyCleanedLinks.splice(0, historyCleanedLinks.length);
 
-			if (prefValues.enabled && prefValues.cbc)
+			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
+			var changes = ['cbc', 'progltr', 'httpomr'].reduce((dict, prop) =>
+				Object.assign(dict, {[prop]: (prefValues.enabled && prefValues[prop] === true ? 1 : 0)
+										- (oldPrefValues.enabled && oldPrefValues[prop] === true ? 1 : 0)})
+			, {});
+
+			if (changes.cbc > 0)
 				browser.contextMenus.create({
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
 					contexts: ['link', 'selection', 'page']
 				});
-			else
+			else if (changes.cbc < 0)
 				browser.contextMenus.remove('copy-clean-link')
 
-			if (prefValues.enabled && prefValues.progltr)
+			if (changes.progltr > 0)
 				browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
-			else
+			else if (changes.progltr < 0)
 				browser.webRequest.onHeadersReceived.removeListener(cleanRedirectHeaders);
 
-			if (prefValues.enabled && prefValues.httpomr)
+			if (changes.httpomr > 0)
 				browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
-			else
+			else if (changes.httpomr < 0)
 				browser.webRequest.onBeforeRequest.removeListener(onRequest);
 
 			browser.tabs.query({}).then(tabs => tabs.forEach(tab =>
-				browser.tabs.sendMessage(tab.id, 'reloadOptions')
+				browser.tabs.sendMessage(tab.id, 'reloadOptions').catch(() => {})
 			));
 		})
 	}

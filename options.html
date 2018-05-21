@@ -22,17 +22,27 @@
 			width: 5em;
 		}
 		input[type=text], textarea {
+			width: 100%;
+		}
+		fieldset {
 			width:80%;
+			margin: 0 0 2em;
 		}
 		textarea {
 			height:10em;
+		}
+		legend {
+			font-weight: bold;
+			font-size: 1.2em;
 		}
 	</style>
 </head>
 
 <body>
-	<h3>Options</h3>
-	<h4>Link cleaning</h4>
+	<h2>Options</h2>
+
+	<fieldset>
+	<legend>Link cleaning</legend>
 	<label i18n_title="skipwhen_tooltip"><span i18n_text="skipwhen_title"></span>
 		<br /><input type="text" name="skipwhen" value="" />
 	</label>
@@ -45,8 +55,10 @@
 	<label i18n_title="ignhttp_tooltip"><span i18n_text="ignhttp_title"></span>
 		<input type="checkbox" name="ignhttp" value="" />
 	</label>
+	</fieldset>
 
-	<h4>Features</h4>
+	<fieldset>
+	<legend>Features</legend>
 	<label i18n_title="evdm_tooltip"><span i18n_text="evdm_title"></span>
 		<input type="checkbox" name="evdm" value="" />
 	</label>
@@ -74,8 +86,10 @@
 	<label i18n_title="repdelay_tooltip"><span i18n_text="repdelay_title"></span>
 		<input type="number" name="repdelay" value="" />
 	</label>
+	</fieldset>
 
-	<h4>Display</h4>
+	<fieldset>
+	<legend>Display</legend>
 	<label><span i18n_text="highlight_title"></span>
 		<input type="checkbox" name="highlight" value="" />
 	</label>
@@ -88,9 +102,12 @@
 	<label i18n_title="notiftime_tooltip"><span i18n_text="notiftime_title"></span>
 		<input type="number" name="notiftime" value="" />
 	</label>
+	</fieldset>
 
-	<h4>Reset</h4>
+	<fieldset>
+	<legend>Reset</legend>
 	<p><button name="reset" i18n_text="reset_label" i18n_title="reset_tooltip"></button></p>
+	</fieldset>
 
 	<script src="cleanlink.js"></script>
 	<script src="options.js"></script>
