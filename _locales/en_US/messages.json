@@ -175,7 +175,7 @@
 	"message": "Clean outgoing HTTP requests",
 	"description": ""
 },
-"httpomr_tootltip": {
+"httpomr_tooltip": {
 	"message": "Setup an http request listener that can clean links from outside firefox, or initiated automatically by a page such as refreshes.",
 	"description": ""
 },
