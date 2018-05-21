@@ -92,6 +92,12 @@ function loadOptions()
 			for (var param in data.configuration) {
 				if (typeof prefValues[param] == 'number')
 					prefValues[param] = parseInt(data.configuration[param]);
+				else if (typeof prefValues[param] == 'boolean')
+				{
+					prefValues[param] = data.configuration[param] === true
+									|| data.configuration[param] === 'true'
+									|| data.configuration[param] === 'on';
+				}
 				else if (typeof prefValues[param] == 'string')
 					prefValues[param] = data.configuration[param];
 				else if (prefValues[param] instanceof RegExp)
