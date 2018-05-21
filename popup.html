@@ -4,6 +4,15 @@
 <head>
 	<meta charset="utf-8">
 	<style>
+		@media (max-width: 425px) {
+			/* (hack-ish) force FF to compensate for the header or some miscalculation
+			 * in the popup's size when it is in the overflow menu, and allow to scroll
+			 * the document until the bottom. */
+			html {
+				padding-bottom: 50px;
+				overflow-y:auto;
+			}
+		}
 		* {
 			background: white;
 			color: black;
