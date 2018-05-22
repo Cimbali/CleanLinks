@@ -203,7 +203,10 @@ loadOptions().then(() =>
 	});
 
 	if (!prefValues.enabled)
+	{
+		setIcon(icon_disabled);
 		return;
+	}
 
 	if (prefValues.httpomr)
 		browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
