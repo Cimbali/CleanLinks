@@ -167,6 +167,9 @@ function onClick(evt)
 
 loadOptions().then(() =>
 {
+	if (!prefValues.enabled)
+		return;
+
 	window.addEventListener('click', onClick, true);
 
 	// Not event mode: clean up document early
@@ -179,15 +182,20 @@ browser.runtime.onMessage.addListener(message =>
 {
 	if (message == 'reloadOptions')
 	{
-		var pre_evdm = prefValues.evdm;
+		var doc_cleaned = prefValues.enabled && !prefValues.evdm;
+		var had_onclick = prefValues.enabled;
 		return loadOptions().then(() =>
 		{
-			if (pre_evdm == prefValues.evdm)
-				return;
-			else if (!prefValues.evdm)
+			// clean on switching to event mode if enabled, undo clean on disable and switching to event mode
+			if (!doc_cleaned && prefValues.enabled && !prefValues.evdm)
 				cleanLinksInDoc(document);
-			else
+			else if (doc_cleaned && (!prefValues.enabled || prefValues.evdm))
 				undoCleanLinksInDoc(document);
+
+			if (!had_onclick && prefValues.enabled)
+				window.addEventListener('click', onClick, true);
+			else if (had_onclick && !prefValues.enabled)
+				window.removeEventListener('click', onClick, true);
 		});
 	}
 	else
