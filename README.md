@@ -1,4 +1,4 @@
-##CleanLinks Mozilla Firefox Extension [![Stories in Ready](https://badge.waffle.io/diegocr/cleanlinks.png?label=ready)](https://waffle.io/diegocr/cleanlinks)  
+## CleanLinks Mozilla Firefox Extension
 
 This Extension is designed to convert obfuscated/nested links to genuine/normal plain clean links.
 
@@ -12,11 +12,13 @@ _Eg:_
 
 It also allows to remove affiliate/tracking tags from URLs by the use of configurable patterns, being the most common used ones defined by default (ie, UTM, AFF, REF, etc)
 
-_Further details on the AMO listing page:_
+#### Get it from the AMO page:
 
-<https://addons.mozilla.org/addon/clean-links/>
+<https://addons.mozilla.org/addon/clean-links-webext/>
 
 
-_If you want to help testing by installing Clean Links straight from this repo try this extension:_
+#### If you want to help testing by installing Clean Links straight from this repo:
 
-<https://addons.mozilla.org/addon/GitHub-Extension-Installer/>
+- Either get [web-ext](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext), and run `web-ext run` in the source code directory.
+
+- Alternately, [temporarily load the add-on from `about:debugging#addons`](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Temporary_Installation_in_Firefox), by ticking "Enable add-on debugging", clicking "Load Temporary Add-on" and selecting the `manifest.json` file from the source code directory.
