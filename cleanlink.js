@@ -129,6 +129,15 @@ function cleanLink(link, base)
 		return link;
 	}
 
+	let s = 0, origLink = link;
+
+	var [all, quote, linkParam] = link.match(/^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
+	if (all)
+	{
+		link = linkParam;
+		s++;
+	}
+
 	if (typeof base == 'undefined')
 	{
 		if (/^https?:/.test(link))
@@ -173,21 +182,17 @@ function cleanLink(link, base)
 		return link;
 	}
 
-	let s = 0,
-		origLink = link,
-		isYahooLink = /\.yahoo.com$/.test(base.host);
+	let isYahooLink = /\.yahoo.com$/.test(base.host);
 
-	link = link.replace(/^javascript:.+(["'])(https?(?:\:|%3a).+?)\1.*/gi, (all, quote, quotedLink) => (++s, quotedLink));
-
-	if (/\b((?:aHR0|d3d3)[A-Z0-9+=\/]+)/gi.test(link))
+	let [base64match] = link.match(/\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i) || [];
+	if (base64match)
 	{
 		try
 		{
-			let r = RegExp.$1;
 			if (isYahooLink)
-				r = r.replace(/\/RS.*$/, '');
+				base64match = base64match.replace(/\/RS.*$/, '');
 
-			let decoded = decodeURIComponent(atob(r));
+			let decoded = decodeURIComponent(atob(base64match));
 			if (decoded)
 				link = '=' + decoded;
 		}
@@ -217,10 +222,15 @@ function cleanLink(link, base)
 	}
 
 	let lmt = 4;
-	while (--lmt && (/(?:.\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i.test(link) || /(?:[?=]|[^\/]\/)(www\..+)$/i.test(link)))
+	while (--lmt)
 	{
+		var [all, capture] = link.match(/(?:.\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i) ||
+							link.match(/(?:[?=]|[^\/]\/)(www\..+)$/i) || []
+		if (!all)
+			break;
+
+		link = capture;
 		let pos;
-		link = RegExp.$1;
 		if ((pos = link.indexOf('&')) !== -1)
 			link = link.substr(0, pos);
 		link = decodeURIComponent(link);
