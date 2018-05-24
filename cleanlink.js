@@ -63,7 +63,7 @@ var prefValues = {
 
 function log()
 {
-	if (prefValues.debug) console.log.call(arguments)
+	if (prefValues.debug) console.log.apply(null, arguments)
 }
 
 
@@ -269,7 +269,6 @@ function cleanLink(link, base)
 	log('cleaning', origLink, ':', link)
 	return link;
 }
-
 
 function cleanLinksInDoc(doc)
 {
