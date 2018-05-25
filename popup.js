@@ -13,7 +13,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-function add_option(orig, clean)
+function add_option(orig, clean, classes)
 {
 	var select = document.querySelector('select');
 
@@ -24,6 +24,7 @@ function add_option(orig, clean)
 		option.disabled = true;
 	}
 	option.setAttribute('title', orig + '\n----- Cleaned to -----\n' + clean);
+	classes.forEach(cl => option.classList.add(cl));
 
 	var span = document.createElement('span');
 	span.append(document.createTextNode(orig))
@@ -65,11 +66,11 @@ function populate_popup()
 	link.appendChild(document.createTextNode(homepage));
 	document.querySelector('#homepage').appendChild(link);
 
-	add_option(_('bootstrap_listheader_original'), _('bootstrap_listheader_cleaned'));
+	add_option(_('bootstrap_listheader_original'), _('bootstrap_listheader_cleaned'), []);
 
 	browser.runtime.sendMessage('get_cleaned_list').then(response =>
 	{
-		response.forEach(clean => add_option(clean.orig, clean.url));
+		response.forEach(clean => add_option(clean.orig, clean.url, 'dropped' in clean ? ['dropped'] : []));
 	});
 
 	set_toggle_text();
