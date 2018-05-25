@@ -427,7 +427,7 @@ function cleanRedirectHeaders(details)
 	if (cleanDest == dest)
 		return {};
 
-	handleMessage({ url: cleanDest, orig: dest });
+	handleMessage({ url: cleanDest, orig: dest, type: 'header' });
 	return {redirectUrl: cleanDest};
 }
 
@@ -442,7 +442,7 @@ function onRequest(details)
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (new URL(cleanDest).domain == new URL(curLink).domain && details.type != 'main_frame')
 	{
-		handleMessage({ url: cleanDest, orig: dest, dropped: true });
+		handleMessage({ url: cleanDest, orig: dest, dropped: true, type: 'request' });
 		return {cancel: true};
 	}
 

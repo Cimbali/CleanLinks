@@ -52,6 +52,14 @@ function set_toggle_text()
 }
 
 
+function filter_from_input(input)
+{
+	var opts = Array.from(document.querySelectorAll('select option.' + input.name));
+	var displ = input.checked ? 'inline-block' : 'none';
+	opts.forEach(opt => opt.style.display = displ);
+}
+
+
 function populate_popup()
 {
 	var list = document.querySelectorAll('[i18n_text]');
@@ -70,7 +78,14 @@ function populate_popup()
 
 	browser.runtime.sendMessage('get_cleaned_list').then(response =>
 	{
-		response.forEach(clean => add_option(clean.orig, clean.url, 'dropped' in clean ? ['dropped'] : []));
+		response.forEach(clean => add_option(clean.orig, clean.url,
+											'dropped' in clean ? ['dropped', clean.type] : [clean.type]));
+
+		Array.from(document.querySelectorAll('#filters input')).forEach(input =>
+		{
+			filter_from_input(input);
+			input.onchange = () => filter_from_input(input)
+		});
 	});
 
 	set_toggle_text();

@@ -147,14 +147,15 @@ function onClick(evt)
 						highlightLink(node);
 
 					// instead of blinking the URL bar, tell the background to show a notification.
-					browser.runtime.sendMessage({url: cleanedLink, orig: link});
+					browser.runtime.sendMessage({url: cleanedLink, orig: link, type: 'clicked'});
 				}
 			}
 			else if(!textLink && node.hasAttribute(attr_cleaned_link))
 			{
 				browser.runtime.sendMessage({
 					url: evt.target.href,
-					orig: evt.target.getAttribute(attr_cleaned_link)
+					orig: evt.target.getAttribute(attr_cleaned_link),
+					type: 'pre-cleaned'
 				});
 			}
 		}
