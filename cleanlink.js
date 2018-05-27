@@ -52,7 +52,7 @@ var prefValues = {
 	ignhttp   : false,                                         // ignore non-http(s?) links
 	cltrack   : true,                                          // whether we track the link cleaning
 	switchToTab : true,                                        // Should be a copy of the browser preference: switch to a new tab when we open a link?
-	notifications: true,                                       // Send notifications when tracking links?
+	notifications: false,                                      // Send notifications when tracking links?
 	notiftime : 800,                                           // Duration of a notification in ms
 	debug     : false
 }
