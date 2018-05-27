@@ -99,22 +99,6 @@
 	"message": "Wende diesen CSS Style auf gesäuberte Links an.",
 	"description": ""
 },
-"repdelay_title": {
-	"message": "Verzögerte Neuanwendung",
-	"description": ""
-},
-"repdelay_tooltip": {
-	"message": "Säuberung nach einstellten Sekunden erneut anwenden. Dies funktioniert nur im nicht-Delegationsmodus. Auf 0 setzen zum deaktivieren.",
-	"description": ""
-},
-"evdm_title": {
-	"message": "Event Delegations Modus",
-	"description": ""
-},
-"evdm_tooltip": {
-	"message": "Dies ist eine weniger aufwändige Methode, die auf click events wartet. Echtzeit Hervorhebung und Zähler funktionieren in diesem Modus nicht, dafür sollte die Performace viel besser sein.",
-	"description": ""
-},
 "cbc_title": {
 	"message": "CopyLink Controller?",
 	"description": ""

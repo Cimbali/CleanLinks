@@ -99,22 +99,6 @@
 	"message": "本樣式將被應用到經過處理的鏈接標籤上",
 	"description": ""
 },
-"repdelay_title": {
-	"message": "重複處理間隔",
-	"description": ""
-},
-"repdelay_tooltip": {
-	"message": "在指定秒之後再次處理頁面上的鏈接。只在不使用事件委託模式時有效，設置為 0 即禁用。",
-	"description": ""
-},
-"evdm_title": {
-	"message": "使用事件委托模式",
-	"description": ""
-},
-"evdm_tooltip": {
-	"message": "監聽點擊事件處理鏈接。本模式下實時高亮和計數器將會無效。",
-	"description": ""
-},
 "cbc_title": {
 	"message": "接管複製鏈接地址菜單",
 	"description": ""

@@ -99,22 +99,6 @@
 	"message": "本样式将被应用到经过处理的链接标签上",
 	"description": ""
 },
-"repdelay_title": {
-	"message": "重复处理间隔",
-	"description": ""
-},
-"repdelay_tooltip": {
-	"message": "在指定秒之后再次处理网页上的链接。只在不使用事件委托模式时有效，设置为 0 即禁用。",
-	"description": ""
-},
-"evdm_title": {
-	"message": "使用事件委托模式",
-	"description": ""
-},
-"evdm_tooltip": {
-	"message": "监听点击事件处理链接。本模式下实时高亮和计数器将会无效。",
-	"description": ""
-},
 "cbc_title": {
 	"message": "接管复制链接地址菜单",
 	"description": ""

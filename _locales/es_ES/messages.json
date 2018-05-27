@@ -99,22 +99,6 @@
 	"message": "Aplica este estilo de subrayado a los enlaces limpiados.",
 	"description": ""
 },
-"repdelay_title": {
-	"message": "Retraso de reaplicación",
-	"description": ""
-},
-"repdelay_tooltip": {
-	"message": "El limpiado de enlaces se aplicara nuevamente tras el numero de segundos especificado. Únicamente valido para el modo no-delegado.",
-	"description": ""
-},
-"evdm_title": {
-	"message": "Modo de Evento Delegado?",
-	"description": ""
-},
-"evdm_tooltip": {
-	"message": "Usando este modo los enlaces se limpiara al vuelo cuando pulse sobre ellos, lo cual es menos intrusivo pero la funcionalidad de destacar enlaces en tiempo real no estará disponible.",
-	"description": ""
-},
 "cbc_title": {
 	"message": "CopyLink Controller?",
 	"description": ""

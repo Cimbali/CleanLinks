@@ -44,13 +44,10 @@ var prefValues = {
 				'signin.ebay.com'],
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
-	evdm      : true,                                          // Event Delegation Mode: whether we clean on click
-															   // (vs. preventively/recursively cleaning all links)
 	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
 	httpomr   : true,                                          // http-on-modify-request: skip redirects
 	cbc       : true,                                          // Context menus to clean links
 	gotarget  : false,                                         // whether we respect target attributes on links that are being cleaned
-	repdelay  : 3,                                             // delay before we call recursiveCleanLinksInDoc again (to handle ajax links)
 	textcl    : false,                                         // search for & clean links in selected text
 	ignhttp   : false,                                         // ignore non-http(s?) links
 	cltrack   : true,                                          // whether we track the link cleaning
@@ -273,89 +270,12 @@ function cleanLink(link, base)
 			ht = link.substr(pos), link = link.substr(0, pos);
 
 		link = link.replace(/&amp;/g, '&').replace(prefValues.remove, '').replace(/[?&]$/, '')
-			+ (ht && /^[\w\/#!-]+$/.test(ht) ? ht : (prefValues.evdm ? '' : '#'));
+			+ (ht && /^[\w\/#!-]+$/.test(ht) ? ht : '');
 	}
 
 	log('cleaning', origLink, ':', link)
 	return link;
 }
-
-function cleanLinksInDoc(doc)
-{
-	if (typeof doc == 'undefined')
-		doc = document;
-
-	if (typeof doc == 'undefined')
-		return;
-
-	let links = doc.getElementsByTagName('a'),
-		nCleanedLinks = 0;
-
-	for (let l = 0, link = links[l]; l < links.length; link = links[++l])
-	{
-		let href = link.href,
-			cleanedHref = cleanLink(href, link.baseURI);
-
-		if (href != cleanedHref)
-		{
-			++nCleanedLinks;
-
-			if (!(link.hasAttribute(attr_cleaned_link)))
-			{
-				link.setAttribute(attr_cleaned_link, link.href);
-
-				let t = link.hasAttribute('title') ? link.getAttribute('title') : '';
-				link.setAttribute('title', (t + str_cleanlink_touch).replace(/^\s+/, ''));
-			}
-			link.setAttribute('href', cleanedHref);
-
-			// alternately: {text-decoration: underline dotted #9f9f8e !important;}
-			link.style.setProperty('border-bottom', '1px dotted #9f9f8e', 'important');
-
-			if (prefValues.highlight)
-				highlightLink(link);
-		}
-
-		// TODO: OK-looking links (fine URL etc.): remove events. E.g. Google replaces
-		// @onmousedown https://foo/ with https://google.com/url?...;url=https://foo/
-	}
-
-	browser.runtime.sendMessage({ 'cleaned': nCleanedLinks });
-	return nCleanedLinks;
-}
-
-
-function undoCleanLinksInDoc(doc)
-{
-	if (typeof doc == 'undefined')
-		doc = document;
-
-	if (typeof doc == 'undefined')
-		return;
-
-
-	let links = doc.getElementsByTagName('a'),
-		c = links.length;
-
-	for (let l = 0, link = links[l]; l < links.length; link = links[++l])
-	{
-		if (link.hasAttribute(attr_cleaned_link))
-		{
-			link.setAttribute('href', link.getAttribute(attr_cleaned_link));
-			link.setAttribute('title', link.getAttribute('title').replace(str_cleanlink_touch.replace(/^\s+/, ''), '').replace(/\s+$/, ''));
-			link.style.setProperty('border-bottom', '0px', 'important');
-
-			// remove highlight styling
-			if (prefValues.highlight)
-				highlightLink(link, true);
-		}
-	}
-
-	//doc.body.setAttribute(attr_cleaned_count, 0);
-	browser.runtime.sendMessage({ 'cleaned': 0 });
-	return 0;
-}
-
 
 function textFindLink(node)
 {
@@ -401,55 +321,4 @@ function textFindLink(node)
 	}
 
 	return undefined;
-}
-
-
-function cleanRedirectHeaders(details)
-{
-	if (30 != parseInt(details.statusCode / 10) || 304 == details.statusCode)
-		return {};
-
-	var loc = details.responseHeaders.find(element => element.name.toLowerCase() == 'location')
-	if (!loc || !loc.value)
-		return {};
-
-	var dest = loc.value, cleanDest = cleanLink(dest, details.url);
-
-	/* NB.  XUL code seemed to mark redirected requests, due to infinite redirections on *.cox.net,
-	 * see #13 & 8c280b7. However it is not clear whether this is necessary nor how to do this in webexts.
-	 *
-	 * NB2. XUL code also protected against "The page isn't redirecting properly" errors with the following:
-
-	if (cleanDest != details.url)
-		return {}
-	*/
-
-	if (cleanDest == dest)
-		return {};
-
-	handleMessage({ url: cleanDest, orig: dest, type: 'header' });
-	return {redirectUrl: cleanDest};
-}
-
-
-function onRequest(details)
-{
-	var dest = details.url, curLink = details.originUrl, cleanDest = cleanLink(dest, curLink)
-
-	if (!cleanDest || cleanDest == dest)
-		return {};
-
-	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
-	if (new URL(cleanDest).domain == new URL(curLink).domain && details.type != 'main_frame')
-	{
-		handleMessage({ url: cleanDest, orig: dest, dropped: true, type: 'request' });
-		return {cancel: true};
-	}
-
-	// Allowed requests when destination is self, to protect against infinite loops (see 42106fd).
-	else if (cleanDest == curLink)
-		return {}
-
-	handleMessage({ url: cleanDest, orig: dest });
-	return {redirectUrl: cleanDest};
 }

@@ -30,16 +30,61 @@ function setIcon(marker)
 
 
 // Count of clean links per page, reset it at every page load
-var cleanedPerTab = {};
-browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
-	if ('status' in changeInfo && changeInfo.status === 'loading') {
-		cleanedPerTab[tab.id] = 0;
-	}
-});
-
-
+var cleanedInSession = 0;
 var historyCleanedLinks = [];
 var lastRightClick = {textLink: null, reply: () => {}}
+
+
+function cleanRedirectHeaders(details)
+{
+	if (30 != parseInt(details.statusCode / 10) || 304 == details.statusCode)
+		return {};
+
+	var loc = details.responseHeaders.find(element => element.name.toLowerCase() == 'location')
+	if (!loc || !loc.value)
+		return {};
+
+	var dest = loc.value, cleanDest = cleanLink(dest, details.url);
+
+	/* NB.  XUL code seemed to mark redirected requests, due to infinite redirections on *.cox.net,
+	 * see #13 & 8c280b7. However it is not clear whether this is necessary nor how to do this in webexts.
+	 *
+	 * NB2. XUL code also protected against "The page isn't redirecting properly" errors with the following:
+
+	if (cleanDest != details.url)
+		return {}
+	*/
+
+	if (cleanDest == dest)
+		return {};
+
+	handleMessage({ url: cleanDest, orig: dest, type: 'header' });
+	return {redirectUrl: cleanDest};
+}
+
+
+function onRequest(details)
+{
+	var dest = details.url, curLink = details.originUrl, cleanDest = cleanLink(dest, curLink)
+
+	if (!cleanDest || cleanDest == dest)
+		return {};
+
+	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
+	if (new URL(cleanDest).domain == new URL(curLink).domain && details.type != 'main_frame')
+	{
+		handleMessage({ url: cleanDest, orig: dest, dropped: true, type: 'request' });
+		return {cancel: true};
+	}
+
+	// Allowed requests when destination is self, to protect against infinite loops (see 42106fd).
+	else if (cleanDest == curLink)
+		return {}
+
+	handleMessage({ url: cleanDest, orig: dest });
+	return {redirectUrl: cleanDest};
+}
+
 
 function handleMessage(message, sender)
 {
@@ -82,6 +127,9 @@ function handleMessage(message, sender)
 				historyCleanedLinks.splice(0, historyCleanedLinks.length - 100);
 		}
 
+		cleanedInSession += 1;
+		browser.browserAction.setBadgeText({text: '' + cleanedInSession});
+
 		return p;
 	}
 
@@ -93,17 +141,6 @@ function handleMessage(message, sender)
 			return browser.tabs.create({ url: message.openUrl, active: prefValues.switchToTab, openerTabId: sender.tab.id });
 		else
 			return browser.tabs.update({ url: message.openUrl });
-	}
-
-	else if ('cleaned' in message)
-	{
-		if (!(sender.tab.id in cleanedPerTab))
-			cleanedPerTab[sender.tab.id] = 0;
-
-		cleanedPerTab[sender.tab.id] += message.cleaned;
-		browser.browserAction.setBadgeText({text: '' + cleanedPerTab[sender.tab.id], tabId: sender.tab.id});
-
-		return Promise.resolve(cleanedPerTab[sender.tab.id])
 	}
 
 	else if ('whitelist' in message)

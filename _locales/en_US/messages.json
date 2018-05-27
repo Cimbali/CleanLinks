@@ -99,22 +99,6 @@
 	"message": "Apply this CSS Style to cleaned links.",
 	"description": ""
 },
-"repdelay_title": {
-	"message": "Replay Delay",
-	"description": ""
-},
-"repdelay_tooltip": {
-	"message": "Reapply cleaning of links after the specified number of seconds. This is for non-Delegation Mode only, set it to 0 to disable it.",
-	"description": ""
-},
-"evdm_title": {
-	"message": "Event Delegation Mode?",
-	"description": ""
-},
-"evdm_tooltip": {
-	"message": "This is a less intrusive mode by just listening to click events. Note that real-time highlighting and counters will not work then, even though the performance should be much better.",
-	"description": ""
-},
 "cbc_title": {
 	"message": "Copy clean links from the context menu",
 	"description": ""
