@@ -118,6 +118,18 @@ function populate_popup()
 		browser.runtime.openOptionsPage();
 		window.close();
 	}
+
+	document.addEventListener('copy', e =>
+	{
+		console.log(e.target);
+		if (e.target.tagName != 'SELECT')
+			return;
+
+		var sel = e.target;
+		var spans = e.target.querySelector('option[value="' + e.target.value + '"]').childNodes;
+		e.clipboardData.setData('text/plain', spans[0].innerText + '\n' + spans[1].innerText);
+		e.preventDefault();
+	});
 }
 
 loadOptions().then(() => populate_popup());
