@@ -232,7 +232,7 @@ loadOptions().then(() =>
 		// that populates rightClickLink[tab.id]. If the option (this listener) is triggered really fast,
 		// maybe it can happen before the link message gets here.
 		// In that case, we'll need to pre-make a promise, resolved by the message, and .then() it here.
-		else
+		else if (prefValues.textcl)
 			link = lastRightClick.textLink;
 
 		// Clean & copy

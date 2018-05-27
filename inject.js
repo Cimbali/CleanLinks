@@ -109,11 +109,13 @@ function onClick(evt)
 	if (node.nodeName != 'A' && !evt.altKey && prefValues.textcl)
 		textLink = textFindLink(node);
 
-	if (evt.button == 2 && prefValues.textcl)
+	if (evt.button == 2)
 	{
+		// NB: always send out the textLink here, even if prefValues.textcl is false, to get the reply
+		// and potentially copy to clipboard
 		browser.runtime.sendMessage({rightClickLink: textLink}).then(reply => copyToClipboard(reply) );
 	}
-	else if (evt.button != 2)
+	else
 	{
 		if (node.nodeName != 'A' && !textLink)
 			do {
