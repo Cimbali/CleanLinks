@@ -160,7 +160,7 @@ function handleMessage(message, sender)
 				historyCleanedLinks.splice(0, historyCleanedLinks.length);
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
-			var changes = ['cbc', 'progltr', 'httpomr'].reduce((dict, prop) =>
+			var changes = ['cbc', 'progltr', 'httpomr', 'textcl'].reduce((dict, prop) =>
 				Object.assign(dict, {[prop]: (prefValues.enabled && prefValues[prop] === true ? 1 : 0)
 										- (oldPrefValues.enabled && oldPrefValues[prop] === true ? 1 : 0)})
 			, {});
@@ -169,10 +169,16 @@ function handleMessage(message, sender)
 				browser.contextMenus.create({
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
-					contexts: ['link', 'selection', 'page']
+					contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
 				});
 			else if (changes.cbc < 0)
 				browser.contextMenus.remove('copy-clean-link')
+			else if (changes.textcl != 0)
+				browser.contextMenus.update('copy-clean-link',
+				{
+					title: 'Copy clean link',
+					contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
+				});
 
 			if (changes.progltr > 0)
 				browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
@@ -255,6 +261,6 @@ loadOptions().then(() =>
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',
-			contexts: ['link', 'selection', 'page']
+			contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
 		});
 });
