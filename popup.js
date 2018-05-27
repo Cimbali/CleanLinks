@@ -55,7 +55,7 @@ function set_toggle_text()
 function filter_from_input(input)
 {
 	var opts = Array.from(document.querySelectorAll('select option.' + input.name));
-	var displ = input.checked ? 'inline-block' : 'none';
+	var displ = input.checked ? 'block' : 'none';
 	opts.forEach(opt => opt.style.display = displ);
 }
 

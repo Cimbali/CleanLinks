@@ -19,16 +19,16 @@
 		* {
 			color: black;
 		}
-		select {
+		#history {
 			display: block;
 			width: 100%;
 			padding: 0;
 		}
-		option {
+		#history option {
 			margin: 0;
 			padding: 0;
 		}
-		option span {
+		#history option span {
 			display: inline-block;
 			width: 50%;
 			margin: 2px 0px;
@@ -36,7 +36,7 @@
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
-		select option[value="-1"] span {
+		#history option[value="-1"] span {
 			font-weight: bold;
 			border: thin solid;
 			padding: 2px 5px;
@@ -92,7 +92,7 @@
 		<label><input type="checkbox" name="request" checked="checked" />HTTP requests</label>
 		<label><input type="checkbox" name="header" checked="checked" />Header redirects</label>
 	</p>
-	<select size="11"></select>
+	<select id="history" size="11"></select>
 
 	<button id="whitelist" i18n_text="bootstrap_whitelist_button" />
 
