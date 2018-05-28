@@ -14,8 +14,6 @@
 
 function update_page(prefs)
 {
-	// if evdm is enabled, don't inject cleaning code into the document -- so don't repeat
-	document.querySelector('input[name="repdelay"]').disabled = prefs.evdm;
 	document.querySelector('input[name="notiftime"]').disabled = !prefs.notifications;
 	document.querySelector('input[name="hlstyle"]').disabled = !prefs.highlight;
 }
