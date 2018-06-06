@@ -121,7 +121,6 @@ function populate_popup()
 
 	document.addEventListener('copy', e =>
 	{
-		console.log(e.target);
 		if (e.target.tagName != 'SELECT')
 			return;
 

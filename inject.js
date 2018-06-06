@@ -111,7 +111,6 @@ function onClick(evt)
 
 	if (evt.button == 2)
 	{
-		console.log('Right click! Text is', textLink);
 		// NB: always send out the textLink here, even if prefValues.textcl is false, to get the reply
 		// and potentially copy to clipboard
 		browser.runtime.sendMessage({rightClickLink: textLink}).then(reply => copyToClipboard(reply) );
