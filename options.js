@@ -22,7 +22,7 @@ function save_options()
 {
 	var prefs = Array.from(document.querySelectorAll('input, textarea')).reduce((prefs, field) =>
 	{
-		prefs[field.name] = field.value || field.checked;
+		prefs[field.name] = typeof prefValues[field.name] == 'boolean' ? field.checked : field.value;
 		return prefs
 	}, {})
 
@@ -30,7 +30,7 @@ function save_options()
 
 	browser.storage.local.set({configuration: prefs}).then(() =>
 	{
-		browser.runtime.sendMessage({ 'options': Date.now() })
+		browser.runtime.sendMessage({options: Date.now()})
 		loadOptions();
 	});
 }

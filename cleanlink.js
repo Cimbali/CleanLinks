@@ -96,11 +96,11 @@ function loadOptions()
 									|| data.configuration[param] === 'on';
 				}
 				else if (typeof prefValues[param] == 'string')
-					prefValues[param] = data.configuration[param];
+					prefValues[param] = data.configuration[param] || '';
 				else if (prefValues[param] instanceof RegExp)
-					prefValues[param] = new RegExp(data.configuration[param]);
+					prefValues[param] = new RegExp(data.configuration[param] || '.^');
 				else if (Array.isArray(prefValues[param]))
-					prefValues[param] = data.configuration[param].split(',').map(s => s.trim()).filter(s => s.length > 0);
+					prefValues[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
 			}
 		}
 	});
