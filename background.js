@@ -147,8 +147,13 @@ function handleMessage(message, sender)
 	{
 		var entry = historyCleanedLinks.splice(message.whitelist, 1)[0];
 		var host = (new URL(entry.orig)).hostname;
-		prefValues.skipdoms.push(host);
-		return browser.storage.local.set({configuration: serializeOptions()})
+		if (prefValues.skipdoms.indexOf(host) === -1)
+		{
+			prefValues.skipdoms.push(host);
+			return browser.storage.local.set({configuration: serializeOptions()})
+		}
+		else
+			return Promise.resolve(null)
 	}
 
 	else if ('options' in message)
