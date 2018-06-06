@@ -58,7 +58,7 @@ function cleanRedirectHeaders(details)
 	if (cleanDest == dest)
 		return {};
 
-	handleMessage({ url: cleanDest, orig: dest, type: 'header' });
+	handleMessage({ action: 'notify', url: cleanDest, orig: dest, type: 'header' });
 	return {redirectUrl: cleanDest};
 }
 
@@ -73,7 +73,7 @@ function onRequest(details)
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (new URL(cleanDest).domain == new URL(curLink).domain && details.type != 'main_frame')
 	{
-		handleMessage({ url: cleanDest, orig: dest, dropped: true, type: 'request' });
+		handleMessage({ action: 'notify', url: cleanDest, orig: dest, dropped: true, type: 'request' });
 		return {cancel: true};
 	}
 
@@ -81,7 +81,7 @@ function onRequest(details)
 	else if (cleanDest == curLink)
 		return {}
 
-	handleMessage({ url: cleanDest, orig: dest });
+	handleMessage({ action: 'notify', url: cleanDest, orig: dest });
 	return {redirectUrl: cleanDest};
 }
 
@@ -90,20 +90,12 @@ function handleMessage(message, sender)
 {
 	log('received message :', JSON.stringify(message))
 
-	if (message == 'get_cleaned_list')
+	if (message.action == 'cleaned list')
 	{
 		return Promise.resolve(historyCleanedLinks);
 	}
 
-	else if (message == 'toggle')
-	{
-		prefValues.enabled = !prefValues.enabled;
-
-		setIcon(prefValues.enabled ? icon_default : icon_disabled);
-		return browser.storage.local.set({configuration: serializeOptions()}).then(() => handleMessage({options: Date.now()}))
-	}
-
-	else if ('url' in message)
+	else if (message.action == 'notify')
 	{
 		var p;
 		if (prefValues.notifications)
@@ -118,7 +110,7 @@ function handleMessage(message, sender)
 			browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + prefValues.notiftime});
 		}
 		else
-			p = Promise.resolve(null)
+			p = Promise.resolve(null);
 
 		if (prefValues.cltrack)
 		{
@@ -133,17 +125,17 @@ function handleMessage(message, sender)
 		return p;
 	}
 
-	else if ('openUrl' in message)
+	else if (message.action == 'open url')
 	{
 		if (message.target == new_window)
-			return browser.windows.create({ url: message.openUrl });
+			return browser.windows.create({ url: message.link });
 		else if (message.target == new_tab)
-			return browser.tabs.create({ url: message.openUrl, active: prefValues.switchToTab, openerTabId: sender.tab.id });
+			return browser.tabs.create({ url: message.link, active: prefValues.switchToTab, openerTabId: sender.tab.id });
 		else
-			return browser.tabs.update({ url: message.openUrl });
+			return browser.tabs.update({ url: message.link });
 	}
 
-	else if ('whitelist' in message)
+	else if (message.action == 'whitelist')
 	{
 		var entry = historyCleanedLinks.splice(message.whitelist, 1)[0];
 		var host = (new URL(entry.orig)).hostname;
@@ -156,10 +148,21 @@ function handleMessage(message, sender)
 			return Promise.resolve(null)
 	}
 
-	else if ('options' in message)
+	else if (message.action == 'options' || message.action == 'toggle')
 	{
 		var oldPrefValues = Object.assign({}, prefValues);
-		return loadOptions().then(() =>
+
+		if (message.action == 'toggle')
+		{
+			prefValues.enabled = !prefValues.enabled;
+
+			setIcon(prefValues.enabled ? icon_default : icon_disabled);
+			var p = browser.storage.local.set({configuration: serializeOptions()});
+		}
+		else
+			var p = loadOptions();
+
+		return p.then(() =>
 		{
 			if (!prefValues.cltrack)
 				historyCleanedLinks.splice(0, historyCleanedLinks.length);
@@ -196,17 +199,17 @@ function handleMessage(message, sender)
 				browser.webRequest.onBeforeRequest.removeListener(onRequest);
 
 			browser.tabs.query({}).then(tabs => tabs.forEach(tab =>
-				browser.tabs.sendMessage(tab.id, 'reloadOptions').catch(() => {})
+				browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})
 			));
 		})
 	}
 
-	else if ('rightClickLink' in message)
+	else if (message.action == 'right click')
 	{
 		return new Promise((resolve, rejecte) =>
 		{
 			lastRightClick = {
-				textLink: message.rightClickLink,
+				textLink: message.link,
 				reply: resolve
 			}
 		})

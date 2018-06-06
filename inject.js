@@ -52,7 +52,8 @@ function eventDoClick(url, node, evt)
 	}
 
 	browser.runtime.sendMessage({
-		openUrl: url,
+		action: 'open url',
+		link: url,
 		target: (evt.ctrlKey || evt.button == 1) ? new_tab : (evt.shiftKey ? new_window : same_tab)
 	}).catch(() =>
 	{
@@ -113,7 +114,7 @@ function onClick(evt)
 	{
 		// NB: always send out the textLink here, even if prefValues.textcl is false, to get the reply
 		// and potentially copy to clipboard
-		browser.runtime.sendMessage({rightClickLink: textLink}).then(reply => copyToClipboard(reply) );
+		browser.runtime.sendMessage({action: 'right click', link: textLink}).then(reply => copyToClipboard(reply) );
 	}
 	else
 	{
@@ -149,12 +150,13 @@ function onClick(evt)
 						highlightLink(node);
 
 					// instead of blinking the URL bar, tell the background to show a notification.
-					browser.runtime.sendMessage({url: cleanedLink, orig: link, type: 'clicked'});
+					browser.runtime.sendMessage({action: 'notify', url: cleanedLink, orig: link, type: 'clicked'});
 				}
 			}
 			else if(!textLink && node.hasAttribute(attr_cleaned_link))
 			{
 				browser.runtime.sendMessage({
+					action: 'notify',
 					url: evt.target.href,
 					orig: evt.target.getAttribute(attr_cleaned_link),
 					type: 'pre-cleaned'
@@ -172,7 +174,7 @@ loadOptions().then(() =>
 
 browser.runtime.onMessage.addListener(message =>
 {
-	if (message == 'reloadOptions')
+	if (message.action == 'reload options')
 	{
 		var had_onclick = prefValues.enabled;
 		return loadOptions().then(() =>

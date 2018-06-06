@@ -76,7 +76,7 @@ function populate_popup()
 
 	add_option(_('bootstrap_listheader_original'), _('bootstrap_listheader_cleaned'), []);
 
-	browser.runtime.sendMessage('get_cleaned_list').then(response =>
+	browser.runtime.sendMessage({action: 'cleaned list'}).then(response =>
 	{
 		response.forEach(clean => add_option(clean.orig, clean.url,
 											'dropped' in clean ? ['dropped', clean.type] : [clean.type]));
@@ -93,14 +93,14 @@ function populate_popup()
 	{
 		prefValues.enabled = !prefValues.enabled;
 		set_toggle_text();
-		browser.runtime.sendMessage('toggle');
+		browser.runtime.sendMessage({action: 'toggle'});
 	}
 
 	document.querySelector('#whitelist').onclick = () =>
 	{
 		var select = document.querySelector('select');
 		var id = parseInt(select.value);
-		browser.runtime.sendMessage({whitelist: id}).then(() =>
+		browser.runtime.sendMessage({action: 'whitelist', item: id}).then(() =>
 			// remove selected element, and renumber higher-ordered ones
 			select.querySelectorAll('option').forEach(opt =>
 			{

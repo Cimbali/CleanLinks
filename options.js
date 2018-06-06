@@ -30,7 +30,7 @@ function save_options()
 
 	browser.storage.local.set({configuration: prefs}).then(() =>
 	{
-		browser.runtime.sendMessage({options: Date.now()})
+		browser.runtime.sendMessage({action: 'options'});
 		loadOptions();
 	});
 }
