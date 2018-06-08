@@ -34,6 +34,10 @@ var cleanedInSession = 0;
 var historyCleanedLinks = [];
 var lastRightClick = {textLink: null, reply: () => {}}
 
+// wrap the promise in an async function call, to catch a potential ReferenceError
+var get_browser_version = (async () => await browser.runtime.getBrowserInfo())()
+							.then(info => parseFloat(info.version)).catch(() => NaN)
+
 
 function cleanRedirectHeaders(details)
 {
@@ -130,7 +134,11 @@ function handleMessage(message, sender)
 		if (message.target == new_window)
 			return browser.windows.create({ url: message.link });
 		else if (message.target == new_tab)
-			return browser.tabs.create({ url: message.link, active: prefValues.switchToTab, openerTabId: sender.tab.id });
+		{
+			return get_browser_version.then(v =>
+				browser.tabs.create(Object.assign({ url: message.link, active: prefValues.switchToTab },
+												  isNaN(v) || v < 57 ? {} : { openerTabId: sender.tab.id })))
+		}
 		else
 			return browser.tabs.update({ url: message.link });
 	}
