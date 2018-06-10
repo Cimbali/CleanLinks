@@ -145,7 +145,7 @@ function handleMessage(message, sender)
 
 	else if (message.action == 'whitelist')
 	{
-		var entry = historyCleanedLinks.splice(message.whitelist, 1)[0];
+		var entry = historyCleanedLinks.splice(message.item, 1)[0];
 		var host = (new URL(entry.orig)).hostname;
 		if (prefValues.skipdoms.indexOf(host) === -1)
 		{
