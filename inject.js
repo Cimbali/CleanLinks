@@ -55,8 +55,10 @@ function eventDoClick(url, node, evt)
 		action: 'open url',
 		link: url,
 		target: (evt.ctrlKey || evt.button == 1) ? new_tab : (evt.shiftKey ? new_window : same_tab)
-	}).catch(() =>
+	}).catch((error) =>
 	{
+		console.error(error);
+
 		// Could not find a target window or assigning a location to it failed
 		node.setAttribute('href', url);
 		node.click();
