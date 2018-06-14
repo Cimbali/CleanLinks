@@ -69,13 +69,18 @@ function cleanRedirectHeaders(details)
 
 function onRequest(details)
 {
-	var dest = details.url, curLink = details.originUrl, cleanDest = cleanLink(dest, curLink)
+	var dest = details.url, curLink = details.originUrl, cleanDest = cleanLink(dest, curLink), same_domain = false
 
 	if (!cleanDest || cleanDest == dest)
 		return {};
 
+	try
+	{
+		same_domain = (new URL(cleanDest).domain == new URL(curLink).domain);
+	} catch(e) {}
+
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
-	if (new URL(cleanDest).domain == new URL(curLink).domain && details.type != 'main_frame')
+	if (same_domain && details.type != 'main_frame')
 	{
 		handleMessage({ action: 'notify', url: cleanDest, orig: dest, dropped: true, type: 'request' });
 		return {cancel: true};
