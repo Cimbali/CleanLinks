@@ -1,0 +1,29 @@
+{
+	"name": "CleanLinks",
+	"version": "3.0.3",
+	"description": "Converts obfuscated/nested links to genuine clean links",
+	"author": "Cimbali <me@cimba.li>",
+	"license": "MPL-2.0",
+	"main": "index.js",
+	"scripts":
+	{
+		"lint": "web-ext -s ./addon lint",
+		"firefox": "web-ext -s ./addon run",
+		"bundle": "web-ext -s ./addon -a ./dist build",
+		"test": "karma start"
+	},
+	"directories":
+	{
+		"tests": "tests"
+	},
+	"devDependencies":
+	{
+		"chai": "^4.1.1",
+		"karma": "^1.3.0",
+		"karma-firefox-launcher": "^1.0.0",
+		"karma-mocha": "^1.3.0",
+		"mocha": "^3.5.0",
+		"sinon-chrome": "^2.1.2",
+		"web-ext": "^1.6.0"
+	}
+}
