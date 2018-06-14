@@ -30,8 +30,17 @@ function setIcon(marker)
 
 
 // Count of clean links per page, reset it at every page load
-var cleanedInSession = 0;
-var historyCleanedLinks = [];
+var cleanedPerTab = {}
+cleanedPerTab.get = tab_id =>
+{
+	if  (!(tab_id in cleanedPerTab))
+		cleanedPerTab[tab_id] = {count: 0, history: []};
+	return cleanedPerTab[tab_id];
+}
+cleanedPerTab.clear = tab_id => { delete cleanedPerTab[tab_id]; };
+cleanedPerTab.getHistory = tab_id => cleanedPerTab.get(browser.tabs.TAB_ID_NONE).history.concat(cleanedPerTab.get(tab_id).history);
+cleanedPerTab.getCount = tab_id => cleanedPerTab.get(tab_id).count;
+
 var lastRightClick = {textLink: null, reply: () => {}}
 
 // wrap the promise in an async function call, to catch a potential ReferenceError
@@ -62,7 +71,7 @@ function cleanRedirectHeaders(details)
 	if (cleanDest == dest)
 		return {};
 
-	handleMessage({ action: 'notify', url: cleanDest, orig: dest, type: 'header' });
+	handleMessage({ action: 'notify', url: cleanDest, orig: dest, type: 'header', tab_id: details.tabId });
 	return {redirectUrl: cleanDest};
 }
 
@@ -82,7 +91,7 @@ function onRequest(details)
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (same_domain && details.type != 'main_frame')
 	{
-		handleMessage({ action: 'notify', url: cleanDest, orig: dest, dropped: true, type: 'request' });
+		handleMessage({ action: 'notify', url: cleanDest, orig: dest, dropped: true, type: 'request', tab_id: details.tabId });
 		return {cancel: true};
 	}
 
@@ -90,7 +99,7 @@ function onRequest(details)
 	else if (cleanDest == curLink)
 		return {}
 
-	handleMessage({ action: 'notify', url: cleanDest, orig: dest });
+	handleMessage({ action: 'notify', url: cleanDest, orig: dest, tab_id: details.tabId });
 	return {redirectUrl: cleanDest};
 }
 
@@ -102,7 +111,7 @@ function handleMessage(message, sender)
 	switch (message.action)
 	{
 	case 'cleaned list':
-		return Promise.resolve(historyCleanedLinks);
+		return Promise.resolve(cleanedPerTab.getHistory(message.tab_id));
 
 	case 'notify':
 		var p;
@@ -120,15 +129,22 @@ function handleMessage(message, sender)
 		else
 			p = Promise.resolve(null);
 
+		if (!('tab_id' in message))
+			message['tab_id'] = 'tab' in sender ? sender.tab.id : browser.tabs.TAB_ID_NONE;
+		else if (message.tab_id == -1)
+			message.tab_id = browser.tabs.TAB_ID_NONE;
+
 		if (prefValues.cltrack)
 		{
-			historyCleanedLinks.push(Object.assign({}, message));
-			if (historyCleanedLinks.length > 100)
-				historyCleanedLinks.splice(0, historyCleanedLinks.length - 100);
+			var hist = cleanedPerTab.get(message.tab_id).history;
+			hist.push(Object.assign({}, message));
+			if (hist.length > 100)
+				hist.splice(0, hist.length - 100);
 		}
 
-		cleanedInSession += 1;
-		browser.browserAction.setBadgeText({text: '' + cleanedInSession});
+		cleanedPerTab.get(message.tab_id).count += 1;
+
+		browser.browserAction.setBadgeText({tabId: message.tab_id, text: '' + cleanedPerTab.getCount(message.tab_id)});
 
 		return p;
 
@@ -145,7 +161,13 @@ function handleMessage(message, sender)
 			return browser.tabs.update({ url: message.link });
 
 	case 'whitelist':
-		var entry = historyCleanedLinks.splice(message.item, 1)[0];
+		var nonHist = cleanedPerTab.get(browser.tabs.TAB_ID_NONE).history;
+		var tabHist = cleanedPerTab.get(message.tab_id).history;
+		if (message.item >= nonHist.length)
+			var entry = tabHist.splice(message.item - nonHist.length, 1)[0];
+		else
+			var entry = nonHist.splice(message.item, 1)[0];
+
 		var host = (new URL(entry.orig)).hostname;
 		if (prefValues.skipdoms.indexOf(host) === -1)
 		{
@@ -171,8 +193,11 @@ function handleMessage(message, sender)
 
 		return p.then(() =>
 		{
-			if (!prefValues.cltrack)
-				historyCleanedLinks.splice(0, historyCleanedLinks.length);
+			if (!prefValues.cltrack) {
+				for (var key in cleanedPerTab)
+					if (typeof cleanedPerTab[key] !== 'function')
+						cleanedPerTab.clear(key);
+			}
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
 			var changes = ['cbc', 'progltr', 'httpomr', 'textcl'].reduce((dict, prop) =>
@@ -277,4 +302,14 @@ loadOptions().then(() =>
 			title: 'Copy clean link',
 			contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
 		});
+
+	// Auto update badge text for pages when loading is complete
+	browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
+		if (cleanedPerTab.getCount(tab.id))
+			browser.browserAction.setBadgeText({tabId: id, text: '' + cleanedPerTab.getCount(tab.id)});
+	});
+
+	browser.tabs.onRemoved.addListener((id, removeInfo) => {
+		cleanedPerTab.clear(id);
+	});
 });

@@ -12,6 +12,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+var tab_id = -1;
 
 function add_option(orig, clean, classes)
 {
@@ -76,15 +77,19 @@ function populate_popup()
 
 	add_option(_('bootstrap_listheader_original'), _('bootstrap_listheader_cleaned'), []);
 
-	browser.runtime.sendMessage({action: 'cleaned list'}).then(response =>
+	browser.tabs.query({active: true, currentWindow: true}).then(tabList =>
 	{
-		response.forEach(clean => add_option(clean.orig, clean.url,
-											'dropped' in clean ? ['dropped', clean.type] : [clean.type]));
-
-		Array.from(document.querySelectorAll('#filters input')).forEach(input =>
+		tab_id = tabList[0].id;
+		browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
 		{
-			filter_from_input(input);
-			input.onchange = () => filter_from_input(input)
+			response.forEach(clean => add_option(clean.orig, clean.url,
+												'dropped' in clean ? ['dropped', clean.type] : [clean.type]));
+
+			Array.from(document.querySelectorAll('#filters input')).forEach(input =>
+			{
+				filter_from_input(input);
+				input.onchange = () => filter_from_input(input)
+			});
 		});
 	});
 
@@ -100,7 +105,7 @@ function populate_popup()
 	{
 		var select = document.querySelector('select');
 		var id = parseInt(select.value);
-		browser.runtime.sendMessage({action: 'whitelist', item: id}).then(() =>
+		browser.runtime.sendMessage({action: 'whitelist', item: id, tab_id: tab_id}).then(() =>
 			// remove selected element, and renumber higher-ordered ones
 			select.querySelectorAll('option').forEach(opt =>
 			{
@@ -124,7 +129,6 @@ function populate_popup()
 		if (e.target.tagName != 'SELECT')
 			return;
 
-		var sel = e.target;
 		var spans = e.target.querySelector('option[value="' + e.target.value + '"]').childNodes;
 		e.clipboardData.setData('text/plain', spans[0].innerText + '\n' + spans[1].innerText);
 		e.preventDefault();
