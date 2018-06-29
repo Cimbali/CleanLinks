@@ -177,6 +177,11 @@ function handleMessage(message, sender)
 		else
 			return Promise.resolve(null)
 
+	case 'clearlist':
+		cleanedPerTab.clear(message.tab_id);
+		browser.browserAction.setBadgeText({tabId: id, text: null});
+		return Promise.resolve(null);
+
 	case 'options':
 	case 'toggle':
 		var oldPrefValues = Object.assign({}, prefValues);

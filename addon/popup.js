@@ -118,6 +118,14 @@ function populate_popup()
 		);
 	}
 
+	document.querySelector('#clearlist').onclick = () =>
+	{
+		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id}).then(() =>
+		{
+			document.querySelector('select').querySelectorAll('option').forEach(opt => opt.remove());
+		});
+	}
+
 	document.querySelector('#options').onclick = () =>
 	{
 		browser.runtime.openOptionsPage();
