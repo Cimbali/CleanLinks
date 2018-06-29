@@ -99,13 +99,12 @@ function handleMessage(message, sender)
 {
 	log('received message :', JSON.stringify(message))
 
-	if (message.action == 'cleaned list')
+	switch (message.action)
 	{
+	case 'cleaned list':
 		return Promise.resolve(historyCleanedLinks);
-	}
 
-	else if (message.action == 'notify')
-	{
+	case 'notify':
 		var p;
 		if (prefValues.notifications)
 		{
@@ -132,10 +131,8 @@ function handleMessage(message, sender)
 		browser.browserAction.setBadgeText({text: '' + cleanedInSession});
 
 		return p;
-	}
 
-	else if (message.action == 'open url')
-	{
+	case 'open url':
 		if (message.target == new_window)
 			return browser.windows.create({ url: message.link });
 		else if (message.target == new_tab)
@@ -146,10 +143,8 @@ function handleMessage(message, sender)
 		}
 		else
 			return browser.tabs.update({ url: message.link });
-	}
 
-	else if (message.action == 'whitelist')
-	{
+	case 'whitelist':
 		var entry = historyCleanedLinks.splice(message.item, 1)[0];
 		var host = (new URL(entry.orig)).hostname;
 		if (prefValues.skipdoms.indexOf(host) === -1)
@@ -159,10 +154,9 @@ function handleMessage(message, sender)
 		}
 		else
 			return Promise.resolve(null)
-	}
 
-	else if (message.action == 'options' || message.action == 'toggle')
-	{
+	case 'options':
+	case 'toggle':
 		var oldPrefValues = Object.assign({}, prefValues);
 
 		if (message.action == 'toggle')
@@ -215,10 +209,8 @@ function handleMessage(message, sender)
 				browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})
 			));
 		})
-	}
 
-	else if (message.action == 'right click')
-	{
+	case 'right click':
 		return new Promise((resolve, rejecte) =>
 		{
 			lastRightClick = {
@@ -226,9 +218,10 @@ function handleMessage(message, sender)
 				reply: resolve
 			}
 		})
-	}
-	else
+
+	default:
 		return Promise.reject('Unexpected message: ' + String(message));
+	}
 }
 
 function handleAlarm(alarm)
