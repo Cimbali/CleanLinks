@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Test cleaning links</title>
+
+	<!-- Mock browser object so cleanLink can be loaded -->
+	<script>
+	var browser = {
+		runtime: Object.assign({getManifest: () => ({
+			"name": "Clean Links",
+			"description": "Converts obfuscated/nested links to genuine clean links",
+			"author": "Cimbali (maintainer), \nDiego Casorran (creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
+			"version": "3.0.3",
+			"homepage_url": "https://github.com/Cimbali/CleanLinks",
+			})
+		}),
+		storage: {local: {get: () => {}}},
+		i18n: {getMessage: () => "string"}
+	}
+	</script>
+
+	<!-- Embed the actual cleanLink script -->
+	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/cleanlink.js"></script>
+
+	<!-- Inner workings of this page -->
+	<script>
+	function addToList(dirty, clean)
+	{
+		var l = document.querySelector('ul#clean_history');
+
+		l.insertBefore(document.createElement('li'), l.children[0]);
+		l.children[0].textContent = ' ';
+
+		l.insertBefore(document.createElement('li'), l.children[0]);
+		l.children[0].textContent = clean;
+		l.children[0].className = 'cleaned'
+
+		l.insertBefore(document.createElement('li'), l.children[0]);
+		l.children[0].textContent = dirty;
+	}
+
+	function testCleaning()
+	{
+		var link = document.querySelector('#paste_link input').value;
+		if (link) addToList(link, cleanLink(link))
+	}
+
+	window.onload = () =>
+	{
+		document.querySelector('#paste_link button').onclick = testCleaning
+	}
+	</script>
+
+	<!-- Styling for the page -->
+	<style>
+	p#paste_link {
+		width: 100%;
+		display: inline-flex;
+		align-items: baseline;
+	}
+	p#paste_link input {
+		width: 5em;
+		margin: 0 1em;
+		flex-grow: 1;
+	}
+	ul#clean_history {
+		list-style: none;
+	}
+	ul#clean_history li.cleaned:before{
+		content: '→';
+		position: relative;
+		left: -5px;
+		padding-bottom: 10px;
+	}
+	</style>
+</head>
+
+<body>
+	<p id="paste_link">Link:&nbsp;<input type="text" />&nbsp;<button>Clean it!</button></p>
+	<ul id="clean_history"></ul>
+</body>
+
+</html>
