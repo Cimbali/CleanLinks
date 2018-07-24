@@ -68,7 +68,6 @@ function populate_popup()
 		list[n].prepend(document.createTextNode(_(list[n].getAttribute('i18n_text'))));
 
 	document.querySelector('#title').prepend(document.createTextNode(title + ' v' + version));
-	document.querySelector('#copyright').appendChild(document.createTextNode('\u00A9 '+copyright));
 
 	var link = document.createElement('a');
 	link.setAttribute('href', homepage);

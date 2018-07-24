@@ -13,6 +13,9 @@
 				overflow-y:auto;
 			}
 		}
+		html {
+			font-size: .8em;
+		}
 		html, button, input, select {
 			background: white;
 		}
@@ -46,16 +49,16 @@
 			float: left;
 			margin: 15px;
 		}
-		#desc {
-			clear: both;
-		}
 		#toggle, #options {
 			display: block;
 			float: right;
 			margin-left: 5px;
 		}
-		#title, #homepage, #copyright {
+		#title {
 			margin: 0;
+		}
+		#homepage {
+			font-weight: normal;
 		}
 		#whitelist, #clearlist {
 			display: block;
@@ -66,6 +69,7 @@
 			background: rgb(255, 128, 128)
 		}
 		#filters {
+			clear: both;
 			display: flex;
 			justify-content: space-around;
 			flex-wrap: wrap;
@@ -80,12 +84,10 @@
 	<div>
 		<button id="toggle"></button>
 		<button id="options" title="Options page">Settings</button>
-		<h3 id="title"> &mdash; <span id="status"></span></h3>
-		<p id="copyright"></p>
-		<p id="homepage"></p>
-	</div>
+		<h3 id="title"> &mdash; <span id="status"></span><br /><span id="homepage"></span></h3>
 
-	<p id="desc" i18n_text="bootstrap_whitelist_description"></p>
+		<p id="desc" i18n_text="bootstrap_whitelist_description"></p>
+	</div>
 
 	<p id="filters">
 		<label><input type="checkbox" name="clicked" checked="checked" />Clicked links</label>

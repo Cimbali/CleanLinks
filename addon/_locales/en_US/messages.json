@@ -60,7 +60,7 @@
 	"description": ""
 },
 "bootstrap_whitelist_description": {
-	"message": "This is a current-session list of the last (up to 100) cleaned links and the original link they came from, for ease whitelisting. Red backgrounds indicate a link whose loading was denied. Please note you will be whitelisting whole websites, while sometimes it is good just picking a tag of the URL to add it to the \"matching\" option.",
+	"message": "This is a list of the last cleaned links in this tab, and their uncleaned versions. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.",
 	"description": ""
 },
 "skipwhen_title": {
