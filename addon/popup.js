@@ -92,6 +92,10 @@ function populate_popup()
 		});
 	});
 
+	document.querySelector('select#history').disabled = !prefValues.cltrack;
+	document.querySelector('button#whitelist').disabled = !prefValues.cltrack;
+	document.querySelector('button#clearlist').disabled = !prefValues.cltrack;
+
 	set_toggle_text();
 	document.querySelector('#toggle').onclick = () =>
 	{
