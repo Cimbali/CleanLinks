@@ -3,7 +3,7 @@
 	"description": "__MSG_addon_description__",
 	"author": "Cimbali (maintainer), \nDiego Casorran (creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
 	"manifest_version": 2,
-	"version": "3.0.3",
+	"version": "3.1.0",
 	"homepage_url": "https://github.com/Cimbali/CleanLinks",
 	"default_locale": "en_US",
 	"icons":
