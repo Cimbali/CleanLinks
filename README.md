@@ -12,6 +12,8 @@ _Eg:_
 
 It also allows to remove affiliate/tracking tags from URLs by the use of configurable patterns, being the most common used ones defined by default (ie, UTM, AFF, REF, etc)
 
+You can [test the current (master) link cleaning code online](https://cimbali.github.io/CleanLinks/), by pasting a link in the text area and clicking the "Clean it!" button.
+
 #### Get it from the AMO page:
 
 <https://addons.mozilla.org/addon/clean-links-webext/>
