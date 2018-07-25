@@ -35,7 +35,7 @@ var prefValues = {
 	enabled   : true,
 	skipwhen  : new RegExp('/ServiceLogin|imgres\\?|searchbyimage\\?|watch%3Fv|auth\\?client_id|signup|bing\\.com/widget|'
 		+ 'oauth|openid\\.ns|\\.mcstatic\\.com|sVidLoc|[Ll]ogout|submit\\?url=|magnet:|google\\.com/recaptcha/'),
-	remove    : /(?:ref|aff)\\w*|utm_\\w+|(?:merchant|programme|media)ID/,
+	remove    : /(?:ref|aff)\w*|utm_\w+|(?:merchant|programme|media)ID/,
 	skipdoms  : ['accounts.google.com', 'docs.google.com', 'translate.google.com',
 				'login.live.com', 'plus.google.com', 'twitter.com',
 				'static.ak.facebook.com', 'www.linkedin.com', 'www.virustotal.com',
@@ -120,14 +120,14 @@ function highlightLink(node, remove)
 
 function cleanParams(link, base)
 {
-	let url = new URL(link, base);
+	let url = new URL(link, base), params = new URLSearchParams();
 
-	let params = Object.keys(url.searchParams).filter(p => !prefValues.remove.test(p)).reduce(p =>
-		Object.assign(params, {p: url.searchParams[p]}),
-	{});
+	for (var [key, val] of url.searchParams)
+		if (!prefValues.remove.test(key + (val.length ? '=' + val : '')))
+			params.append(key, val);
 
-	params = new URLSearchParams(params).toString()
-	url.search = (params.length ? '?' : '') + params;
+	params = params.toString()
+	url.search = (params.length ? '?' + params : '');
 
 	return url.href;
 }

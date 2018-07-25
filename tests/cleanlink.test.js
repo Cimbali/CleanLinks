@@ -39,7 +39,8 @@ describe('cleanLink', function() {
 	});
 	it('should strip the utm parameters', done =>
 	{
-		expect(cleanLink('https://www.aboutamazon.com/?utm_source=gateway&utm_medium=footer')).to.equal('https://www.aboutamazon.com/');
+		expect(cleanLink('https://www.aboutamazon.com/?keep=this&utm_source=gateway&utm_medium=footer'))
+			.to.equal('https://www.aboutamazon.com/?keep=this');
 		done();
 	});
 });
