@@ -118,42 +118,12 @@ function highlightLink(node, remove)
 }
 
 
-function cleanParams(link, base)
-{
-	let url = new URL(link, base), params = new URLSearchParams();
-
-	for (var [key, val] of url.searchParams)
-		if (!prefValues.remove.test(key + (val.length ? '=' + val : '')))
-			params.append(key, val);
-
-	params = params.toString()
-	url.search = (params.length ? '?' + params : '');
-
-	return url.href;
-}
-
-
 function cleanLink(link, base)
 {
-	if (!link || link.startsWith("view-source:"))
+	if (!link || link.startsWith("view-source:") || (prefValues.skipwhen && prefValues.skipwhen.test(link)))
 	{
-		log('not cleaning', link, ': empty or source');
+		log('not cleaning', link, ': empty, source, or matches skipwhen');
 		return link;
-	}
-
-	else if (prefValues.skipwhen && prefValues.skipwhen.test(link))
-	{
-		log('not cleaning', link, ': matches skipwhen');
-		try
-		{
-			return cleanParams(link, base);
-		}
-		catch (e)
-		{
-			// If we're cleaning on click and someone whitelisted e.g. a javscript: link,
-			// URL() will fail and it makes no sense to clean parameters off it
-			return link;
-		}
 	}
 
 	let s = 0, origLink = link;
@@ -189,7 +159,7 @@ function cleanLink(link, base)
 			if (prefValues.skipdoms.indexOf(linkURL.host) !== -1)
 			{
 				log('not cleaning', link, ': host in skipdoms');
-				return cleanParams(link, base.href);
+				return link;
 			}
 		}
 		catch (e) {}
@@ -198,15 +168,15 @@ function cleanLink(link, base)
 	if (prefValues.ignhttp && !(/^https?:/.test(typeof linkURL != 'undefined' ? linkURL.href : link)))
 	{
 		log('not cleaning', link, ': ignoring non-http(s) links');
-		return cleanParams(link, base.href);
+		return link;
 	}
 
 	if (/\.google\.[a-z.]+\/search\?(?:.+&)?q=http/i.test(link)
 		|| /^https?:\/\/www\.amazon\.[\w.]+\/.*\/voting\/cast\//.test(link)
 	)
 	{
-		log('not cleaning', link, ': google search for an URL/amazon vote')
-		return cleanParams(link, base.href);
+		log('not cleaning', link, ': google search/amazon vote')
+		return link;
 	}
 
 	let isYahooLink = /\.yahoo.com$/.test(base.host);
@@ -289,18 +259,22 @@ function cleanLink(link, base)
 		}
 	}
 
-	// This is not really redirect stripping, yet not really parameter cleaning either,
-	// as we are removing part of the path
 	if (isYahooLink)
 		link = link.replace(/\/R[KS]=\d.*$/, '');
 
-	// Decode html-encoded ampersands, up to the amount of times that we decoded the URI:
-	// doubly encoding & gives &amp;amp; and so on.
-	if (s)
-		link = link.replace(RegExp('&\(amp;\)\{1,'+s+'\}', 'g'), '&')
+	prefValues.remove.lastIndex = 0;
+	if (s || prefValues.remove.test(link))
+	{
+		let pos, ht = null;
+		if ((pos = link.indexOf('#')) !== -1)
+			ht = link.substr(pos), link = link.substr(0, pos);
+
+		link = link.replace(/&amp;/g, '&').replace(prefValues.remove, '').replace(/[?&]$/, '')
+			+ (ht && /^[\w\/#!-]+$/.test(ht) ? ht : '');
+	}
 
 	log('cleaning', origLink, ':', link)
-	return cleanParams(link, base.href);
+	return link;
 }
 
 function textFindLink(node)
