@@ -60,7 +60,7 @@
 	"description": ""
 },
 "bootstrap_whitelist_description": {
-	"message": "This is a list of the last cleaned links in this tab, and their uncleaned versions. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.",
+	"message": "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.",
 	"description": ""
 },
 "skipwhen_title": {

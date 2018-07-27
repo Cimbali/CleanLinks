@@ -4,92 +4,153 @@
 <head>
 	<meta charset="utf-8">
 	<style>
-		@media (max-width: 425px) {
-			/* (hack-ish) force FF to compensate for the header or some miscalculation
-			 * in the popup's size when it is in the overflow menu, and allow to scroll
-			 * the document until the bottom. */
-			html {
-				padding-bottom: 50px;
-				overflow-y:auto;
-			}
-		}
 		html {
 			font-size: .8em;
+			max-height: 500px;
 		}
 		html, button, input, select {
 			background: white;
 		}
 		* {
 			color: black;
+			margin: 0;
+			padding: 0;
+		}
+		button {
+			padding: 0 5px;
+		}
+		body {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			align-content: stretch;
+		}
+		.disabled, button:disabled {
+			 background: #ddd;
 		}
 		#history {
 			display: block;
+			min-height: 4em;
+			max-height: 15em;
+			flex: 1 1 auto;
+			border: black thin solid;
+			overflow-y: scroll;
+			overflow-x: hidden;
+		}
+		#history p {
 			width: 100%;
-			padding: 0;
+			border-bottom: black thin solid;
 		}
-		#history option {
-			margin: 0;
-			padding: 0;
-		}
-		select:disabled, button:disabled {
-			 background: #ddd;
-		}
-		#history option span {
-			display: inline-block;
-			width: 50%;
-			margin: 2px 0px;
+		#history p span {
+			display: block;
+			padding: 2px;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+			border-left: black thin solid;
 		}
-		#history option[value="-1"] span {
-			font-weight: bold;
-			border: thin solid;
-			padding: 2px 5px;
-			margin: 0;
+		#history p span.cleaned::before {
+			content: " → ";
+		}
+		#history p.selected span {
+			background: #BBF;
+		}
+		#history p[value] {
+			cursor: pointer;
 		}
 		#icon {
+			width: 60px;
+			height: 60px;
 			float: left;
-			margin: 15px;
+			margin: 0 15px 15px 0;
 		}
 		#toggle, #options {
 			display: block;
 			float: right;
-			margin-left: 5px;
+			margin: 5px 5px 0 0;
+			width: 30px;
+			height: 30px;
+			background: center / 80% no-repeat;
 		}
-		#title {
-			margin: 0;
+		#toggle {
+			background-image: url("icons/onoff.svg");
 		}
-		#homepage {
-			font-weight: normal;
+		#options  {
+			background-image: url("icons/settings.svg");
 		}
 		#whitelist, #clearlist {
 			display: block;
 			margin: 5px 0 5px 10px;
-			float: right;
 		}
 		.dropped {
 			background: rgb(255, 128, 128)
 		}
 		#filters {
-			clear: both;
+			margin-bottom: 5px;
 			display: flex;
 			justify-content: space-around;
 			flex-wrap: wrap;
+			align-items: center;
+		}
+		#filters input {
+			margin: 0 5px 0 15px;
+		}
+		#filters label:last-child {
+			margin-right: 15px;
+		}
+		#help {
+			position: relative;
+		}
+		.tooltip {
+			font-weight: bold;
+			border:thin solid black;
+			border-radius: 2em;
+			display: inline-block;
+			width:1.3em;
+			text-align:center;
+			cursor: help;
+		}
+		#help .tooltiptext {
+			visibility: hidden;
+			position: absolute;
+			z-index: 1;
+
+			width: 20em;
+			left: 50%;
+			width: 20em;
+			bottom: 100%;
+
+			background: white;
+			border:thin solid black;
+			padding: 5px;
+			border-radius: 6px;
+
+			text-align: center;
+		}
+		#help:hover .tooltiptext {
+			visibility: visible;
+		}
+		#bottom {
+			margin: 0 5px;
+			display: flex;
+			align-items: center;
+		}
+		.spacer {
+			flex-grow: 1;
 		}
 	</style>
 </head>
 
 <body>
-	<div id="icon">
-		<img src="icon.png" />
-	</div>
-	<div>
-		<button id="toggle"></button>
-		<button id="options" title="Options page">Settings</button>
-		<h3 id="title"> &mdash; <span id="status"></span><br /><span id="homepage"></span></h3>
-
-		<p id="desc" i18n_text="bootstrap_whitelist_description"></p>
+	<div id="header">
+		<div id="icon">
+			<a id="homepage"><img src="icon.png" /></a>
+		</div>
+		<div>
+			<button id="toggle"></button>
+			<button id="options" title="Options page"></button>
+			<h3 id="title"> &mdash; <span id="status"></span></h3>
+		</div>
 	</div>
 
 	<p id="filters">
@@ -97,10 +158,18 @@
 		<label><input type="checkbox" name="request" checked="checked" />HTTP requests</label>
 		<label><input type="checkbox" name="header" checked="checked" />Header redirects</label>
 	</p>
-	<select id="history" size="11"></select>
 
-	<button id="whitelist" i18n_text="bootstrap_whitelist_button" />
-	<button id="clearlist" i18n_text="bootstrap_clearlist_button" />
+	<div id="history"></div>
+
+	<p id="bottom">
+		<span id="help">
+			<span class="tooltip">?</span>
+			<span i18n_text="bootstrap_whitelist_description" class="tooltiptext"></span>
+		</span>
+		<span class="spacer"></span>
+		<button id="clearlist" i18n_text="bootstrap_clearlist_button"></button>
+		<button id="whitelist" i18n_text="bootstrap_whitelist_button"></button>
+	</p>
 
 	<script src="cleanlink.js"></script>
 	<script src="popup.js"></script>

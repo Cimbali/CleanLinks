@@ -14,17 +14,26 @@
 
 var tab_id = -1;
 
+function set_selected(evt)
+{
+	var selected = document.querySelector('#history .selected');
+	if (selected) selected.classList.remove('selected');
+
+	var target = evt.target;
+	while (target && target.tagName != 'P')
+		target = target.parentNode;
+
+	if (target) target.classList.add('selected');
+}
+
+
 function add_option(orig, clean, classes)
 {
-	var select = document.querySelector('select');
+	var history = document.querySelector('#history');
 
-	var option = document.createElement('option');
-	// value is -1 for title, otherwise id of elment in clean list
-	option.setAttribute('value', '' + (select.querySelectorAll('option').length - 1));
-	if (option.value == '-1') {
-		option.disabled = true;
-	}
-	option.setAttribute('title', orig + '\n----- Cleaned to -----\n' + clean);
+	var option = document.createElement('p');
+	option.setAttribute('value', '' + history.querySelectorAll('p').length);
+	option.setAttribute('title', orig + '\n-> ' + clean);
 	classes.forEach(cl => option.classList.add(cl));
 
 	var span = document.createElement('span');
@@ -37,7 +46,9 @@ function add_option(orig, clean, classes)
 	span.setAttribute('class', 'cleaned');
 	option.appendChild(span);
 
-	select.appendChild(option);
+	option.onclick = set_selected
+
+	history.appendChild(option);
 }
 
 
@@ -45,10 +56,12 @@ function set_toggle_text()
 {
 	if (prefValues.enabled) {
 		document.querySelector('#status').textContent = _('browser_enabled')
-		document.querySelector('#toggle').textContent = _('browser_disable')
+		document.querySelector('#toggle').setAttribute('title', _('browser_disable'));
+		document.querySelector('#icon img').setAttribute('src', 'icon.png');
 	} else {
 		document.querySelector('#status').textContent = _('browser_disabled')
-		document.querySelector('#toggle').textContent = _('browser_enable')
+		document.querySelector('#toggle').setAttribute('title', _('browser_enable'));
+		document.querySelector('#icon img').setAttribute('src', 'icons/disabled.png');
 	}
 }
 
@@ -68,13 +81,8 @@ function populate_popup()
 		list[n].prepend(document.createTextNode(_(list[n].getAttribute('i18n_text'))));
 
 	document.querySelector('#title').prepend(document.createTextNode(title + ' v' + version));
-
-	var link = document.createElement('a');
-	link.setAttribute('href', homepage);
-	link.appendChild(document.createTextNode(homepage));
-	document.querySelector('#homepage').appendChild(link);
-
-	add_option(_('bootstrap_listheader_original'), _('bootstrap_listheader_cleaned'), []);
+	document.querySelector('#homepage').setAttribute('href', homepage);
+	document.querySelector('#homepage').setAttribute('title', title + ' homepage');
 
 	browser.tabs.query({active: true, currentWindow: true}).then(tabList =>
 	{
@@ -92,7 +100,7 @@ function populate_popup()
 		});
 	});
 
-	document.querySelector('select#history').disabled = !prefValues.cltrack;
+	if (!prefValues.cltrack) document.querySelector('#history').classList.add('disabled')
 	document.querySelector('button#whitelist').disabled = !prefValues.cltrack;
 	document.querySelector('button#clearlist').disabled = !prefValues.cltrack;
 
@@ -106,27 +114,19 @@ function populate_popup()
 
 	document.querySelector('#whitelist').onclick = () =>
 	{
-		var select = document.querySelector('select');
-		var id = parseInt(select.value);
-		browser.runtime.sendMessage({action: 'whitelist', item: id, tab_id: tab_id}).then(() =>
-			// remove selected element, and renumber higher-ordered ones
-			select.querySelectorAll('option').forEach(opt =>
-			{
-				var opt_id = parseInt(opt.value);
-				if (opt_id == id)
-					opt.remove()
-				else if (opt_id > id)
-					opt.value = '' + (opt_id - 1);
-			})
-		);
+		var selected = document.querySelector('#history p.selected');
+		var id = parseInt(selected.getAttribute('value'));
+		browser.runtime.sendMessage({action: 'whitelist', item: id, tab_id: tab_id});
+		// remove selected element, and renumber remaining ones (should be in sendMessage.then())
+		selected.remove();
+		document.querySelectorAll('#history p').forEach((opt, idx) => { opt.setAttribute('value', '' + idx) });
 	}
 
 	document.querySelector('#clearlist').onclick = () =>
 	{
-		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id}).then(() =>
-		{
-			document.querySelector('select').querySelectorAll('option').forEach(opt => opt.remove());
-		});
+		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
+		// remove cleared (all) elements (should be in sendMessage.then())
+		document.querySelectorAll('#history p').forEach(opt => { opt.remove() });
 	}
 
 	document.querySelector('#options').onclick = () =>
@@ -137,12 +137,13 @@ function populate_popup()
 
 	document.addEventListener('copy', e =>
 	{
-		if (e.target.tagName != 'SELECT')
-			return;
+		var selected = document.querySelector('#history .selected');
 
-		var spans = e.target.querySelector('option[value="' + e.target.value + '"]').childNodes;
-		e.clipboardData.setData('text/plain', spans[0].innerText + '\n' + spans[1].innerText);
-		e.preventDefault();
+		if (selected)
+		{
+			e.clipboardData.setData('text/plain', selected.childNodes[0].innerText + '\n' + selected.childNodes[1].innerText);
+			e.preventDefault();
+		}
 	});
 }
 
