@@ -4,10 +4,6 @@
 <head>
 	<meta charset="utf-8">
 	<style>
-		html {
-			font-size: .8em;
-			max-height: 500px;
-		}
 		html, button, input, select {
 			background: white;
 		}
@@ -19,9 +15,14 @@
 		button {
 			padding: 0 5px;
 		}
+		html, body {
+			max-height: 500px;
+			width: 400px;
+			overflow-x: hidden;
+		}
 		body {
-			height: 100%;
 			display: flex;
+			font-size: .8em;
 			flex-direction: column;
 			align-content: stretch;
 		}
@@ -30,22 +31,22 @@
 		}
 		#history {
 			display: block;
-			min-height: 4em;
+			min-height: 3.5em;
 			max-height: 15em;
 			flex: 1 1 auto;
 			border: black thin solid;
 			overflow-y: scroll;
 			overflow-x: hidden;
+			padding-right: 17px;
 		}
 		#history p {
-			width: 100%;
+			width: 384px;
 			border-bottom: black thin solid;
 		}
 		#history p span {
 			display: block;
 			padding: 2px;
 			white-space: nowrap;
-			overflow: hidden;
 			text-overflow: ellipsis;
 			border-left: black thin solid;
 		}
@@ -59,10 +60,15 @@
 			cursor: pointer;
 		}
 		#icon {
-			width: 60px;
-			height: 60px;
 			float: left;
-			margin: 0 15px 15px 0;
+			margin: 5px 15px 5px 5px;
+		}
+		#icon img {
+			width: 45px;
+			height: 45px;
+		}
+		#title {
+			margin-top: 5px;
 		}
 		#toggle, #options {
 			display: block;
