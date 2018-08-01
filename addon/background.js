@@ -179,7 +179,7 @@ function handleMessage(message, sender)
 
 	case 'clearlist':
 		cleanedPerTab.clear(message.tab_id);
-		browser.browserAction.setBadgeText({tabId: id, text: null});
+		browser.browserAction.setBadgeText({tabId: message.tab_id, text: null});
 		return Promise.resolve(null);
 
 	case 'options':
