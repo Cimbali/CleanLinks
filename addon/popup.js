@@ -68,7 +68,7 @@ function set_toggle_text()
 
 function filter_from_input(input)
 {
-	var opts = Array.from(document.querySelectorAll('select option.' + input.name));
+	var opts = Array.from(document.querySelectorAll('#history p.' + input.name));
 	var displ = input.checked ? 'block' : 'none';
 	opts.forEach(opt => opt.style.display = displ);
 }
