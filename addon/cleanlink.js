@@ -120,7 +120,8 @@ function highlightLink(node, remove)
 
 function cleanLink(link, base)
 {
-	if (!link || link.startsWith("view-source:") || (prefValues.skipwhen && prefValues.skipwhen.test(link)))
+	if (!link || link.startsWith("view-source:") || link.startsWith("data:")
+		|| (prefValues.skipwhen && prefValues.skipwhen.test(link)))
 	{
 		log('not cleaning', link, ': empty, source, or matches skipwhen');
 		return link;
