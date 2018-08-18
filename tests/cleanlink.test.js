@@ -37,6 +37,12 @@ describe('cleanLink', function() {
 			.to.equal('https://www.airbnb.co.uk/rooms/123456789');
 		done();
 	});
+	it('should preserve a link without redirects', done =>
+	{
+		let link = 'https://assets-cdn.github.com/assets/frameworks-95aff0b550d3fe338b645a4deebdcb1b.css'
+		expect(cleanLink(link)).to.equal(link);
+		done();
+	});
 	it('should strip the utm parameters', done =>
 	{
 		expect(cleanLink('https://www.aboutamazon.com/?keep=this&utm_source=gateway&utm_medium=footer'))
