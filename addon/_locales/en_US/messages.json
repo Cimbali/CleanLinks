@@ -3,6 +3,10 @@
 	"message": "Converts obfuscated/nested links to genuine clean links",
 	"description": ""
 },
+"popup_description": {
+	"message": "Open cleaned links history",
+	"description": ""
+},
 "browser_status": {
 	"message": "Status:\u0020",
 	"description": ""

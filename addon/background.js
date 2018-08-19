@@ -293,6 +293,8 @@ loadOptions().then(() =>
 			lastRightClick.reply(cleanLink(link, tab.url))
 		});
 
+	browser.tabs.query({}).then(tablist => tablist.forEach(tab => browser.pageAction.show(tab.id)));
+
 	if (!prefValues.enabled)
 	{
 		setIcon(icon_disabled);
@@ -313,9 +315,17 @@ loadOptions().then(() =>
 		});
 
 	// Auto update badge text for pages when loading is complete
-	browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
-		if (cleanedPerTab.getCount(tab.id))
-			browser.browserAction.setBadgeText({tabId: id, text: '' + cleanedPerTab.getCount(tab.id)});
+	browser.tabs.onUpdated.addListener((id, changeInfo, tab) =>
+	{
+		browser.pageAction.show(id);
+
+		var ncleaned = cleanedPerTab.getCount(tab.id);
+		if (!ncleaned)
+			return;
+
+		browser.pageAction.setTitle({tabId: id, title: _('popup_description') + ' (' + ncleaned + ')'});
+		else
+			browser.browserAction.setBadgeText({tabId: id, text: '' + ncleaned});
 	});
 
 	browser.tabs.onRemoved.addListener((id, removeInfo) => {

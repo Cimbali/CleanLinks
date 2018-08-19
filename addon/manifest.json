@@ -48,6 +48,15 @@
 	{
 		"browser_style": false,
 		"default_icon": "icons/32.png",
+		"default_title": "__MSG_popup_description__",
+		"default_popup": "popup.html"
+	},
+
+	"page_action":
+	{
+		"browser_style": false,
+		"default_icon": "icons/32.png",
+		"default_title": "__MSG_popup_description__",
 		"default_popup": "popup.html"
 	},
 
