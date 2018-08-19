@@ -49,4 +49,10 @@ describe('cleanLink', function() {
 			.to.equal('https://www.aboutamazon.com/?keep=this');
 		done();
 	});
+	it('should manage fb mobile URLs with all the path in the hash', done =>
+	{
+		let link = 'https://m.facebook.com/home.php#!/photo.php?fbid=1234567890&id=1234567890&set=a.1234567890&source=1234567890&refid=1234567890&_ft_=qid.1234567890%1234567890Amf_story_key.1234567890%1234567890Aog_action_id.1234567890%1234567890Atop_level_post_id.1234567890%1234567890Asrc.1234567890%1234567890Aphoto_id.1234567890&__tn__=EH-R'
+		expect(cleanLink(link)).to.equal(link);
+		done();
+	});
 });
