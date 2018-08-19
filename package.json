@@ -10,6 +10,7 @@
 		"lint": "web-ext -s ./addon lint",
 		"firefox": "web-ext -s ./addon run",
 		"bundle": "web-ext -s ./addon -a ./dist build",
+		"beta": "scripts/beta.sh",
 		"test": "karma start"
 	},
 	"directories":
