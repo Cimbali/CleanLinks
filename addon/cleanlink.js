@@ -266,12 +266,11 @@ function cleanLink(link, base)
 	prefValues.remove.lastIndex = 0;
 	if (s || prefValues.remove.test(link))
 	{
-		let pos, ht = null;
+		let pos, ht = '';
 		if ((pos = link.indexOf('#')) !== -1)
 			ht = link.substr(pos), link = link.substr(0, pos);
 
-		link = link.replace(/&amp;/g, '&').replace(prefValues.remove, '').replace(/[?&]$/, '')
-			+ (ht && /^[\w\/#!-]+$/.test(ht) ? ht : '');
+		link = link.replace(/&amp;/g, '&').replace(prefValues.remove, '').replace(/[?&]$/, '') + ht;
 	}
 
 	log('cleaning', origLink, ':', link)
