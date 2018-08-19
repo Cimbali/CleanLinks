@@ -118,163 +118,268 @@ function highlightLink(node, remove)
 }
 
 
-function cleanLink(link, base)
+function skipLinkType(link)
 {
-	if (!link || link.startsWith("view-source:") || link.startsWith("data:")
-		|| (prefValues.skipwhen && prefValues.skipwhen.test(link)))
-	{
-		log('not cleaning', link, ': empty, source, or matches skipwhen');
-		return link;
-	}
+	return (link.startsWith("view-source:") || link.startsWith("data:")
+			|| (prefValues.skipwhen && prefValues.skipwhen.test(link)));
+}
 
-	let s = 0, origLink = link;
 
-	var [all, quote, linkParam] = link.match(/^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
-	if (all)
-	{
-		link = linkParam;
-		s++;
-	}
+function getLinkSearchStrings(link, depth)
+{
+	// Safety for recursive calls
+	if (typeof depth === 'undefined')
+		depth = 0;
+	else if (depth > 2)
+		return [];
 
-	if (typeof base == 'undefined')
+	var arr = [link.pathname], vals = [];
+	if (link.search)
 	{
-		if (/^https?:/.test(link))
-			base = link;
-		else if (window)
+		// NB searchParams.values() does not work reliably, probably because URLSearchParams are some kind of generator:
+		// they need to be manually iterated.
+		for (let [key, val] of link.searchParams)
 		{
-			base = new URL(window.location);
-			base.hash = '';
+			if (key)
+				arr.push(key);
+			if (val)
+				vals.push(val);
 		}
+		arr = arr.concat(vals);
 	}
 
-	if (typeof base === 'string')
-		base = new URL(base);
+	if (link.hash.startsWith('#!'))
+	{
+		var noHashLink = new URL(link.href);
+		noHashLink.hash = '';
+		try
+		{
+			var hashLink = new URL(link.hash.slice(2), noHashLink.href);
+			log('Parsing from hash-bang type URL: ' + hashLink.href);
+		}
+		catch (e)
+		{
+			return arr.concat(link.hash.slice(1));
+		}
 
-	let linkURL;
-	if (prefValues.skipdoms)
+		var hashLinkSearchStrings = getLinkSearchStrings(hashLink, depth + 1);
+		// remove common prefix of both arrays
+		for (let item of arr)
+		{
+			if (hashLinkSearchStrings.length > 0 && item == hashLinkSearchStrings[0])
+				hashLinkSearchStrings.shift();
+			else
+				break;
+		}
+		return arr.concat(hashLinkSearchStrings);
+	}
+
+	return link.hash ? arr.concat(link.hash.slice(1)) : arr;
+}
+
+function getBaseURL(base)
+{
+	if (typeof base === 'string')
 	{
 		try
 		{
-			linkURL = new URL(link, 'href' in base ? base.href : base);
-
-			if (prefValues.skipdoms.indexOf(linkURL.host) !== -1)
-			{
-				log('not cleaning', link, ': host in skipdoms');
-				return link;
-			}
+			base = new URL(base);
+			base.hash = '';
+			return base;
 		}
 		catch (e) {}
 	}
 
-	if (prefValues.ignhttp && !(/^https?:/.test(typeof linkURL != 'undefined' ? linkURL.href : link)))
+	// fall back on window.location if it exists
+	if (window)
 	{
-		log('not cleaning', link, ': ignoring non-http(s) links');
-		return link;
+		base = new URL(window.location);
+		base.hash = '';
 	}
 
-	if (/\.google\.[a-z.]+\/search\?(?:.+&)?q=http/i.test(link)
-		|| /^https?:\/\/www\.amazon\.[\w.]+\/.*\/voting\/cast\//.test(link)
-	)
-	{
-		log('not cleaning', link, ': google search/amazon vote')
-		return link;
-	}
+	return base;
+}
 
-	let isYahooLink = /\.yahoo.com$/.test(base.host);
+function getLinkURL(link, base)
+{
+	// extract javascript arguments
+	var [all, quote, linkParam] = link.match(/^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
+	if (all)
+		link = linkParam;
 
-	let [base64match] = link.match(/\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i) || [];
-	if (base64match)
-	{
-		try
-		{
-			if (isYahooLink)
-				base64match = base64match.replace(/\/RS.*$/, '');
+	// TODO: what if new URL() throws? return link?
+	// Also check that it only happens in injected script
+	return new URL(link, typeof base === 'undefined' ? base : base.href);
+}
 
-			let decoded = decodeURIComponent(atob(base64match));
-			if (decoded)
-				link = '=' + decoded;
-		}
-		catch (e)
-		{
-			log('Invalid base64 data in link', link, ':' , r, '-- error is', e);
-		}
-	}
+
+function domainRulesBase64(link, base, base64match)
+{
+	if (/\.yahoo.com$/.test(base.host))
+		return base64match.replace(/\/RS.*$/, '');
 	else
+		return base64match;
+}
+
+
+function decodeURIBase64(link, base, base64match)
+{
+	try
+	{
+		let decoded = decodeURIComponent(atob(base64match));
+		if (decoded)
+			return new URL(decoded);
+	}
+	catch (e)
+	{
+		log('Invalid base64 data in link', link, ':' , r, '-- error is', e);
+	}
+}
+
+
+function domainRulesGeneral(link, base)
+{
+	if (typeof base !== 'undefined')
 	{
 		switch (base.host)
 		{
 			case 'www.tripadvisor.com':
 				if (link.indexOf('-a_urlKey') !== -1)
-					link = '=' + decodeURIComponent(link.replace(/_+([a-f\d]{2})/gi, '%$1')
-						.replace(/_|%5f/ig, '')).split('-aurl.').pop().split('-aurlKey').shift();
-				break;
-			default:
-				switch (linkURL && linkURL.host || (link.match(/^\w+:\/\/([^/]+)/) || []).pop())
-				{
-					case 'redirect.disqus.com':
-						if (link.indexOf('/url?url=') !== -1)
-							link = '=' + link.match(/url\?url=([^&]+)/).pop().split(/%3a[\w-]+$/i).shift();
-						break;
-				}
+					return new URL(decodeURIComponent(link.replace(/_+([a-f\d]{2})/gi, '%$1')
+						.replace(/_|%5f/ig, '')).split('-aurl.').pop().split('-aurlKey').shift());
 		}
+
+
+		if (/\.yahoo.com$/.test(base.host))
+			link.path = link.path.replace(/\/R[KS]=\d.*$/, '');
 	}
 
-	let lmt = 4;
+	switch (link.host) // alt: (link.match(/^\w+:\/\/([^/]+)/) || [])
+	{
+		case 'redirect.disqus.com':
+			if (link.indexOf('/url?url=') !== -1)
+				return new URL(link.match(/url\?url=([^&]+)/).pop().split(/%3a[\w-]+$/i).shift());
+	}
+
+	if (/\.google\.[a-z.]+\/search\?(?:.+&)?q=http/i.test(link)
+		|| /^https?:\/\/www\.amazon\.[\w.]+\/.*\/voting\/cast\//.test(link)
+	)
+		return null; // TODO: raise error? this is a domain+pattern-specific whitelist
+	else
+		return link;
+}
+
+
+function decodeURIGeneral(link, base)
+{
+	var all, capture, lmt = 4;
 	while (--lmt)
 	{
-		var [all, capture] = link.match(/(?:.\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i) ||
-							link.match(/(?:[?=]|[^\/]\/)(www\..+)$/i) || []
+		all = null;
+		for (let str of getLinkSearchStrings(link))
+		{
+			[all, capture] = str.match(/(?:\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i) ||
+								str.match(/(?:^|[^\/]\/)(www\..+)$/i) || [];
+			if (!all)
+				continue;
+
+			capture = decodeURIComponent(capture);
+			log('decoded URI Component =', capture)
+
+			// strip any non-link parts of capture that appeared after decoding the URI component
+			var pos;
+			if ((pos = capture.indexOf('html&')) !== -1 || (pos = capture.indexOf('html%')) !== -1)
+				capture = capture.substr(0, pos + 4);
+			else if ((pos = capture.indexOf('/&')) !== -1) // || (pos = capture.indexOf('/%')) !== -1)
+				capture = capture.substr(0, pos);
+
+			link = new URL(capture.replace(/&amp;/g, '&'), link.href);
+			break;
+		}
+
 		if (!all)
 			break;
-
-		link = capture;
-		let pos;
-		if ((pos = link.indexOf('&')) !== -1)
-			link = link.substr(0, pos);
-		link = decodeURIComponent(link);
-		log('decoded URI Component =', link)
-
-		if ((pos = link.indexOf('html&')) !== -1 || (pos = link.indexOf('html%')) !== -1)
-			link = link.substr(0, pos + 4);
-		else if ((pos = link.indexOf('/&')) !== -1) // || (pos = link.indexOf('/%')) !== -1)
-			link = link.substr(0, pos);
-		if (link.indexOf('://') == -1)
-			link = 'http://' + link;
-		if (link.indexOf('/', link.indexOf(':') + 2) == -1)
-			link += '/';
-		++s;
 	}
 
-	link = link.replace(/^h[\w*]+(ps?):/i, 'htt$1:');
-
-	if (origLink != link)
-	{
-		try
-		{
-			new URL(link);
-		}
-		catch (e)
-		{
-			log('not cleaning', origLink, ': yielded invalid link :', link)
-			link = origLink;
-		}
-	}
-
-	if (isYahooLink)
-		link = link.replace(/\/R[KS]=\d.*$/, '');
-
-	prefValues.remove.lastIndex = 0;
-	if (s || prefValues.remove.test(link))
-	{
-		let pos, ht = '';
-		if ((pos = link.indexOf('#')) !== -1)
-			ht = link.substr(pos), link = link.substr(0, pos);
-
-		link = link.replace(/&amp;/g, '&').replace(prefValues.remove, '').replace(/[?&]$/, '') + ht;
-	}
-
-	log('cleaning', origLink, ':', link)
 	return link;
+}
+
+
+function filterParams(link, base)
+{
+	if (prefValues.remove.test(link))
+	{
+		var cleanParams = new URLSearchParams();
+		for (let [key, val] of link.searchParams)
+		{
+			if (!key.match(prefValues.remove))
+				cleanParams.append(key, val);
+		}
+		link.search = cleanParams.toString();
+	}
+
+	return link;
+}
+
+
+function cleanLink(link, base)
+{
+	var origLink = link, base64match;
+
+	if (!link || skipLinkType(link))
+	{
+		log('not cleaning', link, ': empty, source, or matches skipwhen');
+		return link;
+	}
+
+	base = getBaseURL(base);
+	link = getLinkURL(link, base);
+
+	if (prefValues.skipdoms && prefValues.skipdoms.indexOf(link.host) !== -1)
+	{
+		log('not cleaning', link, ': host in skipdoms');
+		return link;
+	}
+
+	if (prefValues.ignhttp && !(/^https?:$/.test(link.protocol)))
+	{
+		log('not cleaning', link, ': ignoring non-http(s) links');
+		return link;
+	}
+
+	for (let str of getLinkSearchStrings(link))
+	{
+		[base64match] = str.match(/\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i) || [];
+		if (base64match)
+		{
+			link = decodeURIBase64(link, base, domainRulesBase64(link, base, base64match));
+			break;
+		}
+	}
+	if (!base64match)
+	{
+		link = domainRulesGeneral(link, base);
+		if (!link)
+			return origLink;
+	}
+
+	link = decodeURIGeneral(link, base)
+
+	// This is inherited from the legacy code, but is it ever really used ?
+	link.protocol = link.protocol.replace(/^h[\w*]+(ps?):$/i, 'htt$1:');
+
+	// Should params be filtered only here, when no whitelist is applied? All the time? With a separate whitelist mechanism?
+	link = filterParams(link, base);
+
+	log('cleaning', origLink, ':', link.href)
+
+	// compare with pre-cleaning link, but canonicalize through URL() if possible
+	// to ignore potential meaningless changes, i.e. "," -> "%2C"
+	var changed;
+	try { changed = (link != new URL(origLink)); }
+	catch (e) { changed = (origLink != link.href); }
+
+	return changed ? link.href : origLink;
 }
 
 function textFindLink(node)
