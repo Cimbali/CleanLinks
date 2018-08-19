@@ -210,20 +210,23 @@ function handleMessage(message, sender)
 										- (oldPrefValues.enabled && oldPrefValues[prop] === true ? 1 : 0)})
 			, {});
 
-			if (changes.cbc > 0)
-				browser.contextMenus.create({
-					id: 'copy-clean-link',
-					title: 'Copy clean link',
-					contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
-				});
-			else if (changes.cbc < 0)
-				browser.contextMenus.remove('copy-clean-link')
-			else if (changes.textcl != 0)
-				browser.contextMenus.update('copy-clean-link',
-				{
-					title: 'Copy clean link',
-					contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
-				});
+			if (android) // no context menu on Android
+			{
+				if (changes.cbc > 0)
+					browser.contextMenus.create({
+						id: 'copy-clean-link',
+						title: 'Copy clean link',
+						contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
+					});
+				else if (changes.cbc < 0)
+					browser.contextMenus.remove('copy-clean-link')
+				else if (changes.textcl != 0)
+					browser.contextMenus.update('copy-clean-link',
+					{
+						title: 'Copy clean link',
+						contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
+					});
+			}
 
 			if (changes.progltr > 0)
 				browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
@@ -270,24 +273,25 @@ browser.browserAction.setBadgeBackgroundColor({color: 'rgba(0, 0, 0, 0)'});
 loadOptions().then(() =>
 {
 	// Always add the listener, even if CleanLinks is disabled. Only add the menu item on enabled.
-	browser.contextMenus.onClicked.addListener((info, tab) =>
-	{
-		var link;
-		if ('linkUrl' in info && info.linkUrl)
-			link = info.linkUrl;
-		else if ('selectionText' in info && info.selectionText)
-			link = info.selectionText;
+	if (!android)
+		browser.contextMenus.onClicked.addListener((info, tab) =>
+		{
+			var link;
+			if ('linkUrl' in info && info.linkUrl)
+				link = info.linkUrl;
+			else if ('selectionText' in info && info.selectionText)
+				link = info.selectionText;
 
-		// WARNING: potential race condition here (?) on right click we send a message to background,
-		// that populates rightClickLink[tab.id]. If the option (this listener) is triggered really fast,
-		// maybe it can happen before the link message gets here.
-		// In that case, we'll need to pre-make a promise, resolved by the message, and .then() it here.
-		else if (prefValues.textcl)
-			link = lastRightClick.textLink;
+			// WARNING: potential race condition here (?) on right click we send a message to background,
+			// that populates rightClickLink[tab.id]. If the option (this listener) is triggered really fast,
+			// maybe it can happen before the link message gets here.
+			// In that case, we'll need to pre-make a promise, resolved by the message, and .then() it here.
+			else if (prefValues.textcl)
+				link = lastRightClick.textLink;
 
-		// Clean & copy
-		lastRightClick.reply(cleanLink(link, tab.url))
-	});
+			// Clean & copy
+			lastRightClick.reply(cleanLink(link, tab.url))
+		});
 
 	if (!prefValues.enabled)
 	{
@@ -301,7 +305,7 @@ loadOptions().then(() =>
 	if (prefValues.progltr)
 		browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
 
-	if (prefValues.cbc)
+	if (!android && prefValues.cbc)
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',

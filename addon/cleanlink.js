@@ -21,6 +21,7 @@ const title = browser.runtime.getManifest().name;
 const version = browser.runtime.getManifest().version;
 const homepage = browser.runtime.getManifest().homepage_url;
 const copyright = browser.runtime.getManifest().author;
+const android = browser.runtime.PlatformOs == 'android';
 
 const icon_default = '';
 const icon_disabled = '-';
