@@ -168,7 +168,7 @@ function handleMessage(message, sender)
 		else
 			var entry = nonHist.splice(message.item, 1)[0];
 
-		var host = (new URL(entry.orig)).hostname;
+		var host = (new URL(entry.orig)).host;
 		if (prefValues.skipdoms.indexOf(host) === -1)
 		{
 			prefValues.skipdoms.push(host);
