@@ -22,7 +22,23 @@ function save_options()
 {
 	var prefs = Array.from(document.querySelectorAll('input, textarea')).reduce((prefs, field) =>
 	{
-		prefs[field.name] = typeof prefValues[field.name] == 'boolean' ? field.checked : field.value;
+		if (typeof prefValues[field.name] == 'boolean')
+			prefs[field.name] = field.checked;
+		else if (prefValues[field.name] instanceof RegExp)
+		{
+			var error_span = document.querySelector('span#' + field.name + '_error');
+			try {
+				var r = new RegExp(field.value || '.^');
+				prefs[field.name] = field.value;
+				error_span.innerText = '';
+			} catch (e) {
+				prefs[field.name] = prefValues[field.name].source;
+				error_span.innerText = 'Error parsing RegExp: ' + e.message;
+			}
+		}
+		else
+			prefs[field.name] = field.value;
+
 		return prefs
 	}, {})
 

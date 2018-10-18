@@ -98,7 +98,13 @@ function loadOptions()
 				else if (typeof prefValues[param] == 'string')
 					prefValues[param] = data.configuration[param] || '';
 				else if (prefValues[param] instanceof RegExp)
-					prefValues[param] = new RegExp(data.configuration[param] || '.^');
+				{
+					try {
+						prefValues[param] = new RegExp(data.configuration[param] || '.^');
+					} catch (e) {
+						log('Error parsing regex', (data.configuration[param] || '.^'), ':', e.message);
+					}
+				}
 				else if (Array.isArray(prefValues[param]))
 					prefValues[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
 			}

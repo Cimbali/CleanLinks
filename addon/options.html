@@ -21,6 +21,11 @@
 			min-width: 20em;
 		}
 
+		span.parsing_error {
+			color: red;
+			font-weight:bold;
+		}
+
 		input[type=number] {
 			width: 5em;
 		}
@@ -47,9 +52,11 @@
 	<fieldset>
 	<legend>Link cleaning</legend>
 	<label i18n_title="skipwhen_tooltip"><span i18n_text="skipwhen_title"></span>
+		<span class="parsing_error" id="skipwhen_error"></span>
 		<br /><input type="text" name="skipwhen" value="" />
 	</label>
 	<label i18n_title="remove_tooltip"><span i18n_text="remove_title"></span>
+		<span class="parsing_error" id="remove_error"></span>
 		<br /><input type="text" name="remove" value="" />
 	</label>
 	<label i18n_title="skipdoms_tooltip"><span i18n_text="skipdoms_title"></span>
