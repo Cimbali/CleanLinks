@@ -204,8 +204,6 @@ function handleMessage(message, sender)
 		if (message.action == 'toggle')
 		{
 			prefValues.enabled = !prefValues.enabled;
-
-			setIcon(prefValues.enabled ? icon_default : icon_disabled);
 			var p = browser.storage.local.set({configuration: serializeOptions()});
 		}
 		else
@@ -220,13 +218,14 @@ function handleMessage(message, sender)
 			}
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
-			var changes = ['cbc', 'progltr', 'httpomr', 'textcl'].reduce((dict, prop) =>
+			var changes = ['enabled', 'cbc', 'progltr', 'httpomr', 'textcl'].reduce((dict, prop) =>
 				Object.assign(dict, {[prop]: (prefValues.enabled && prefValues[prop] === true ? 1 : 0)
 										- (oldPrefValues.enabled && oldPrefValues[prop] === true ? 1 : 0)})
 			, {});
 
 			if (changes.cbc > 0)
-				browser.contextMenus.create({
+				browser.contextMenus.create(
+				{
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
 					contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
@@ -249,6 +248,9 @@ function handleMessage(message, sender)
 				browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
 			else if (changes.httpomr < 0)
 				browser.webRequest.onBeforeRequest.removeListener(onRequest);
+
+			if (changes.enabled != 0)
+				setIcon(prefValues.enabled ? icon_default : icon_disabled);
 
 			browser.tabs.query({}).then(tabs => tabs.forEach(tab =>
 				browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})

@@ -144,18 +144,34 @@
 		.spacer {
 			flex-grow: 1;
 		}
+		input#enabled {
+			display: none;
+		}
+		input#enabled:checked ~ * .when_disabled {
+			display: none !important;
+		}
+		input#enabled:not(:checked) ~ * .when_enabled {
+			display: none !important;
+		}
 	</style>
 </head>
 
 <body>
 	<div id="header">
+		<input type="checkbox" name="enabled" id="enabled" />
 		<div id="icon">
-			<a id="homepage"><img src="icon.png" /></a>
+			<a id="homepage">
+				<img src="icon.png" class="when_enabled"/>
+				<img src="icons/disabled.png" class="when_disabled"/>
+			</a>
 		</div>
 		<div>
-			<button id="toggle"></button>
+			<button id="toggle" i18n_title="extension_toggle_tooltip"></button>
 			<button id="options" title="Options page"></button>
-			<h3 id="title"> &mdash; <span id="status"></span></h3>
+			<h3 id="title"> &mdash;
+				<span i18n_text="extension_enabled" class="when_enabled"></span>
+				<span i18n_text="extension_disabled" class="when_disabled"></span>
+			</h3>
 		</div>
 	</div>
 

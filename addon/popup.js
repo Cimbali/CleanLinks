@@ -53,20 +53,6 @@ function add_option(orig, clean, classes)
 }
 
 
-function set_toggle_text()
-{
-	if (prefValues.enabled) {
-		document.querySelector('#status').textContent = _('browser_enabled')
-		document.querySelector('#toggle').setAttribute('title', _('browser_disable'));
-		document.querySelector('#icon img').setAttribute('src', 'icon.png');
-	} else {
-		document.querySelector('#status').textContent = _('browser_disabled')
-		document.querySelector('#toggle').setAttribute('title', _('browser_enable'));
-		document.querySelector('#icon img').setAttribute('src', 'icons/disabled.png');
-	}
-}
-
-
 function filter_from_input(input)
 {
 	var opts = Array.from(document.querySelectorAll('#history p.' + input.name));
@@ -80,6 +66,10 @@ function populate_popup()
 	var list = document.querySelectorAll('[i18n_text]');
 	for (var n = 0; n < list.length; n++)
 		list[n].prepend(document.createTextNode(_(list[n].getAttribute('i18n_text'))));
+
+	var titles = document.querySelectorAll('[i18n_title]');
+	for (var n = 0; n < titles.length; n++)
+		titles[n].setAttribute('title', _(titles[n].getAttribute('i18n_title')));
 
 	document.querySelector('#title').prepend(document.createTextNode(title + ' v' + version));
 	document.querySelector('#homepage').setAttribute('href', homepage);
@@ -105,11 +95,11 @@ function populate_popup()
 	document.querySelector('button#whitelist').disabled = !prefValues.cltrack;
 	document.querySelector('button#clearlist').disabled = !prefValues.cltrack;
 
-	set_toggle_text();
+	document.querySelector('input#enabled').checked = prefValues.enabled;
 	document.querySelector('#toggle').onclick = () =>
 	{
 		prefValues.enabled = !prefValues.enabled;
-		set_toggle_text();
+		document.querySelector('input#enabled').checked = prefValues.enabled;
 		browser.runtime.sendMessage({action: 'toggle'});
 	}
 

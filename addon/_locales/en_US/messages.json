@@ -7,22 +7,6 @@
 	"message": "Status:\u0020",
 	"description": ""
 },
-"browser_enabled": {
-	"message": "Enabled",
-	"description": ""
-},
-"browser_disabled": {
-	"message": "Disabled",
-	"description": ""
-},
-"browser_enable": {
-	"message": "enable",
-	"description": ""
-},
-"browser_disable": {
-	"message": "disable",
-	"description": ""
-},
 "browser_cleanedlinks": {
 	"message": "Cleaned Links:\u0020",
 	"description": ""
@@ -65,6 +49,22 @@
 },
 "bootstrap_whitelist_description": {
 	"message": "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.",
+	"description": ""
+},
+"extension_text": {
+	"message": "Extension ",
+	"description": ""
+},
+"extension_toggle_tooltip": {
+	"message": "Toggle to enable or disable the extension.",
+	"description": ""
+},
+"extension_enabled": {
+	"message": "Enabled",
+	"description": ""
+},
+"extension_disabled": {
+	"message": "Disabled",
 	"description": ""
 },
 "skipwhen_title": {

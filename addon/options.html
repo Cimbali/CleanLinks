@@ -16,7 +16,7 @@
 			margin: 1ex 0;
 		}
 
-		label span {
+		fieldset label span {
 			display:inline-block;
 			min-width: 20em;
 		}
@@ -24,6 +24,14 @@
 		span.parsing_error {
 			color: red;
 			font-weight:bold;
+		}
+
+		input[name='enabled']:not(:checked) ~ span[i18n_text='extension_enabled'] {
+			display: none;
+		}
+
+		input[name='enabled']:checked ~ span[i18n_text='extension_disabled'] {
+			display: none;
 		}
 
 		input[type=number] {
@@ -47,6 +55,14 @@
 </head>
 
 <body>
+	<label i18n_title="extension_toggle_tooltip">
+		<h3>
+			<input type="checkbox" name="enabled" value="" />
+			<span i18n_text="extension_text"></span>
+			<span i18n_text="extension_enabled"></span>
+			<span i18n_text="extension_disabled"></span>
+		</h3>
+	</label>
 	<h2>Options</h2>
 
 	<fieldset>
