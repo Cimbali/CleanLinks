@@ -51,6 +51,10 @@
 	"message": "Cleaned Link",
 	"description": ""
 },
+"bootstrap_openonce_button": {
+	"message": "Open Un-cleaned Link",
+	"description": ""
+},
 "bootstrap_whitelist_button": {
 	"message": "Whitelist Selection",
 	"description": ""

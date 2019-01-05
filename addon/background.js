@@ -47,6 +47,8 @@ var lastRightClick = {textLink: null, reply: () => {}}
 var get_browser_version = (async () => await browser.runtime.getBrowserInfo())()
 							.then(info => parseFloat(info.version)).catch(() => NaN)
 
+// Links that are whitelisted just once (rudimentary)
+var temporaryWhitelist = []
 
 function cleanRedirectHeaders(details)
 {
@@ -78,7 +80,16 @@ function cleanRedirectHeaders(details)
 
 function onRequest(details)
 {
-	var dest = details.url, curLink = details.originUrl, cleanDest = cleanLink(dest, curLink), same_domain = false
+	var dest = details.url, curLink = details.originUrl;
+
+	var urlpos = temporaryWhitelist.indexOf(dest);
+	if (urlpos >= 0) {
+		log('One-time whitelist for', JSON.stringify(dest));
+		temporaryWhitelist.splice(urlpos, 1);
+		return {};
+	}
+
+	var cleanDest = cleanLink(dest, curLink), same_domain = false
 
 	if (!cleanDest || cleanDest == dest)
 		return {};
@@ -147,6 +158,10 @@ function handleMessage(message, sender)
 		browser.browserAction.setBadgeText({tabId: message.tab_id, text: '' + cleanedPerTab.getCount(message.tab_id)});
 
 		return p;
+
+	case 'open bypass':
+		log('Adding to one-time whitelist', message.link);
+		temporaryWhitelist.push(message.link);
 
 	case 'open url':
 		if (message.target == new_window)

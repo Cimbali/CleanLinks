@@ -24,6 +24,7 @@ function set_selected(evt)
 		target = target.parentNode;
 
 	if (target) target.classList.add('selected');
+	document.querySelector('#openonce').disabled = !target;
 }
 
 
@@ -127,6 +128,14 @@ function populate_popup()
 		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
 		// remove cleared (all) elements (should be in sendMessage.then())
 		document.querySelectorAll('#history p').forEach(opt => { opt.remove() });
+	}
+
+	document.querySelector('#openonce').onclick = () =>
+	{
+		var selected = document.querySelector('#history .selected');
+		if (selected)
+			browser.runtime.sendMessage({action: 'open bypass', tab_id: tab_id, target: same_tab,
+										 link: selected.childNodes[0].innerText});
 	}
 
 	document.querySelector('#options').onclick = () =>
