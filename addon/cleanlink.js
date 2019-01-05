@@ -31,6 +31,11 @@ const same_tab = 0;
 const new_tab = 1;
 const new_window = 2;
 
+const javascript_link = /^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/
+const encoded_scheme_url = /(?:\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i
+const encoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i
+const decoded_url_beforepath = /^([a-z]+s?:\/\/([0-9a-z$_.+!*(),'-](:[0-9a-z$_.+!*(),'-])?)?[a-z0-9-]+|www)(\.[a-z0-9-]+)+(:[0-9]+)?/i
+
 var prefValues = {
 	enabled   : true,
 	skipwhen  : new RegExp('/ServiceLogin|imgres\\?|searchbyimage\\?|watch%3Fv|auth\\?client_id|signup|bing\\.com/widget|'
@@ -224,7 +229,7 @@ function getBaseURL(base)
 function getLinkURL(link, base)
 {
 	// extract javascript arguments
-	var [all, quote, linkParam] = link.match(/^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
+	var [all, quote, linkParam] = link.match(javascript_link) || [];
 	if (all)
 		link = linkParam;
 
@@ -299,8 +304,7 @@ function decodeURIGeneral(link, base)
 		all = null;
 		for (let str of getLinkSearchStrings(link))
 		{
-			[all, capture] = str.match(/(?:\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i) ||
-								str.match(/(?:^|[^\/]\/)(www\..+)$/i) || [];
+			[all, capture] = str.match(encoded_scheme_url) || str.match(encoded_www_url) || [];
 			if (!all)
 				continue;
 
