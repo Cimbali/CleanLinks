@@ -82,8 +82,23 @@ function serializeOptions()
 
 function loadOptions()
 {
+	var check_storages = key => new Promise(found =>
+	{
+		browser.storage.local.get(key).then(data =>
+		{
+			if (key in data)
+			{
+				browser.storage.local.clear();
+				browser.storage.sync.set(data);
+				found(data);
+			}
+			else
+				browser.storage.sync.get(key).then(data => found(data))
+		})
+	});
+
 	// return the promise so it can be chained
-	return browser.storage.local.get('configuration').then(data =>
+	return check_storages('configuration').then(data =>
 	{
 		if ('configuration' in data) {
 			for (var param in data.configuration) {

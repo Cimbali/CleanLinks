@@ -44,7 +44,7 @@ function save_options()
 
 	update_page(prefs);
 
-	browser.storage.local.set({configuration: prefs}).then(() =>
+	browser.storage.sync.set({configuration: prefs}).then(() =>
 	{
 		browser.runtime.sendMessage({action: 'options'});
 		loadOptions();
@@ -67,7 +67,7 @@ var delayed_save = (function()
 function reset_options()
 {
 	// clear options storage, reload everything
-	browser.storage.local.clear().then(() =>
+	browser.storage.sync.clear().then(() =>
 		browser.runtime.getBackgroundPage().then(page =>
 		{
 			page.location.reload();
