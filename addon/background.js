@@ -59,7 +59,7 @@ function cleanRedirectHeaders(details)
 	if (!loc || !loc.value)
 		return {};
 
-	var dest = loc.value, cleanDest = cleanLink(dest, details.url);
+	var dest = new URL(loc.value, details.url).href, cleanDest = cleanLink(dest, details.url);
 
 	/* NB.  XUL code seemed to mark redirected requests, due to infinite redirections on *.cox.net,
 	 * see #13 & 8c280b7. However it is not clear whether this is necessary nor how to do this in webexts.
