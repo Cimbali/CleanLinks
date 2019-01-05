@@ -35,6 +35,7 @@ const javascript_link = /^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/
 const encoded_scheme_url = /(?:\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i
 const encoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i
 const decoded_url_beforepath = /^([a-z]+:\/\/(([-0-9a-z$_.+!*'(),]+(:[-0-9a-z$_.+!*'(),]+)?@)?([a-z0-9-]+(\.[a-z0-9-]+)+|\[[0-9a-f:.]+\]))|www(\.[a-z0-9-]+)+)(:[0-9]+)?/i
+const trailing_invalid_chars = /([^-a-z0-9$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
 
 var prefValues = {
 	enabled   : true,
@@ -309,14 +310,15 @@ function decodeURIGeneral(link, base)
 				continue;
 
 			capture = decodeURIComponent(capture);
-			log('decoded URI Component =', capture)
 
 			// strip any non-link parts of capture that appeared after decoding the URI component
-			var pos;
-			if ((pos = capture.indexOf('html&')) !== -1 || (pos = capture.indexOf('html%')) !== -1)
-				capture = capture.substr(0, pos + 4);
-			else if ((pos = capture.indexOf('/&')) !== -1) // || (pos = capture.indexOf('/%')) !== -1)
-				capture = capture.substr(0, pos);
+			var [before_path] = capture.match(decoded_url_beforepath);
+			log('decoded URI Component =', capture, '->', before_path)
+			link = new URL(capture, link.href);
+			capture = capture.slice(0, before_path.length) +
+					  capture.slice(before_path.length).replace(trailing_invalid_chars, '')
+
+			log('cleaned URI Component =', capture)
 
 			link = new URL(capture.replace(/&amp;/g, '&'), link.href);
 			break;
