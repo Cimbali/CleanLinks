@@ -1,6 +1,6 @@
 {
 	"name": "CleanLinks",
-	"version": "3.2.1",
+	"version": "3.2.2",
 	"description": "Converts obfuscated/nested links to genuine clean links",
 	"author": "Cimbali <me@cimba.li>",
 	"license": "MPL-2.0",
