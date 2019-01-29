@@ -16,12 +16,13 @@
 			"homepage_url": "https://github.com/Cimbali/CleanLinks",
 			})
 		}),
-		storage: {local: {get: () => {}}},
+		storage: {local: {get: () => {}, set: () => {}}},
 		i18n: {getMessage: () => "string"}
 	}
 	</script>
 
 	<!-- Embed the actual cleanLink script -->
+	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/prefs.js"></script>
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/cleanlink.js"></script>
 
 	<!-- Inner workings of this page -->

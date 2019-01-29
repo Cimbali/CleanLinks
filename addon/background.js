@@ -12,6 +12,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+'use strict'
 
 function setIcon(marker)
 {
@@ -87,7 +88,7 @@ function onRequest(details)
 {
 	var dest = details.url, curLink = details.originUrl;
 
-	if (!prefValues.enabled || !prefValues.httpall && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
+	if (!prefs.values.enabled || !prefs.values.httpall && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
 		return {};
 
 	var urlpos = temporaryWhitelist.indexOf(dest);
@@ -155,16 +156,16 @@ function handleMessage(message, sender)
 
 	case 'notify':
 		var p;
-		if (prefValues.notifications)
+		if (prefs.values.notifications)
 		{
 			p = browser.notifications.create(message.url,
 			{
 				type: 'basic',
-				iconUrl: browser.extension.getURL('icon.png'),
+				iconUrl: browser.extension.getURL('/icons/CleanLinks.png'),
 				title: 'Link cleaned!',
 				message: message.url
 			});
-			browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + prefValues.notiftime});
+			browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + prefs.values.notiftime});
 		}
 		else
 			p = Promise.resolve(null);
@@ -174,7 +175,7 @@ function handleMessage(message, sender)
 		else if (message.tab_id == -1)
 			message.tab_id = browser.tabs.TAB_ID_NONE;
 
-		if (prefValues.cltrack)
+		if (prefs.values.cltrack)
 		{
 			var hist = cleanedPerTab.get(message.tab_id).history;
 			hist.push(Object.assign({}, message));
@@ -198,7 +199,7 @@ function handleMessage(message, sender)
 		else if (message.target == new_tab)
 		{
 			return get_browser_version.then(v =>
-				browser.tabs.create(Object.assign({ url: message.link, active: prefValues.switchToTab },
+				browser.tabs.create(Object.assign({ url: message.link, active: prefs.values.switchToTab },
 												  isNaN(v) || v < 57 ? {} : { openerTabId: sender.tab.id })))
 		}
 		else
@@ -213,10 +214,10 @@ function handleMessage(message, sender)
 			var entry = nonHist.splice(message.item, 1)[0];
 
 		var host = (new URL(entry.orig)).host;
-		if (prefValues.skipdoms.indexOf(host) === -1)
+		if (prefs.values.skipdoms.indexOf(host) === -1)
 		{
-			prefValues.skipdoms.push(host);
-			return browser.storage.local.set({configuration: serializeOptions()})
+			prefs.values.skipdoms.push(host);
+			return browser.storage.local.set({configuration: prefs.serialize()()})
 		}
 		else
 			return Promise.resolve(null)
@@ -228,19 +229,19 @@ function handleMessage(message, sender)
 
 	case 'options':
 	case 'toggle':
-		var oldPrefValues = Object.assign({}, prefValues);
+		var oldPrefValues = Object.assign({}, prefs.values);
 
 		if (message.action == 'toggle')
 		{
-			prefValues.enabled = !prefValues.enabled;
-			var p = browser.storage.local.set({configuration: serializeOptions()});
+			prefs.values.enabled = !prefs.values.enabled;
+			var p = browser.storage.local.set({configuration: prefs.serialize()()});
 		}
 		else
-			var p = loadOptions();
+			var p = prefs.load();
 
 		return p.then(() =>
 		{
-			if (!prefValues.cltrack) {
+			if (!prefs.values.cltrack) {
 				for (var key in cleanedPerTab)
 					if (typeof cleanedPerTab[key] !== 'function')
 						cleanedPerTab.clear(key);
@@ -248,7 +249,7 @@ function handleMessage(message, sender)
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
 			var changes = ['enabled', 'cbc', 'progltr', 'httpall', 'textcl'].reduce((dict, prop) =>
-				Object.assign(dict, {[prop]: (prefValues.enabled && prefValues[prop] === true ? 1 : 0)
+				Object.assign(dict, {[prop]: (prefs.values.enabled && prefs.values[prop] === true ? 1 : 0)
 										- (oldPrefValues.enabled && oldPrefValues[prop] === true ? 1 : 0)})
 			, {});
 
@@ -257,7 +258,7 @@ function handleMessage(message, sender)
 				{
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
-					contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
+					contexts: prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
 				});
 			else if (changes.cbc < 0)
 				browser.contextMenus.remove('copy-clean-link')
@@ -265,7 +266,7 @@ function handleMessage(message, sender)
 				browser.contextMenus.update('copy-clean-link',
 				{
 					title: 'Copy clean link',
-					contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
+					contexts: prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
 				});
 
 			if (changes.progltr > 0)
@@ -274,10 +275,10 @@ function handleMessage(message, sender)
 				browser.webRequest.onHeadersReceived.removeListener(cleanRedirectHeaders);
 
 			if (changes.enabled != 0)
-				setIcon(prefValues.enabled ? icon_default : icon_disabled);
+				setIcon(prefs.values.enabled ? icon_default : icon_disabled);
 
 			browser.tabs.query({}).then(tabs => tabs.forEach(tab =>
-				browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})
+				browser.tabs.sendMessage(tab.id, {action: 'reload options', enabled: prefs.values.enabled}).catch(() => {})
 			));
 		})
 
@@ -300,7 +301,7 @@ browser.runtime.onMessage.addListener(handleMessage);
 browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
 browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});
 
-loadOptions().then(() =>
+prefs.load().then(() =>
 {
 	browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
 
@@ -317,20 +318,20 @@ loadOptions().then(() =>
 		navigator.clipboard.writeText(cleanLink(link, tab.url))
 	});
 
-	if (!prefValues.enabled)
+	if (!prefs.values.enabled)
 	{
 		setIcon(icon_disabled);
 		return;
 	}
 
-	if (prefValues.progltr)
+	if (prefs.values.progltr)
 		browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
 
-	if (prefValues.cbc)
+	if (prefs.values.cbc)
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',
-			contexts: prefValues.textcl ? ['link', 'selection', 'page'] : ['link']
+			contexts: prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
 		});
 
 	// Auto update badge text for pages when loading is complete
@@ -343,3 +344,4 @@ loadOptions().then(() =>
 		cleanedPerTab.clear(id);
 	});
 });
+console.log('Done loading background.js')

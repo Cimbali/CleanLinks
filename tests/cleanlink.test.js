@@ -9,22 +9,6 @@ describe('cleanLink', function() {
 		expect(cleanLink('http://example.com/aHR0cDovL3d3dy5nb29nbGUuY29t?arg=val')).to.equal('http://www.google.com/');
 		done();
 	});
-	it('should clean the link to the simple javascript function argument', done =>
-	{
-		expect(cleanLink("javascript:window.open('http://somesite.com/')")).to.equal('http://somesite.com/');
-		done();
-	});
-	it('should clean the link to the complex javascript function argument', done =>
-	{
-		expect(cleanLink("javascript:func(\"arg1\", 'arg2', 'http://somesite.com', 'target=\"_self\"')")).to.equal('http://somesite.com/');
-		done();
-	});
-	it('should clean the link to the javascript function relative path argument', done =>
-	{
-		expect(cleanLink("javascript:displayWindowzdjecie('/_misc/zdj_wym.php?url_zdjecie=https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg',1100,778);"))
-			.to.equal('https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg');
-		done();
-	});
 	it('should clean the link to the URL-encoded URL in parameters', done =>
 	{
 		expect(cleanLink('https://l.messenger.com/l.php?u=https%3A%2F%2Fwww.airbnb.co.uk%2Frooms%2F123456789&h=ATO7e0WkmJSY2jU_U6fyz6-MmwWZvfV4NAQwuaK1aB9QwmXdOZuHbPceKl8FCqHYTbEpoSWufsOmj36S4K0DI6BLpuIyGoRK_OcE5UHyPnY'))
@@ -47,12 +31,6 @@ describe('cleanLink', function() {
 	{
 		let link = 'https://www.laas.fr/public/sites/www.laas.fr.public/files/logos/LAAS-2016.png'
 		expect(cleanLink(link)).to.equal('https://www.laas.fr.public/files/logos/LAAS-2016.png');
-		done();
-	});
-	it('should strip the utm parameters', done =>
-	{
-		expect(cleanLink('https://www.aboutamazon.com/?keep=this&utm_source=gateway&utm_medium=footer'))
-			.to.equal('https://www.aboutamazon.com/?keep=this');
 		done();
 	});
 	it('should manage fb mobile URLs with all the path in the hash', done =>
@@ -85,6 +63,12 @@ describe('cleanLink', function() {
 			.to.equal('https://some.thing/forum/viewtopic.php?t=4960084')
 		done();
 	});
+	it('should manage', done =>
+	{
+		let url = 'blob:https://web.whatsapp.com/a-hash-code-here'
+		expect(cleanLink(url)).to.equal(url)
+		done();
+	});
 	it('should detect and decode partially encoded URLs', done =>
 	{
 		expect(cleanLink('https://www.google.com/url?q=https://www.foobar2000.org/&sa=U&ved=2ahUKEwi8l6qs2dbnAhXeDmMBHYvBCVMQFjAAegQIBhAB&usg=AOvVaw2YoonF8M2_JRbtpQrjT0dE'))
@@ -92,3 +76,37 @@ describe('cleanLink', function() {
 		done();
 	});
 });
+
+describe('extractJavascriptLink', function() {
+	it('should clean the link to the simple javascript function argument', done =>
+	{
+		expect(extractJavascriptLink("javascript:window.open('http://somesite.com/')")).to.equal('http://somesite.com/');
+		done();
+	});
+	it('should clean the link to the complex javascript function argument', done =>
+	{
+		expect(extractJavascriptLink("javascript:func(\"arg1\", 'arg2', 'http://somesite.com', 'target=\"_self\"')")).to.equal('http://somesite.com/');
+		done();
+	});
+});
+
+describe('extractJavascriptLink + cleanLink', function() {
+	it('should clean the link to the javascript function relative path argument', done =>
+	{
+		let rel_url = "javascript:displayWindowzdjecie('/_misc/zdj_wym.php?url_zdjecie=https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg',1100,778);";
+		let unjs_url = extractJavascriptLink(rel_url, 'http://somedomain.com/a/page.html?foo=qux')
+		console.log('After cleaning JS link: ' + unjs_url)
+		expect(cleanLink(unjs_url))
+			.to.equal('https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg');
+		done();
+	});
+});
+
+/*
+	it('should strip the utm parameters', done =>
+	{
+		expect(cleanLink('https://www.aboutamazon.com/?keep=this&utm_source=gateway&utm_medium=footer'))
+			.to.equal('https://www.aboutamazon.com/?keep=this');
+		done();
+	});
+*/

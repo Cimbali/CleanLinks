@@ -12,156 +12,17 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-const _ = browser.i18n.getMessage
-const attr_cleaned_count = 'data-cleanedlinks';
-const attr_cleaned_link = 'data-cleanedlink';
-const str_cleanlink_touch = "\n\n- " + _("browser_touch");
-
-const title = browser.runtime.getManifest().name;
-const version = browser.runtime.getManifest().version;
-const homepage = browser.runtime.getManifest().homepage_url;
-const copyright = browser.runtime.getManifest().author;
-
-const icon_default = '';
-const icon_disabled = '-';
-const icon_fire = '~';
-const icon_green = '!';
-
-const same_tab = 0;
-const new_tab = 1;
-const new_window = 2;
-
-const javascript_link = /^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/
 const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or "="}[a-z]+://{more stuff}
 const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
 const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i					// {base64-encoded http or www.}{more valid base64 chars}
 const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
 const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComponent('=')], ['&', encodeURIComponent('&')]];
 
-var prefValues = {
-	enabled   : true,
-	skipwhen  : new RegExp('/ServiceLogin|imgres\\?|searchbyimage\\?|watch%3Fv|auth\\?client_id|signup|bing\\.com/widget|'
-		+ 'oauth|openid\\.ns|\\.mcstatic\\.com|sVidLoc|[Ll]ogout|submit\\?url=|magnet:|google\\.com/recaptcha/|'
-		+ '\\.google\\.[a-z.]+\\/search\\?(.+&)?q=http|^https?:\\/\\/www\\.amazon\\.[a-z.]+\\/.*\\/voting\\/cast\\/'),
-	remove    : /\b((?:ref|aff)\w*|utm_\w+|(?:merchant|programme|media)ID)|fbclid/,
-	skipdoms  : ['accounts.google.com', 'docs.google.com', 'translate.google.com',
-				'login.live.com', 'plus.google.com', 'twitter.com',
-				'static.ak.facebook.com', 'www.linkedin.com', 'www.virustotal.com',
-				'account.live.com', 'admin.brightcove.com', 'www.mywot.com',
-				'webcache.googleusercontent.com', 'web.archive.org', 'accounts.youtube.com',
-				'signin.ebay.com'],
-	highlight : true,                                          // highlight cleaned links
-	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
-	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
-	httpall   : true,                                          // http capture all traffic, not just main frame
-	cbc       : true,                                          // Context menus to clean links
-	gotarget  : false,                                         // whether we respect target attributes on links that are being cleaned
-	textcl    : false,                                         // search for & clean links in selected text
-	ignhttp   : false,                                         // ignore non-http(s?) links
-	cltrack   : true,                                          // whether we track the link cleaning
-	switchToTab : true,                                        // Should be a copy of the browser preference: switch to a new tab when we open a link?
-	notifications: false,                                      // Send notifications when tracking links?
-	notiftime : 800,                                           // Duration of a notification in ms
-	debug     : true
-}
-
-
-function log()
-{
-	if (prefValues.debug) console.log.apply(null, arguments)
-}
-
-
-function serializeOptions()
-{
-	return Object.keys(prefValues).reduce((serializedVals, param) =>
-	{
-		if (prefValues[param] instanceof RegExp)
-			serializedVals[param] = prefValues[param].source;
-		else if (Array.isArray(prefValues[param]))
-			serializedVals[param] = prefValues[param].join(',');
-		else
-			serializedVals[param] = prefValues[param];
-
-		return serializedVals;
-	}, {});
-}
-
-
-function upgradeOptions(options)
-{
-	if ('httpomr' in options) {
-		options['httpall'] = options['httpomr'];
-		delete options['httpomr'];
-	}
-}
-
-
-function loadOptions()
-{
-	var check_storages = key => new Promise(found =>
-	{
-		browser.storage.local.get(key).then(data =>
-		{
-			if (key in data)
-			{
-				browser.storage.local.clear();
-				browser.storage.sync.set(data);
-				found(data);
-			}
-			else
-				browser.storage.sync.get(key).then(data => found(data))
-		})
-	});
-
-	// return the promise so it can be chained
-	return check_storages('configuration').then(data =>
-	{
-		if ('configuration' in data) {
-			upgradeOptions(data.configuration);
-
-			for (var param in data.configuration) {
-				if (typeof prefValues[param] == 'number')
-					prefValues[param] = parseInt(data.configuration[param]);
-				else if (typeof prefValues[param] == 'boolean')
-				{
-					prefValues[param] = data.configuration[param] === true
-									|| data.configuration[param] === 'true'
-									|| data.configuration[param] === 'on';
-				}
-				else if (typeof prefValues[param] == 'string')
-					prefValues[param] = data.configuration[param] || '';
-				else if (prefValues[param] instanceof RegExp)
-				{
-					try {
-						prefValues[param] = new RegExp(data.configuration[param] || '.^');
-					} catch (e) {
-						log('Error parsing regex ' + (data.configuration[param] || '.^') + ' : ' + e.message);
-					}
-				}
-				else if (Array.isArray(prefValues[param]))
-					prefValues[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
-			}
-		}
-	});
-}
-
-
-function highlightLink(node, remove)
-{
-	// parse and apply ;-separated list of key:val style properties
-	('' + prefValues.hlstyle).split(';').forEach(function (r)
-	{
-		let [prop, val] = r.split(':').map(s => s.trim());
-		node.style.setProperty(prop, remove ? '' : val, 'important');
-	});
-}
-
 
 function skipLinkType(link)
 {
 	return (link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:")
-			|| (prefValues.skipwhen && prefValues.skipwhen.test(link)));
+			|| (prefs.values.skipwhen && prefs.values.skipwhen.test(link)));
 }
 
 
@@ -231,7 +92,7 @@ function getBaseURL(base)
 	}
 
 	// fall back on window.location if it exists
-	if (window)
+	if (typeof window !== 'undefined')
 	{
 		base = new URL(window.location);
 		base.hash = '';
@@ -239,19 +100,6 @@ function getBaseURL(base)
 
 	return base;
 }
-
-function extractJavascriptLink(link, base)
-{
-	// extract javascript arguments
-	var [all, quote, linkParam] = link.match(javascript_link) || [];
-	if (all)
-		link = linkParam;
-
-	// TODO: what if new URL() throws? return link?
-	// Also check that it only happens in injected script
-	return new URL(link, typeof base === 'undefined' ? base : base.href);
-}
-
 
 // pre-process base-64 matches, before decoding them
 function domainRulesBase64(link, base, base64match)
@@ -337,7 +185,7 @@ function decodeEmbeddedURI(link, base)
 			{
 				// got the new link!
 				link = new URL((capture.startsWith('www.') ? link.protocol + '//' : '') + capture);
-				log('decoded URI Component = ' + capture + ' -> ' + link.origin + ' + ' + link.href.slice(link.origin.length))
+				log('decoded URI Component = ' + capture + ' → ' + link.origin + ' + ' + link.href.slice(link.origin.length))
 				all = str;
 				break;
 			}
@@ -398,12 +246,12 @@ function decodeEmbeddedURI(link, base)
 
 function filterParams(link, base)
 {
-	if (prefValues.remove.test(link))
+	if (prefs.values.remove.test(link))
 	{
 		var cleanParams = new URLSearchParams();
 		for (let [key, val] of link.searchParams)
 		{
-			if (!key.match(prefValues.remove))
+			if (!key.match(prefs.values.remove))
 				cleanParams.append(key, val);
 		}
 		link.search = cleanParams.toString();
@@ -424,15 +272,15 @@ function cleanLink(link, base)
 	}
 
 	base = getBaseURL(base);
-	link = extractJavascriptLink(link, base);
+	link = new URL(link)
 
-	if (prefValues.skipdoms && prefValues.skipdoms.indexOf(link.host) !== -1)
+	if (prefs.values.skipdoms && prefs.values.skipdoms.indexOf(link.host) !== -1)
 	{
 		log('not cleaning ' + link + ' : host in skipdoms');
 		return link;
 	}
 
-	if (prefValues.ignhttp && !(/^https?:$/.test(link.protocol)))
+	if (prefs.values.ignhttp && !(/^https?:$/.test(link.protocol)))
 	{
 		log('not cleaning ' + link + ' : ignoring non-http(s) links');
 		return link;
@@ -452,51 +300,4 @@ function cleanLink(link, base)
 	log('cleaning ' + origLink + ' : ' + link.href)
 
 	return link.href;
-}
-
-
-function textFindLink(node)
-{
-	let pos, selection = node.ownerDocument && node.ownerDocument.defaultView.getSelection();
-
-	// if selection has a node with data, and we can get the offset in that data
-	if (selection && selection.isCollapsed && selection.focusNode && selection.focusNode.data && (pos = selection.focusOffset))
-	{
-		// unsanitized content of selection
-		let content = selection.focusNode.data.substr(--pos);
-
-		// sanitize selection: remove 0-space tags, replace other tags with spaces
-		let text = node.innerHTML.replace(/<\/?wbr>/ig, '').replace(/<[^>]+?>/g, ' ');
-
-		// recover position of selection in sanitized text
-		pos = text.indexOf(content) + 1;
-		if (pos === 0)
-		{
-			text = node.textContent;
-			pos = text.indexOf(content) + 1;
-		}
-
-		// tools to modify boundaries of selection, until a reasonable url
-		let boundaryChars = ' "\'<>\n\r\t()[]|',
-			protectedBoundaryChars = boundaryChars.replace(/(.)/g, '\\$1'),
-			trimEndRegex = RegExp("[" + protectedBoundaryChars + "]+$");
-
-		// move start of selection backwards until start of data or a boundary character
-		while (pos && boundaryChars.indexOf(text[pos]) === -1)
-			--pos;
-
-		text = (pos && text.substr(++pos) || text)
-		text = text.match(/^\s*(?:\w+:\/\/|www\.)[^\s">]{4,}/)
-
-		if (text)
-		{
-			text = text.shift().trim().replace(trimEndRegex, '');
-			if (text.indexOf('://') === -1)
-				text = 'http://' + text;
-		}
-
-		return text;
-	}
-
-	return undefined;
 }

@@ -12,6 +12,21 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+'use strict'
+
+/*
+function highlightLink(node, remove)
+{
+	// parse and apply ;-separated list of key:val style properties
+	('' + prefValues.hlstyle).split(';').forEach(function (r)
+	{
+		let [prop, val] = r.split(':').map(s => s.trim());
+		node.style.setProperty(prop, remove ? '' : val, 'important');
+	});
+}
+*/
+
+
 function eventDoClick(url, node, evt)
 {
 	if (evt.button == 0 && evt.altKey)
@@ -21,7 +36,7 @@ function eventDoClick(url, node, evt)
 	let open_newtab = evt.ctrlKey || evt.button == 1;
 	let open_newwin = evt.shiftKey;
 
-	if (prefValues.gotarget && evt.button == 0 && !(evt.shiftKey || evt.ctrlKey || evt.metaKey || evt.altKey))
+	if (/*prefValues.gotarget && */ evt.button == 0 && !(evt.shiftKey || evt.ctrlKey || evt.metaKey || evt.altKey))
 	{
 		let target = node.hasAttribute('target') && node.getAttribute('target') || '_self';
 		if ("_blank" == target)
@@ -47,11 +62,17 @@ function eventDoClick(url, node, evt)
 
 			if (wnd)
 			{
+				evt.stopPropagation();
+				evt.preventDefault();
+
 				wnd.location = url;
 				return true;
 			}
 		}
 	}
+
+	evt.stopPropagation();
+	evt.preventDefault();
 
 	browser.runtime.sendMessage({
 		action: 'open url',
@@ -69,71 +90,62 @@ function eventDoClick(url, node, evt)
 	return true;
 }
 
-
-/* TODO: use if on mobile? was cleanlinks.mob
-function eventDoClick(url)
+function extractJavascriptLink(textLink, baseURL)
 {
-	window.content.location = url;
-	return true;
+	var [all, quote, cleanedLink] = textLink.match(/^(?:javascript:)?.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
+
+	console.log('matched: ' + cleanedLink)
+	try {
+		return new URL(cleanedLink, baseURL).href
+	} catch (e) {
+		return;
+	}
+
 }
-*/
 
 
 function onClick(evt)
 {
-	let node = evt.target,
-		textLink = null;
+	var node = evt.target, textLink = '', url;
 
-	if (node.nodeName != 'A' && !evt.altKey && prefValues.textcl)
-		textLink = textFindLink(node);
-
-	if (node.nodeName != 'A' && !textLink)
-		do {
-			node = node.parentNode;
-		} while (node && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1);
-
-	if (textLink || (node && node.nodeName == 'A')) // && !handledElsewhere(node)
+	do
 	{
-		switch (textLink || node.ownerDocument.location.hostname)
+		if (node.nodeName === 'A')
 		{
-			case 'twitter.com':
-				if (node.hasAttribute('data-expanded-url'))
-					textLink = node.getAttribute('data-expanded-url');
-				break;
-			case 'www.facebook.com':
-				if (('' + node.getAttribute('onmouseover')).indexOf('LinkshimAsyncLink') !== -1)
-					textLink = node.href;
-		}
-
-		// clean text on pre-clean for a tratement with baseUI
-		let link = textLink || node.href;
-		let cleanedLink = cleanLink(link, node.baseURI);
-		if (textLink || link != cleanedLink)
-		{
-			evt.stopPropagation();
-			evt.preventDefault();
-
-			if (eventDoClick(cleanedLink, node, evt))
+			if (node.href.startsWith('javascript:'))
 			{
-				if (prefValues.highlight)
-					highlightLink(node);
-
-				// instead of blinking the URL bar, tell the background to show a notification.
-				browser.runtime.sendMessage({action: 'notify', url: cleanedLink, orig: link, type: 'clicked'});
+				textLink = node.href
+				break;
 			}
+			else if (node.href !== '#')
+				return;
 		}
-		else if(!textLink && node.hasAttribute(attr_cleaned_link))
-		{
-			browser.runtime.sendMessage({
-				action: 'notify',
-				url: evt.target.href,
-				orig: evt.target.getAttribute(attr_cleaned_link),
-				type: 'pre-cleaned'
-			});
-		}
+
+		for (let evttype of ['onclick', 'onmouseup', 'onmousedown'])
+			if (node[evttype] !== null)
+			{
+				textLink = node[evttype].toString();
+				textLink = textLink.slice(textLink.indexOf('{') + 1, textLink.lastIndexOf('}'))
+				break;
+			}
+
+	} while (!textLink && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
+
+	var cleanedLink = extractJavascriptLink(textLink, window.location);
+
+	if (!cleanedLink || cleanedLink === textLink)
+		return;
+
+	console.log('Cleaning ' + textLink + ' to ' + cleanedLink)
+	if (eventDoClick(url.href, node, evt))
+	{
+		// instead of blinking the URL bar, tell the background to show a notification.
+		browser.runtime.sendMessage({action: 'notify', url: cleanedLink, orig: textLink, type: 'clicked'});
 	}
 }
 
+
+/*
 loadOptions().then(() =>
 {
 	if (prefValues.enabled)
@@ -142,17 +154,19 @@ loadOptions().then(() =>
 
 browser.runtime.onMessage.addListener(message =>
 {
-	if (message.action == 'reload options')
+	if (message.action === 'reload options')
 	{
-		var had_onclick = prefValues.enabled;
-		return loadOptions().then(() =>
+		if (prefValues.enabled != message.enabled)
 		{
-			if (!had_onclick && prefValues.enabled)
+			if (message.enabled)
 				window.addEventListener('click', onClick, true);
-			else if (had_onclick && !prefValues.enabled)
+			else
 				window.removeEventListener('click', onClick, true);
-		});
+		}
+		return loadOptions()
 	}
 	else
 		return Promise.reject('Unexpected message: ' + String(message));
 })
+*/
+window.addEventListener('click', onClick, true);
