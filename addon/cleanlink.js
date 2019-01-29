@@ -32,7 +32,7 @@ const new_tab = 1;
 const new_window = 2;
 
 const javascript_link = /^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/
-const encoded_scheme_url = /(?:\b|3D)([a-z]{2,}(?:\:|%3a)(?:\/|%2f){2}.+)$/i
+const encoded_scheme_url = /(?:\b|3D)([a-z]{2,}:\/\/.+)$/i
 const encoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i
 const decoded_url_beforepath = /^([a-z]+:\/\/(([-0-9a-z$_.+!*'(),]+(:[-0-9a-z$_.+!*'(),]+)?@)?([a-z0-9-]+(\.[a-z0-9-]+)+|\[[0-9a-f:.]+\]))|www(\.[a-z0-9-]+)+)(:[0-9]+)?/i
 const trailing_invalid_chars = /([^-a-z0-9$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
@@ -160,7 +160,7 @@ function getLinkSearchStrings(link, depth)
 	else if (depth > 2)
 		return [];
 
-	var arr = [link.pathname], vals = [];
+	var arr = [decodeURIComponent(link.pathname)], vals = [];
 	if (link.search)
 	{
 		// NB searchParams.values() does not work reliably, probably because URLSearchParams are some kind of generator:
@@ -308,8 +308,6 @@ function decodeURIGeneral(link, base)
 			[all, capture] = str.match(encoded_scheme_url) || str.match(encoded_www_url) || [];
 			if (!all)
 				continue;
-
-			capture = decodeURIComponent(capture);
 
 			// strip any non-link parts of capture that appeared after decoding the URI component
 			var [before_path] = capture.match(decoded_url_beforepath);

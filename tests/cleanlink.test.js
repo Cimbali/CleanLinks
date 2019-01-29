@@ -99,4 +99,10 @@ describe('cleanLink', function() {
 		expect(cleanLink(link)).to.equal(link);
 		done();
 	});
+	it('should keep valid encoded characters in cleaned links', done =>
+	{
+		let link ='https://www.google.com/url?sa=t&rct=j&url=https%3A%2F%2Fzh.wikipedia.org%2Fzh%2F%25E6%25B1%2589%25E8%25AF%25AD&source=web'
+		expect(cleanLink(link)).to.equal('https://zh.wikipedia.org/zh/%E6%B1%89%E8%AF%AD');
+		done();
+	});
 });
