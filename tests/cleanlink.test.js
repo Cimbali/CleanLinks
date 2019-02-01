@@ -87,6 +87,12 @@ describe('cleanLink', function() {
 		expect(cleanLink(link)).to.equal(link);
 		done();
 	});
+	it('should identify a www-link in a path component', done =>
+	{
+		let link = 'https://www.laas.fr/public/sites/www.laas.fr.public/files/logos/LAAS-2016.png'
+		expect(cleanLink(link)).to.equal('https://www.laas.fr.public/files/logos/LAAS-2016.png');
+		done();
+	});
 	it('should strip the utm parameters', done =>
 	{
 		expect(cleanLink('https://www.aboutamazon.com/?keep=this&utm_source=gateway&utm_medium=footer'))

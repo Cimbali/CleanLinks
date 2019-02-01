@@ -313,7 +313,7 @@ function decodeURIGeneral(link, base)
 			var [before_path] = capture.match(decoded_url_beforepath);
 			log('decoded URI Component =', capture, '->', before_path)
 			link = new URL(capture, link.href);
-			capture = capture.slice(0, before_path.length) +
+			capture = (capture.startsWith('www.') ? link.protocol + '//' : '') + capture.slice(0, before_path.length) +
 					  capture.slice(before_path.length).replace(trailing_invalid_chars, '')
 
 			log('cleaned URI Component =', capture)
