@@ -35,7 +35,7 @@ const javascript_link = /^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/
 const encoded_scheme_url = /(?:\b|3D)([a-z]{2,}:\/\/.+)$/i
 const encoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i
 const decoded_url_beforepath = /^([a-z]+:\/\/(([-0-9a-z$_.+!*'(),]+(:[-0-9a-z$_.+!*'(),]+)?@)?([a-z0-9-]+(\.[a-z0-9-]+)+|\[[0-9a-f:.]+\]))|www(\.[a-z0-9-]+)+)(:[0-9]+)?/i
-const trailing_invalid_chars = /([^-a-z0-9$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
+const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
 
 var prefValues = {
 	enabled   : true,

@@ -111,4 +111,10 @@ describe('cleanLink', function() {
 		expect(cleanLink(link)).to.equal('https://zh.wikipedia.org/zh/%E6%B1%89%E8%AF%AD');
 		done();
 	});
+	it('should keep valid ~username in cleaned links', done =>
+	{
+		let link ='https://www.google.com/url?url=https%3A%2F%2Fwww.mcs.anl.gov%2F~zhenxie%2Farchive%2FLetterANL%2Fletter.html'
+		expect(cleanLink(link)).to.equal('https://www.mcs.anl.gov/~zhenxie/archive/LetterANL/letter.html');
+		done();
+	});
 });
