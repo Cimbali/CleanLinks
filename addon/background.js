@@ -82,6 +82,9 @@ function onRequest(details)
 {
 	var dest = details.url, curLink = details.originUrl;
 
+	if (!prefValues.enabled || !prefValues.httpomr && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
+		return {};
+
 	var urlpos = temporaryWhitelist.indexOf(dest);
 	if (urlpos >= 0) {
 		log('One-time whitelist for', JSON.stringify(dest));
@@ -244,11 +247,6 @@ function handleMessage(message, sender)
 			else if (changes.progltr < 0)
 				browser.webRequest.onHeadersReceived.removeListener(cleanRedirectHeaders);
 
-			if (changes.httpomr > 0)
-				browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
-			else if (changes.httpomr < 0)
-				browser.webRequest.onBeforeRequest.removeListener(onRequest);
-
 			if (changes.enabled != 0)
 				setIcon(prefValues.enabled ? icon_default : icon_disabled);
 
@@ -287,6 +285,8 @@ browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});
 
 loadOptions().then(() =>
 {
+	browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
+
 	// Always add the listener, even if CleanLinks is disabled. Only add the menu item on enabled.
 	browser.contextMenus.onClicked.addListener((info, tab) =>
 	{
@@ -312,9 +312,6 @@ loadOptions().then(() =>
 		setIcon(icon_disabled);
 		return;
 	}
-
-	if (prefValues.httpomr)
-		browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
 
 	if (prefValues.progltr)
 		browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);

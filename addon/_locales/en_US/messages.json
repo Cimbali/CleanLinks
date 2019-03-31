@@ -164,11 +164,11 @@
 	"description": ""
 },
 "httpomr_title": {
-	"message": "Clean outgoing HTTP requests",
+	"message": "Clean all outgoing HTTP requests, instead of only top frame",
 	"description": ""
 },
 "httpomr_tooltip": {
-	"message": "Setup an http request listener that can clean links from outside firefox, or initiated automatically by a page such as refreshes.",
+	"message": "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you.",
 	"description": ""
 },
 "switchToTab_title": {

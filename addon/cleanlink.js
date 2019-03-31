@@ -51,7 +51,7 @@ var prefValues = {
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
 	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
-	httpomr   : true,                                          // http-on-modify-request: skip redirects
+	httpomr   : true,                                          // http capture all traffic, not just main frame
 	cbc       : true,                                          // Context menus to clean links
 	gotarget  : false,                                         // whether we respect target attributes on links that are being cleaned
 	textcl    : false,                                         // search for & clean links in selected text
