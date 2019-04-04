@@ -51,7 +51,7 @@ var prefValues = {
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
 	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
-	httpomr   : true,                                          // http capture all traffic, not just main frame
+	httpall   : true,                                          // http capture all traffic, not just main frame
 	cbc       : true,                                          // Context menus to clean links
 	gotarget  : false,                                         // whether we respect target attributes on links that are being cleaned
 	textcl    : false,                                         // search for & clean links in selected text
@@ -86,6 +86,15 @@ function serializeOptions()
 }
 
 
+function upgradeOptions(options)
+{
+	if ('httpomr' in options) {
+		options['httpall'] = options['httpomr'];
+		delete options['httpomr'];
+	}
+}
+
+
 function loadOptions()
 {
 	var check_storages = key => new Promise(found =>
@@ -107,6 +116,8 @@ function loadOptions()
 	return check_storages('configuration').then(data =>
 	{
 		if ('configuration' in data) {
+			upgradeOptions(data.configuration);
+
 			for (var param in data.configuration) {
 				if (typeof prefValues[param] == 'number')
 					prefValues[param] = parseInt(data.configuration[param]);

@@ -163,11 +163,11 @@
 	"message": "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.",
 	"description": ""
 },
-"httpomr_title": {
+"httpall_title": {
 	"message": "Clean all outgoing HTTP requests, instead of only top frame",
 	"description": ""
 },
-"httpomr_tooltip": {
+"httpall_tooltip": {
 	"message": "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you.",
 	"description": ""
 },

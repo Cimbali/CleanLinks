@@ -82,7 +82,7 @@ function onRequest(details)
 {
 	var dest = details.url, curLink = details.originUrl;
 
-	if (!prefValues.enabled || !prefValues.httpomr && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
+	if (!prefValues.enabled || !prefValues.httpall && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
 		return {};
 
 	var urlpos = temporaryWhitelist.indexOf(dest);
@@ -221,7 +221,7 @@ function handleMessage(message, sender)
 			}
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
-			var changes = ['enabled', 'cbc', 'progltr', 'httpomr', 'textcl'].reduce((dict, prop) =>
+			var changes = ['enabled', 'cbc', 'progltr', 'httpall', 'textcl'].reduce((dict, prop) =>
 				Object.assign(dict, {[prop]: (prefValues.enabled && prefValues[prop] === true ? 1 : 0)
 										- (oldPrefValues.enabled && oldPrefValues[prop] === true ? 1 : 0)})
 			, {});
