@@ -32,8 +32,9 @@ const new_tab = 1;
 const new_window = 2;
 
 const javascript_link = /^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/
-const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or decoded "="}[a-z]+://{more stuff}
+const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or "="}[a-z]+://{more stuff}
 const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
+const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i					// {base64-encoded http or www.}{more valid base64 chars}
 const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
 
 var prefValues = {
@@ -251,6 +252,7 @@ function getLinkURL(link, base)
 }
 
 
+// pre-process base-64 matches, before decoding them
 function domainRulesBase64(link, base, base64match)
 {
 	if (/\.yahoo.com$/.test(base.host))
@@ -260,21 +262,7 @@ function domainRulesBase64(link, base, base64match)
 }
 
 
-function decodeURIBase64(link, base, base64match)
-{
-	try
-	{
-		let decoded = decodeURIComponent(atob(base64match));
-		if (decoded)
-			return new URL(decoded);
-	}
-	catch (e)
-	{
-		log('Invalid base64 data in link', link, ':' , r, '-- error is', e);
-	}
-}
-
-
+// pre-process plain/url-encoded matches, before decoding them
 function domainRulesGeneral(link, base)
 {
 	if (typeof base !== 'undefined')
@@ -303,9 +291,37 @@ function domainRulesGeneral(link, base)
 }
 
 
-function decodeURIGeneral(link, base)
+function decodeEmbeddedURI(link, base)
 {
+	// first try to find a base64-encoded link
+	var base64match;
+	for (let str of getLinkSearchStrings(link))
+	{
+		[base64match] = str.match(base64_encoded_url) || [];
+		if (base64match)
+		{
+			base64match = domainRulesBase64(link, base, base64match);
+			try
+			{
+				let decoded = decodeURIComponent(atob(base64match));
+				if (!decoded)
+					continue;
+
+				if (decoded.startsWith('www.'))
+					decoded = link.protocol + '//' + decoded;
+
+				return new URL(decoded);
+			}
+			catch (e)
+			{
+				log('Invalid base64 data in link ' + link + ' : '  + decoded + ' -- error is ' + e);
+			}
+		}
+	}
+
 	var all, capture, lmt = 4;
+	link = domainRulesGeneral(link, base);
+
 	while (--lmt)
 	{
 		all = null;
@@ -367,7 +383,7 @@ function filterParams(link, base)
 
 function cleanLink(link, base)
 {
-	var origLink = link, base64match;
+	var origLink = link;
 
 	if (!link || skipLinkType(link))
 	{
@@ -380,33 +396,17 @@ function cleanLink(link, base)
 
 	if (prefValues.skipdoms && prefValues.skipdoms.indexOf(link.host) !== -1)
 	{
-		log('not cleaning', link, ': host in skipdoms');
+		log('not cleaning ' + link + ' : host in skipdoms');
 		return link;
 	}
 
 	if (prefValues.ignhttp && !(/^https?:$/.test(link.protocol)))
 	{
-		log('not cleaning', link, ': ignoring non-http(s) links');
+		log('not cleaning ' + link + ' : ignoring non-http(s) links');
 		return link;
 	}
 
-	for (let str of getLinkSearchStrings(link))
-	{
-		[base64match] = str.match(/\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i) || [];
-		if (base64match)
-		{
-			link = decodeURIBase64(link, base, domainRulesBase64(link, base, base64match));
-			break;
-		}
-	}
-	if (!base64match)
-	{
-		link = domainRulesGeneral(link, base);
-		if (!link)
-			return origLink;
-	}
-
-	link = decodeURIGeneral(link, base)
+	link = decodeEmbeddedURI(link, base)
 
 	// This is inherited from the legacy code, but is it ever really used ?
 	link.protocol = link.protocol.replace(/^h[\w*]+(ps?):$/i, 'htt$1:');
@@ -414,7 +414,7 @@ function cleanLink(link, base)
 	// Should params be filtered only here, when no whitelist is applied? All the time? With a separate whitelist mechanism?
 	link = filterParams(link, base);
 
-	log('cleaning', origLink, ':', link.href)
+	log('cleaning ' + origLink + ' : ' + link.href)
 
 	// compare with pre-cleaning link, but canonicalize through URL() if possible
 	// to ignore potential meaningless changes, i.e. "," -> "%2C"
@@ -424,6 +424,7 @@ function cleanLink(link, base)
 
 	return changed ? link.href : origLink;
 }
+
 
 function textFindLink(node)
 {
