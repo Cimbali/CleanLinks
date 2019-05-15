@@ -32,9 +32,8 @@ const new_tab = 1;
 const new_window = 2;
 
 const javascript_link = /^javascript:.+(["'])(.*?https?(?:\:|%3a).+?)\1/
-const encoded_scheme_url = /(?:\b|3D)([a-z]{2,}:\/\/.+)$/i
-const encoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i
-const decoded_url_beforepath = /^([a-z]+:\/\/(([-0-9a-z$_.+!*'(),]+(:[-0-9a-z$_.+!*'(),]+)?@)?([a-z0-9-]+(\.[a-z0-9-]+)+|\[[0-9a-f:.]+\]))|www(\.[a-z0-9-]+)+)(:[0-9]+)?/i
+const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or decoded "="}[a-z]+://{more stuff}
+const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
 const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
 
 var prefValues = {
@@ -314,22 +313,34 @@ function decodeURIGeneral(link, base)
 	while (--lmt)
 	{
 		all = null;
+
+		// try first raw: without encoding. If there is a https://, then use all the remaining part of the URL.
+		[all, capture] = link.href.slice(link.origin.length).match(decoded_scheme_url) || [];
+		if (all)
+		{
+			link = new URL(capture);
+			continue;
+		}
+
+		// otherwise check every parsed (URL-decoded) substring
 		for (let str of getLinkSearchStrings(link))
 		{
-			[all, capture] = str.match(encoded_scheme_url) || str.match(encoded_www_url) || [];
+			[all, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
 			if (!all)
 				continue;
 
-			// strip any non-link parts of capture that appeared after decoding the URI component
-			var [before_path] = capture.match(decoded_url_beforepath);
-			log('decoded URI Component =', capture, '->', before_path)
-			link = new URL(capture, link.href);
-			capture = (capture.startsWith('www.') ? link.protocol + '//' : '') + capture.slice(0, before_path.length) +
-					  capture.slice(before_path.length).replace(trailing_invalid_chars, '')
+			if (capture.startsWith('www.'))
+				capture = link.protocol + '//' + capture;
 
-			log('cleaned URI Component =', capture)
+			// got the new link!
+			link = new URL(capture);
+			log('decoded URI Component = ' + capture + ' -> ' + link.origin + ' + ' + link.href.slice(link.origin.length))
 
-			link = new URL(capture.replace(/&amp;/g, '&'), link.href);
+			// trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
+			// but only in the (path + search params + hash) part.
+			link = new URL(capture.slice(link.origin.length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'), link.origin)
+
+			log('cleaned URI Component =' + link.href)
 			break;
 		}
 
