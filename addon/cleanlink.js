@@ -39,7 +39,8 @@ const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{
 var prefValues = {
 	enabled   : true,
 	skipwhen  : new RegExp('/ServiceLogin|imgres\\?|searchbyimage\\?|watch%3Fv|auth\\?client_id|signup|bing\\.com/widget|'
-		+ 'oauth|openid\\.ns|\\.mcstatic\\.com|sVidLoc|[Ll]ogout|submit\\?url=|magnet:|google\\.com/recaptcha/'),
+		+ 'oauth|openid\\.ns|\\.mcstatic\\.com|sVidLoc|[Ll]ogout|submit\\?url=|magnet:|google\\.com/recaptcha/|'
+		+ '\\.google\\.[a-z.]+\\/search\\?(.+&)?q=http|^https?:\\/\\/www\\.amazon\\.[a-z.]+\\/.*\\/voting\\/cast\\/'),
 	remove    : /\b((?:ref|aff)\w*|utm_\w+|(?:merchant|programme|media)ID)|fbclid/,
 	skipdoms  : ['accounts.google.com', 'docs.google.com', 'translate.google.com',
 				'login.live.com', 'plus.google.com', 'twitter.com',
@@ -298,12 +299,7 @@ function domainRulesGeneral(link, base)
 				return new URL(link.match(/url\?url=([^&]+)/).pop().split(/%3a[\w-]+$/i).shift());
 	}
 
-	if (/\.google\.[a-z.]+\/search\?(?:.+&)?q=http/i.test(link)
-		|| /^https?:\/\/www\.amazon\.[\w.]+\/.*\/voting\/cast\//.test(link)
-	)
-		return null; // TODO: raise error? this is a domain+pattern-specific whitelist
-	else
-		return link;
+	return link;
 }
 
 
