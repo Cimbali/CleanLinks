@@ -39,7 +39,7 @@ describe('cleanLink', function() {
 	});
 	it('should preserve a link without redirects', done =>
 	{
-		let link = 'https://assets-cdn.github.com/assets/frameworks-95aff0b550d3fe338b645a4deebdcb1b.css'
+		let link = 'https://assets-cdn.github.com/assets/frameworks-95aff0b550d3fe338b645a4deebdcb1b.css?arg=val&ref=stuff#hashtag'
 		expect(cleanLink(link)).to.equal(link);
 		done();
 	});
