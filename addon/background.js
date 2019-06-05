@@ -108,17 +108,30 @@ function onRequest(details)
 	if (cleanUrl.href == origUrl.href)
 		return {};
 
+
+	var containsParentUrl;
 	try
 	{
-		same_domain = (new URL(cleanDest).domain == new URL(curLink).domain);
-	} catch(e) {}
+		var curUrl = new URL(curLink);
+		containsParentUrl = (cleanUrl.host + cleanUrl.pathname) === (curUrl.host + curUrl.pathname);
+	} catch(e) {
+		containsParentUrl = false;
+	}
+
+	for (let frame of details.frameAncestors)
+		if (!containsParentUrl)
+		{
+			var parentUrl = new URL(frame.url);
+			containsParentUrl = (cleanUrl.host + cleanUrl.pathname) === (parentUrl.host + parentUrl.pathname);
+		}
+
 
 	var cleaning_notif = { action: 'notify', url: cleanDest, orig: dest, tab_id: details.tabId };
 	if (details.type != 'main_frame')
 		cleaning_notif.type = 'request';
 
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
-	if (same_domain && details.type != 'main_frame')
+	if (containsParentUrl && details.type != 'main_frame')
 	{
 		handleMessage(Object.assign(cleaning_notif, {dropped: true}));
 		return {cancel: true};
