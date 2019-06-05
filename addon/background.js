@@ -106,10 +106,14 @@ function onRequest(details)
 		same_domain = (new URL(cleanDest).domain == new URL(curLink).domain);
 	} catch(e) {}
 
+	var cleaning_notif = { action: 'notify', url: cleanDest, orig: dest, tab_id: details.tabId };
+	if (details.type != 'main_frame')
+		cleaning_notif.type = 'request';
+
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (same_domain && details.type != 'main_frame')
 	{
-		handleMessage({ action: 'notify', url: cleanDest, orig: dest, dropped: true, type: 'request', tab_id: details.tabId });
+		handleMessage(Object.assign(cleaning_notif, {dropped: true}));
 		return {cancel: true};
 	}
 
@@ -117,7 +121,7 @@ function onRequest(details)
 	else if (cleanDest == curLink)
 		return {}
 
-	handleMessage({ action: 'notify', url: cleanDest, orig: dest, tab_id: details.tabId });
+	handleMessage(cleaning_notif);
 	return {redirectUrl: cleanDest};
 }
 
