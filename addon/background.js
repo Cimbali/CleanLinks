@@ -87,7 +87,7 @@ function onRequest(details)
 
 	var urlpos = temporaryWhitelist.indexOf(dest);
 	if (urlpos >= 0) {
-		log('One-time whitelist for', JSON.stringify(dest));
+		log('One-time whitelist for ' + JSON.stringify(dest));
 		temporaryWhitelist.splice(urlpos, 1);
 		return {};
 	}
@@ -120,7 +120,7 @@ function onRequest(details)
 
 function handleMessage(message, sender)
 {
-	log('received message :', JSON.stringify(message))
+	log('received message : ' + JSON.stringify(message))
 
 	switch (message.action)
 	{
@@ -163,7 +163,7 @@ function handleMessage(message, sender)
 		return p;
 
 	case 'open bypass':
-		log('Adding to one-time whitelist', message.link);
+		log('Adding to one-time whitelist ' + message.link);
 		temporaryWhitelist.push(message.link);
 
 	case 'open url':

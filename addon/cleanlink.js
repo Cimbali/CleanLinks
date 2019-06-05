@@ -135,7 +135,7 @@ function loadOptions()
 					try {
 						prefValues[param] = new RegExp(data.configuration[param] || '.^');
 					} catch (e) {
-						log('Error parsing regex', (data.configuration[param] || '.^'), ':', e.message);
+						log('Error parsing regex ' + (data.configuration[param] || '.^') + ' : ' + e.message);
 					}
 				}
 				else if (Array.isArray(prefValues[param]))
@@ -239,7 +239,7 @@ function getBaseURL(base)
 	return base;
 }
 
-function getLinkURL(link, base)
+function extractJavascriptLink(link, base)
 {
 	// extract javascript arguments
 	var [all, quote, linkParam] = link.match(javascript_link) || [];
@@ -352,7 +352,7 @@ function decodeEmbeddedURI(link, base)
 			// but only in the (path + search params + hash) part.
 			link = new URL(capture.slice(link.origin.length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'), link.origin)
 
-			log('cleaned URI Component =' + link.href)
+			log('cleaned URI Component = ' + link.href)
 			break;
 		}
 
@@ -387,12 +387,12 @@ function cleanLink(link, base)
 
 	if (!link || skipLinkType(link))
 	{
-		log('not cleaning', link, ': empty, source, or matches skipwhen');
+		log('not cleaning ' + link + ' : empty, source, or matches skipwhen');
 		return link;
 	}
 
 	base = getBaseURL(base);
-	link = getLinkURL(link, base);
+	link = extractJavascriptLink(link, base);
 
 	if (prefValues.skipdoms && prefValues.skipdoms.indexOf(link.host) !== -1)
 	{
