@@ -408,21 +408,18 @@ function cleanLink(link, base)
 
 	link = decodeEmbeddedURI(link, base)
 
-	// This is inherited from the legacy code, but is it ever really used ?
-	link.protocol = link.protocol.replace(/^h[\w*]+(ps?):$/i, 'htt$1:');
+	if (link.href == new URL(origLink))
+	{
+		log('cleaning ' + origLink + ' : unchanged')
+		return origLink;
+	}
 
 	// Should params be filtered only here, when no whitelist is applied? All the time? With a separate whitelist mechanism?
 	link = filterParams(link, base);
 
 	log('cleaning ' + origLink + ' : ' + link.href)
 
-	// compare with pre-cleaning link, but canonicalize through URL() if possible
-	// to ignore potential meaningless changes, i.e. "," -> "%2C"
-	var changed;
-	try { changed = (link != new URL(origLink)); }
-	catch (e) { changed = (origLink != link.href); }
-
-	return changed ? link.href : origLink;
+	return link.href;
 }
 
 

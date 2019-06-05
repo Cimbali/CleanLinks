@@ -92,9 +92,13 @@ function onRequest(details)
 		return {};
 	}
 
-	var cleanDest = cleanLink(dest, curLink), same_domain = false
+	var cleanDest = cleanLink(dest, curLink);
 
-	if (!cleanDest || cleanDest == dest)
+	if (!cleanDest) return {};
+
+	var origUrl = new URL(dest), cleanUrl = new URL(cleanDest);
+
+	if (cleanUrl.href == origUrl.href)
 		return {};
 
 	try
