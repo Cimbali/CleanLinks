@@ -61,19 +61,26 @@ function cleanRedirectHeaders(details)
 
 	var dest = new URL(loc.value, details.url).href, cleanDest = cleanLink(dest, details.url);
 
-	/* NB.  XUL code seemed to mark redirected requests, due to infinite redirections on *.cox.net,
-	 * see #13 & 8c280b7. However it is not clear whether this is necessary nor how to do this in webexts.
-	 *
-	 * NB2. XUL code also protected against "The page isn't redirecting properly" errors with the following:
-
-	if (cleanDest != details.url)
-		return {}
-	*/
-
 	if (cleanDest == dest)
 		return {};
 
-	handleMessage({ action: 'notify', url: cleanDest, orig: dest, type: 'header', tab_id: details.tabId });
+	var cleaning_notif = { action: 'notify', url: cleanDest, orig: dest, type: 'header', tab_id: details.tabId };
+
+	if (details.originUrl && cleanDest == new URL(details.originUrl).href ||
+			details.originUrl != details.documentUrl && cleanDest == new URL(details.documentUrl).href)
+	{
+		/* Risking an infinite loop of redirects here.
+		 * Try it once (i.e. it's not in history yet), but if we already tried then allow it. */
+		if (cleanedPerTab.get(details.tabId).history.some(historic_message =>
+			Object.keys(cleaning_notif).every(key => cleaning_notif[key] === historic_message[key])
+		))
+		{
+			log('Avoiding circular redirect ' + dest + ' -> ' + details.originUrl);
+			return {};
+		}
+	}
+
+	handleMessage(cleaning_notif);
 	return {redirectUrl: cleanDest};
 }
 
