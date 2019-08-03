@@ -18,12 +18,14 @@ function eventDoClick(url, node, evt)
 		return false; // alt+click, do nothing
 
 	let wnd = window;
+	let open_newtab = evt.ctrlKey || evt.button == 1;
+	let open_newwin = evt.shiftKey;
 
 	if (prefValues.gotarget && evt.button == 0 && !(evt.shiftKey || evt.ctrlKey || evt.metaKey || evt.altKey))
 	{
 		let target = node.hasAttribute('target') && node.getAttribute('target') || '_self';
 		if ("_blank" == target)
-			evt.button = 1;
+			open_newtab = true;
 		else
 		{
 			let frames = content.frames;
@@ -54,7 +56,7 @@ function eventDoClick(url, node, evt)
 	browser.runtime.sendMessage({
 		action: 'open url',
 		link: url,
-		target: (evt.ctrlKey || evt.button == 1) ? new_tab : (evt.shiftKey ? new_window : same_tab)
+		target: open_newtab ? new_tab : (open_newwin ? new_window : same_tab)
 	}).catch(() =>
 	{
 		// Could not find a target window or assigning a location to it failed
