@@ -1,7 +1,7 @@
 # CleanLinks Mozilla Firefox Extension
 
 ## What does it do?
-This Extension is designed to convert obfuscated/nested links to genuine/normal plain clean links.
+This Extension automatically detects and converts obfuscated/nested links to genuine/normal plain clean links.
 
 _Eg:_
 
