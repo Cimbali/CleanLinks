@@ -41,8 +41,6 @@ cleanedPerTab.clear = tab_id => { delete cleanedPerTab[tab_id]; };
 cleanedPerTab.getHistory = tab_id => cleanedPerTab.get(browser.tabs.TAB_ID_NONE).history.concat(cleanedPerTab.get(tab_id).history);
 cleanedPerTab.getCount = tab_id => cleanedPerTab.get(tab_id).count;
 
-var lastRightClick = {textLink: null, reply: () => {}}
-
 // wrap the promise in an async function call, to catch a potential ReferenceError
 var get_browser_version = (async () => await browser.runtime.getBrowserInfo())()
 							.then(info => parseFloat(info.version)).catch(() => NaN)
@@ -283,15 +281,6 @@ function handleMessage(message, sender)
 			));
 		})
 
-	case 'right click':
-		return new Promise((resolve, rejecte) =>
-		{
-			lastRightClick = {
-				textLink: message.link,
-				reply: resolve
-			}
-		})
-
 	default:
 		return Promise.reject('Unexpected message: ' + String(message));
 	}
@@ -324,15 +313,8 @@ loadOptions().then(() =>
 		else if ('selectionText' in info && info.selectionText)
 			link = info.selectionText;
 
-		// WARNING: potential race condition here (?) on right click we send a message to background,
-		// that populates rightClickLink[tab.id]. If the option (this listener) is triggered really fast,
-		// maybe it can happen before the link message gets here.
-		// In that case, we'll need to pre-make a promise, resolved by the message, and .then() it here.
-		else if (prefValues.textcl)
-			link = lastRightClick.textLink;
-
 		// Clean & copy
-		lastRightClick.reply(cleanLink(link, tab.url))
+		navigator.clipboard.writeText(cleanLink(link, tab.url))
 	});
 
 	if (!prefValues.enabled)

@@ -61,7 +61,7 @@ var prefValues = {
 	switchToTab : true,                                        // Should be a copy of the browser preference: switch to a new tab when we open a link?
 	notifications: false,                                      // Send notifications when tracking links?
 	notiftime : 800,                                           // Duration of a notification in ms
-	debug     : false
+	debug     : true
 }
 
 

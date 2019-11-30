@@ -79,31 +79,6 @@ function eventDoClick(url)
 */
 
 
-/* This function must be called in a visible page, such as a browserAction popup or a content script.
- * From MDN's examples: https://github.com/mdn/webextensions-examples/tree/master/context-menu-copy-link-with-types
- * It *needs* to be run inside a page, not a background script, so we send the text link around the right-click
- * position and wait for the copy to be resolved with the link to be copied.
- */
-function copyToClipboard(text)
-{
-    function onCopy(event)
-	{
-		// Remove the handler as it is triggered.
-        document.removeEventListener("copy", onCopy, true);
-
-        event.stopImmediatePropagation();
-        event.preventDefault();
-
-        // Overwrite the clipboard content.
-        event.clipboardData.setData("text/plain", text);
-    }
-
-    // Add onCopy handler for copying and trigger an event
-    document.addEventListener("copy", onCopy, true);
-    document.execCommand("copy");
-}
-
-
 function onClick(evt)
 {
 	let node = evt.target,
@@ -112,58 +87,49 @@ function onClick(evt)
 	if (node.nodeName != 'A' && !evt.altKey && prefValues.textcl)
 		textLink = textFindLink(node);
 
-	if (evt.button == 2)
-	{
-		// NB: always send out the textLink here, even if prefValues.textcl is false, to get the reply
-		// and potentially copy to clipboard
-		browser.runtime.sendMessage({action: 'right click', link: textLink}).then(reply => copyToClipboard(reply) );
-	}
-	else
-	{
-		if (node.nodeName != 'A' && !textLink)
-			do {
-				node = node.parentNode;
-			} while (node && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1);
+	if (node.nodeName != 'A' && !textLink)
+		do {
+			node = node.parentNode;
+		} while (node && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1);
 
-		if (textLink || (node && node.nodeName == 'A')) // && !handledElsewhere(node)
+	if (textLink || (node && node.nodeName == 'A')) // && !handledElsewhere(node)
+	{
+		switch (textLink || node.ownerDocument.location.hostname)
 		{
-			switch (textLink || node.ownerDocument.location.hostname)
-			{
-				case 'twitter.com':
-					if (node.hasAttribute('data-expanded-url'))
-						textLink = node.getAttribute('data-expanded-url');
-					break;
-				case 'www.facebook.com':
-					if (('' + node.getAttribute('onmouseover')).indexOf('LinkshimAsyncLink') !== -1)
-						textLink = node.href;
-			}
+			case 'twitter.com':
+				if (node.hasAttribute('data-expanded-url'))
+					textLink = node.getAttribute('data-expanded-url');
+				break;
+			case 'www.facebook.com':
+				if (('' + node.getAttribute('onmouseover')).indexOf('LinkshimAsyncLink') !== -1)
+					textLink = node.href;
+		}
 
-			// clean text on pre-clean for a tratement with baseUI
-			let link = textLink || node.href;
-			let cleanedLink = cleanLink(link, node.baseURI);
-			if (textLink || link != cleanedLink)
-			{
-				evt.stopPropagation();
-				evt.preventDefault();
+		// clean text on pre-clean for a tratement with baseUI
+		let link = textLink || node.href;
+		let cleanedLink = cleanLink(link, node.baseURI);
+		if (textLink || link != cleanedLink)
+		{
+			evt.stopPropagation();
+			evt.preventDefault();
 
-				if (eventDoClick(cleanedLink, node, evt))
-				{
-					if (prefValues.highlight)
-						highlightLink(node);
-
-					// instead of blinking the URL bar, tell the background to show a notification.
-					browser.runtime.sendMessage({action: 'notify', url: cleanedLink, orig: link, type: 'clicked'});
-				}
-			}
-			else if(!textLink && node.hasAttribute(attr_cleaned_link))
+			if (eventDoClick(cleanedLink, node, evt))
 			{
-				browser.runtime.sendMessage({
-					action: 'notify',
-					url: evt.target.href,
-					orig: evt.target.getAttribute(attr_cleaned_link),
-					type: 'pre-cleaned'
-				});
+				if (prefValues.highlight)
+					highlightLink(node);
+
+				// instead of blinking the URL bar, tell the background to show a notification.
+				browser.runtime.sendMessage({action: 'notify', url: cleanedLink, orig: link, type: 'clicked'});
 			}
+		}
+		else if(!textLink && node.hasAttribute(attr_cleaned_link))
+		{
+			browser.runtime.sendMessage({
+				action: 'notify',
+				url: evt.target.href,
+				orig: evt.target.getAttribute(attr_cleaned_link),
+				type: 'pre-cleaned'
+			});
 		}
 	}
 }
