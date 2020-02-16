@@ -160,7 +160,7 @@ function highlightLink(node, remove)
 
 function skipLinkType(link)
 {
-	return (link.startsWith("view-source:") || link.startsWith("data:")
+	return (link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:")
 			|| (prefValues.skipwhen && prefValues.skipwhen.test(link)));
 }
 
