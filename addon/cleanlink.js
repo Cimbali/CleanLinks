@@ -36,6 +36,7 @@ const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or 
 const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
 const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i					// {base64-encoded http or www.}{more valid base64 chars}
 const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
+const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComponent('=')], ['&', encodeURIComponent('&')]];
 
 var prefValues = {
 	enabled   : true,
@@ -319,45 +320,67 @@ function decodeEmbeddedURI(link, base)
 		}
 	}
 
-	var all, capture, lmt = 4;
+	var lmt = 4;
 	link = domainRulesGeneral(link, base);
 
 	while (--lmt)
 	{
-		all = null;
+		var capture = undefined, all;
+		var haystack = link.href.slice(link.origin.length), needle;
+		console.log(link.href)
 
-		// try first raw: without encoding. If there is a https://, then use all the remaining part of the URL.
-		[all, capture] = link.href.slice(link.origin.length).match(decoded_scheme_url) || [];
-		if (all)
-		{
-			link = new URL(capture);
-			continue;
-		}
-
-		// otherwise check every parsed (URL-decoded) substring
+		// check every parsed (URL-decoded) substring in the URL
 		for (let str of getLinkSearchStrings(link))
 		{
 			[all, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
-			if (!all)
-				continue;
-
-			if (capture.startsWith('www.'))
-				capture = link.protocol + '//' + capture;
-
-			// got the new link!
-			link = new URL(capture);
-			log('decoded URI Component = ' + capture + ' -> ' + link.origin + ' + ' + link.href.slice(link.origin.length))
-
-			// trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
-			// but only in the (path + search params + hash) part.
-			link = new URL(capture.slice(link.origin.length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'), link.origin)
-
-			log('cleaned URI Component = ' + link.href)
-			break;
+			if (capture)
+			{
+				// got the new link!
+				link = new URL((capture.startsWith('www.') ? link.protocol + '//' : '') + capture);
+				log('decoded URI Component = ' + capture + ' -> ' + link.origin + ' + ' + link.href.slice(link.origin.length))
+				all = str;
+				break;
+			}
 		}
 
-		if (!all)
+		if (capture === undefined)
 			break;
+
+		// check if the URL appears unencoded or partially encoded in the URL
+		if (capture.startsWith(link.protocol))
+			needle = link.href.slice(0, link.origin.length);
+		else
+			needle = link.href.slice(link.protocol.length + 2, link.origin.length + 1);
+		var raw_pos = haystack.search(needle.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
+
+		if (raw_pos < 0)
+		{
+			// trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
+			// but only in the (path + search params + hash) part.
+			// Only do this for properly encoded URLs.
+			capture = capture.replace(trailing_invalid_chars, '').replace(/&amp;/g, '&')
+			link = new URL(capture, link.origin);
+			log('cleaned URI Component = ' + link.href)
+		}
+		else
+		{
+			// The URL is incorrectly encoded: either fully or partially unencoded.
+			// We must decide what to do!
+			// - "all" contains the string in which we matched the URL
+			// - "haystack.slice(raw_pos)" contains the URL assuming it is fully unencoded
+			// - "link" contains the URL assuming it is partially unencoded, i.e. with & and = properly encoded
+			// => if we find indications that the encoding is indeed partial. do nothing. Otherwise, use "all" as the URL string.
+			var raw_url = haystack.slice(raw_pos), semi_encoded = false;
+			for (let [dec, enc] of encoded_param_chars)
+				if (all.includes(dec) && raw_url.includes(enc))
+					semi_encoded = true;
+
+			if (!semi_encoded)
+			{
+				console.log('using raw URL: ' + raw_url)
+				link = new URL((raw_url.startsWith('www.') ? link.protocol + '//' : '') + raw_url);
+			}
+		}
 	}
 
 	return link;

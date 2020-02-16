@@ -79,4 +79,10 @@ describe('cleanLink', function() {
 			.to.equal('https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19')
 		done();
 	});
+	it('should detect and decode partially encoded URLs', done =>
+	{
+		expect(cleanLink('https://www.google.com/url?q=https://some.thing/forum/viewtopic.php%3Ft%3D4960084'))
+			.to.equal('https://some.thing/forum/viewtopic.php?t=4960084')
+		done();
+	});
 });
