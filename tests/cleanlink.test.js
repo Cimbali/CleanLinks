@@ -85,4 +85,10 @@ describe('cleanLink', function() {
 			.to.equal('https://some.thing/forum/viewtopic.php?t=4960084')
 		done();
 	});
+	it('should detect and decode partially encoded URLs', done =>
+	{
+		expect(cleanLink('https://www.google.com/url?q=https://www.foobar2000.org/&sa=U&ved=2ahUKEwi8l6qs2dbnAhXeDmMBHYvBCVMQFjAAegQIBhAB&usg=AOvVaw2YoonF8M2_JRbtpQrjT0dE'))
+			.to.equal('https://www.foobar2000.org/')
+		done();
+	});
 });

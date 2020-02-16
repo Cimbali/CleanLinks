@@ -351,7 +351,7 @@ function decodeEmbeddedURI(link, base)
 			needle = link.href.slice(0, link.origin.length);
 		else
 			needle = link.href.slice(link.protocol.length + 2, link.origin.length + 1);
-		var raw_pos = haystack.search(needle.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
+		var raw_pos = haystack.indexOf(needle)
 
 		if (raw_pos < 0)
 		{
@@ -377,7 +377,16 @@ function decodeEmbeddedURI(link, base)
 
 			if (!semi_encoded)
 			{
-				console.log('using raw URL: ' + raw_url)
+				log('using raw URL: ' + raw_url)
+				var qmark_pos = raw_url.indexOf('?')
+				var qmark_end = raw_url.lastIndexOf('?')
+				var amp_pos = raw_url.indexOf('&')
+
+				if (amp_pos >= 0 && qmark_pos < 0)
+					raw_url = raw_url.slice(0, amp_pos)
+				else if (qmark_pos >= 0 && qmark_pos < qmark_end)
+					raw_url = raw_url.slice(0, qmark_end)
+
 				link = new URL((raw_url.startsWith('www.') ? link.protocol + '//' : '') + raw_url);
 			}
 		}
