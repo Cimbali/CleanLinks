@@ -20,8 +20,13 @@ module.exports = config => Object.assign(config,
 
 		// The files to be tested have to be served
 		"modules/prefs.js",
+		"modules/punycode.js",
+		"modules/publicsuffixlist.js",
+		"modules/rules.js",
 		"modules/cleanlink.js",
 		"inject.js",
+
+		{type: 'html', included: false, served: true, nocache: true, pattern: 'data/*'},
 
 		// The tests, finally
 		'../tests/*.test.js',
@@ -30,6 +35,7 @@ module.exports = config => Object.assign(config,
 	proxies: {
 		'/modules/': 'http://localhost:9876/base/modules/',
 		'/icons/': 'http://localhost:9876/base/icons/',
+		'/data/': 'http://localhost:9876/base/data/',
 	},
 
 	reporters: ['progress'],

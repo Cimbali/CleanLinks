@@ -1,0 +1,10 @@
+{
+	"rules": {"strip_params": [{"RegExp": "^utm_"}]},
+	 "google.(com?\\.)[a-z]{,3}": {
+		"match": "RegExp",
+		"rules": {"strip_params": ["client"]},
+		"/search": {
+			"rules": {"allow_url": "q"}
+		}
+	}
+}
