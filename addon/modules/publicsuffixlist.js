@@ -641,6 +641,7 @@ const publicSuffixList = {
 				if ('PSL' in data)
 				{
 					fromSelfie(data.PSL, Base64Encoder)
+					console.log('Done unserializing PSL')
 					done();
 				}
 				else

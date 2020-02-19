@@ -21,8 +21,7 @@ const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComp
 
 function skipLinkType(link)
 {
-	return (link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:")
-			|| (prefs.values.skipwhen && prefs.values.skipwhen.test(link)));
+	return link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:")
 }
 
 
@@ -273,6 +272,9 @@ function cleanLink(link, base)
 
 	base = getBaseURL(base);
 	link = new URL(link)
+
+	let rules = find_rules(link, load_rules)
+	// (prefs.values.skipwhen && prefs.values.skipwhen.test(link)));
 
 	if (prefs.values.skipdoms && prefs.values.skipdoms.indexOf(link.host) !== -1)
 	{

@@ -1,101 +1,65 @@
-// Writing rules:
-// - strict imbrication: any level optional, but ordering must be respected
-//   domain > port > path > query params
-// - first char of rule key determines type:
-//     . domain part
-//     : port
-//     / path
-
-function ext_path(cur_path, new_bit)
-{
-	if (new_bit[0] == '.')
-		return new_bit + cur_path;
-	else
-		return cur_path + new_bit;
-}
-
-function print_rules(rules, path)
-{
-	if (path == undefined)
-		path = ''
-
-	if ("actions" in rules)
-		console.log({['*' + path]: rules.actions})
-
-	for (let key in rules)
-		if (key != "actions")
-		  print_rules(rules[key], ext_path(path, key));
-}
-
-
 const all_rules = {
-	"actions": "set1",
+	"*": {
+		"*": {
+			"*": {
+				"check": ["all"],
+				"ignore": ["don’t look at me"]
+			}
+		},
+		"accounts.google": {
+			"/signin/.*/identifier(/.+)?": {
+				"check": ["accounts.google.*/signin/**/identifier"]
+			}
+		}
+	},
 	".co.uk": {
-		".google": { // i.e. *google.co.uk
-			":443": { // i.e. *google.co.uk
-				"actions": "set5"
+		"google": { // i.e. *google.co.uk
+			"*": {
+				"check": ["google.co.uk"]
 			}
 		}
 	},
 	".com": {
-		".google": { // i.e. *google.com
-			"actions": "set6",
+		"google": { // i.e. *google.com
 			"/search": {
-				"actions": "set7"
-			}
-		}
-	},
-	".*": {
-		".google": { // i.e. *google.*
-			"/*": { // i.e. *google.*/*
-				"actions": "set3"
-			},
-			"/search": {
-				"/$": {
-					"actions": "set2"
-				},
-			},
-			"/signin": {
-				"/**": {
-					"/identifier": {
-						"actions": "set8"
-					}
-				}
+				"check": ["google.com/search"]
 			}
 		}
 	},
 }
+
 let google_login = new URL("https://accounts.google.co.uk/signin/v2/sl/foo/bar/baz/qux/identifier")
 let google_search = new URL("https://google.com/search?client=firefox-b-ab&q=some+search+terms")
 let dummy_url = new URL("https://a.b.c.de/")
 
 
 describe('find_rules', function() {
-	console.log(all_rules);
-	print_rules(all_rules);
-
-	it('should work', async done =>
+	it('should work', () =>
 	{
-		console.log(google_login.href);
-		let result = await find_rules(google_login, all_rules)
-		console.log(result)
-		expect(result).to.equal(['set1', 'set3', 'set8'])
-		done();
+		return publicSuffixList.loaded.then(() =>
+		{
+			let result = find_rules(google_login, all_rules)
+			const exp = ['all', 'google.co.uk', 'accounts.google.*/signin/**/identifier']
+			console.log(google_login.href + '\nfound: ' + JSON.stringify(result) + '\nexpected: ' + exp);
+			expect(result.check).to.have.members(exp)
+		})
 	});
-	it('should work', async done =>
+	it('should work', () =>
 	{
-		console.log(google_search.href);
-		let result = await find_rules(google_search, all_rules)
-		console.log(result)
-		expect(result).to.equal(['set1', 'set6', 'set7'])
-		done();
+		return publicSuffixList.loaded.then(() =>
+		{
+			let result = find_rules(google_search, all_rules)
+			const exp = ['all', 'google.com/search']
+			console.log(google_search.href + '\nfound: ' + JSON.stringify(result) + '\nexpected: ' + exp);
+			expect(result.check).to.have.members(exp)
+		});
 	});
-	it('should work', async done =>
+	it('should only match global rules', () =>
 	{
-		console.log(dummy_url.href);
-		let result = await find_rules(dummy_url, all_rules)
-		console.log(result)
-		expect(result).to.equal(['set1'])
-		done();
+		return publicSuffixList.loaded.then(() =>
+		{
+			let result = find_rules(dummy_url, all_rules)
+			expect(result.check).to.have.members(['all'])
+		});
 	});
 });
