@@ -473,11 +473,85 @@ const suffixInPSL = function(hostname) {
 };
 
 /******************************************************************************/
+// from https://gist.github.com/enepomnyaschih/72c423f727d395eeaa09697058238727
+
+const base64abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+function bytesToBase64(uarray, bytes) {
+	if (bytes === undefined)
+		bytes = uarray.length;
+	let result = '', i;
+	for (i = 2; i < bytes; i += 3) {
+		result += base64abc.charAt(uarray[i - 2] >> 2);
+		result += base64abc.charAt(((uarray[i - 2] & 0x03) << 4) | (uarray[i - 1] >> 4));
+		result += base64abc.charAt(((uarray[i - 1] & 0x0F) << 2) | (uarray[i] >> 6));
+		result += base64abc.charAt(uarray[i] & 0x3F);
+	}
+	if (i === bytes + 1) { // 1 octet missing
+		result += base64abc.charAt(uarray[i - 2] >> 2);
+		result += base64abc.charAt((uarray[i - 2] & 0x03) << 4);
+		result += "==";
+	}
+	if (i === bytes) { // 2 octets missing
+		result += base64abc.charAt(uarray[i - 2] >> 2);
+		result += base64abc.charAt(((uarray[i - 2] & 0x03) << 4) | (uarray[i - 1] >> 4));
+		result += base64abc.charAt((uarray[i - 1] & 0x0F) << 2);
+		result += "=";
+	}
+	return result;
+}
+
+function base64ArraySize(base64string) {
+	var full = parseInt((base64string.length / 4) * 3, 10);
+	var padding = base64string.endsWith('==') ? 2 : (base64string.endsWith('=') ? 1 : 0)
+	return full - padding
+}
+
+function base64ToBytes(input, uarray) {
+	var bytes;
+
+	if (uarray === undefined)
+	{
+		bytes = base64ArraySize(input);
+		uarray = new Uint8Array(bytes);
+	}
+	else
+		bytes = uarray.byteLength;
+
+	var chr1, chr2, chr3;
+	var enc1, enc2, enc3, enc4;
+	var i = 0;
+	var j = 0;
+
+	input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+
+	for (i=0; i<bytes; i+=3) {
+		//get the 3 octects in 4 ascii chars
+		enc1 = base64abc.indexOf(input.charAt(j++));
+		enc2 = base64abc.indexOf(input.charAt(j++));
+		enc3 = base64abc.indexOf(input.charAt(j++));
+		enc4 = base64abc.indexOf(input.charAt(j++));
+
+		chr1 = (enc1 << 2) | (enc2 >> 4);
+		chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+		chr3 = ((enc3 & 3) << 6) | enc4;
+
+		uarray[i] = chr1;
+		if (enc3 != 64) uarray[i+1] = chr2;
+		if (enc4 != 64) uarray[i+2] = chr3;
+	}
+
+	return uarray;
+}
+
+const Base64Encoder = {encode: bytesToBase64, decode: base64ToBytes, decodeSize: base64ArraySize}
+
+/******************************************************************************/
 
 const toSelfie = function(encoder) {
     if ( pslBuffer8 === undefined ) { return ''; }
     if ( encoder instanceof Object ) {
-        const bufferStr = encoder.encode(pslBuffer8.buffer, pslByteLength);
+        const bufferStr = encoder.encode(pslBuffer8);
         return `${SELFIE_MAGIC}\t${bufferStr}`;
     }
     return {
@@ -503,7 +577,7 @@ const fromSelfie = function(selfie, decoder) {
         byteLength = decoder.decodeSize(bufferStr);
         if ( byteLength === 0 ) { return false; }
         allocateBuffers(byteLength);
-        decoder.decode(bufferStr, pslBuffer8.buffer);
+        decoder.decode(bufferStr, pslBuffer8);
     } else if (
         selfie instanceof Object &&
         selfie.magic === SELFIE_MAGIC &&
@@ -529,17 +603,18 @@ const fromSelfie = function(selfie, decoder) {
 
 const publicSuffixList = {
 	getDomain, getPublicSuffix, suffixInPSL,
-	loaded: new Promise((done) => {
+	loaded: new Promise(done =>
+	{
 		let populate = (response) =>
 		{
-			console.log(response)
+			console.log('Populating PSL')
 			response.text().then(data =>
 			{
 				console.log('Started loading PSL')
 				parse(data, punycode.toASCII);
 				console.log('Done loading PSL')
 
-				browser.storage.local.set({PSL: Object.assign({when: Date.now()}, toSelfie())})
+				browser.storage.local.set({PSL: toSelfie(Base64Encoder), PSLdate: Date.now()})
 
 				done();
 			})
@@ -547,11 +622,13 @@ const publicSuffixList = {
 
 		let refresh = () =>
 		{
-			fetch(new Request('https://publicsuffix.org/list/public_suffix_list.dat')).then(populate).catch(err =>
+			const world_url = 'https://publicsuffix.org/list/public_suffix_list.dat'
+			const local_url = browser.runtime.getURL('/data/public_suffix_list.dat')
+			fetch(new Request(world_url)).then(populate).catch(err =>
 			{
 				console.error(err)
-				console.log('Trying: ' + browser.runtime.getURL('/data/public_suffix_list.dat'))
-				fetch(new Request(browser.runtime.getURL('/data/public_suffix_list.dat'))).then(populate)
+				console.log('Trying: ' + local_url)
+				fetch(new Request(local_url)).then(populate)
 			});
 		}
 
@@ -563,8 +640,7 @@ const publicSuffixList = {
 			{
 				if ('PSL' in data)
 				{
-					fromSelfie(data.PSL)
-					console.log('Laoded cached PSL')
+					fromSelfie(data.PSL, Base64Encoder)
 					done();
 				}
 				else

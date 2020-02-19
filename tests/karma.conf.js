@@ -26,10 +26,12 @@ module.exports = config => Object.assign(config,
 		"modules/cleanlink.js",
 		"inject.js",
 
-		{type: 'html', included: false, served: true, nocache: true, pattern: 'data/*'},
+		{type: 'css', included: false, served: true, nocache: true, pattern: "data/*"},
 
 		// The tests, finally
-		'../tests/*.test.js',
+		'../tests/publicsuffixlist.test.js',
+		//'../tests/rules.test.js',
+		//'../tests/cleanlink.test.js',
 	],
 
 	proxies: {

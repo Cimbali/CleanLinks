@@ -170,8 +170,10 @@ function recursive_find(path, find_bits)
 }
 
 
-function find_rules(url, all_rules)
+async function find_rules(url, all_rules)
 {
+	await publicSuffixList.loaded()
+
 	var protocol = url.protocol.split(':').shift();
 	var public_suffix = publicSuffixList.getPublicSuffix(url.hostname);
 	console.log(public_suffix)

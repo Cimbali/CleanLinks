@@ -74,26 +74,26 @@ describe('find_rules', function() {
 	console.log(all_rules);
 	print_rules(all_rules);
 
-	it('should work', done =>
+	it('should work', async done =>
 	{
 		console.log(google_login.href);
-		let result = find_rules(google_login, all_rules)
+		let result = await find_rules(google_login, all_rules)
 		console.log(result)
 		expect(result).to.equal(['set1', 'set3', 'set8'])
 		done();
 	});
-	it('should work', done =>
+	it('should work', async done =>
 	{
 		console.log(google_search.href);
-		let result = find_rules(google_search, all_rules)
+		let result = await find_rules(google_search, all_rules)
 		console.log(result)
 		expect(result).to.equal(['set1', 'set6', 'set7'])
 		done();
 	});
-	it('should work', done =>
+	it('should work', async done =>
 	{
 		console.log(dummy_url.href);
-		let result = find_rules(dummy_url, all_rules)
+		let result = await find_rules(dummy_url, all_rules)
 		console.log(result)
 		expect(result).to.equal(['set1'])
 		done();
