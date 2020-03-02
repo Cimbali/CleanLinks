@@ -31,7 +31,7 @@ function recursive_find(rules, keys)
 
 function find_rules(url, all_rules)
 {
-	// use public domain not really TLD
+	// use public domain instead of TLD
 	var suffix = '.' + publicSuffixList.getPublicSuffix(url.hostname);
 	var domain = url.hostname.substr(0, url.hostname.length - suffix.length);
 
@@ -78,7 +78,7 @@ const load_default_rules = (done) =>
 	});
 }
 
-// rules have 4 depths: TLD, domain, path, action type
+
 const load_rules = new Promise(done =>
 {
 	var cached = browser.storage.sync.get('rules')
@@ -94,6 +94,13 @@ const load_rules = new Promise(done =>
 		})
 });
 
+
+function clear_rules()
+{
+	return browser.storage.sync.remove('rules');
+}
+
+
 let Rules = {
 	find: async url => {
 		let rules = await load_rules
@@ -103,4 +110,5 @@ let Rules = {
 		let rules = await load_rules
 		return serialize_rules(rules)
 	},
+	clear: clear_rules,
 }

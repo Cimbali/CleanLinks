@@ -1,0 +1,147 @@
+input:disabled {
+	background: #ccc;
+}
+label {
+	display: block;
+	margin: 1ex 0;
+}
+
+fieldset > label > span:first-child {
+	display:inline-block;
+	min-width: 20em;
+}
+
+label[for="show_URL_legend"] {
+	display: inline-block;
+	position: relative;
+	top: -0.5em;
+	font-size: 80%;
+	background: #eee;
+	border: black thin solid;
+	padding: 1px 4px;
+	box-shadow: 2px 4px #aaa;
+	border-radius: 5px;
+}
+
+span.parsing_error {
+	color: red;
+	font-weight:bold;
+}
+span.whitelist {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+span.whitelist > span {
+	display: inline-block;
+	border: black thin solid;
+	padding: 5px;
+	margin: 2px 5px 2px 0px;
+	border-radius: 5px;
+}
+
+span.whitelist > span::after {
+	content: ' ❌';
+	padding: 0 2px;
+}
+
+/* Any siblings having or containing .enabled or .disabled will be visible based on the .toggle input value */
+input.toggle:not(:checked) ~ .enabled, input.toggle:not(:checked) ~ * .enabled {
+	display: none;
+}
+input.toggle:checked ~ .disabled, input.toggle:checked ~ * .disabled {
+	display: none;
+}
+
+input[type=number] {
+	width: 5em;
+}
+input[type=text], textarea {
+	width: 100%;
+}
+input[type=text][name$=_edit] {
+	width: 87%;
+}
+input[type=text][name$=_edit] + button {
+	margin-left: 2%;
+	width: 10%;
+}
+input[type=text][name=domain] {
+	width: calc(70% - 2ch);
+	margin-right: .5ch;
+}
+input[type=text][name=suffix] {
+	width: 30%;
+	margin-left: .5ch;
+}
+fieldset {
+	width: 100%;
+	margin: 0 0 2em;
+}
+fieldset fieldset, #rule_selector, #rule_legend {
+	width: calc(100% - 2em);
+	margin: 0 1em;
+}
+fieldset fieldset legend {
+	font-size: 1.0em;
+}
+fieldset.example legend {
+	margin: 0 0 -1em 0;
+}
+#rule_legend {
+	margin: 1em 1em 0;
+}
+#rule_selector {
+	height: 15em;
+}
+button#remove_rule {
+	position: absolute;
+	right: 2em;
+	margin-top: -2em;
+}
+textarea {
+	height:10em;
+}
+legend {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+.URL {
+	font-size: 80%;
+	white-space: nowrap;
+	font-family: monospace;
+}
+.protocol { color: palevioletred; }
+.subdomain { color: cornflowerblue; }
+.domain { color: blue; }
+.suffix { color: indigo; }
+.fqdn { color: darkslateblue; }
+.path { color: green; }
+.query { color: orange; }
+.parameter { color: red; }
+
+#show_URL_legend {
+	display: none;
+}
+
+dl {
+	display: grid;
+	grid-template-columns: 25ch auto;
+}
+dt {
+	font-family: monospace;
+	grid-column-start: 1;
+}
+dd {
+	grid-column-start: 2;
+	margin: auto 0;
+}
+
+#reset_buttons {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+#reset_buttons button {
+	margin: 0 2em;
+}

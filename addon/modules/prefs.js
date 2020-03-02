@@ -150,4 +150,9 @@ function loadOptions()
 	});
 }
 
-const prefs = {values: prefValues, serialize: serializeOptions, load: loadOptions}
+function clearOptions()
+{
+	return browser.storage.sync.remove('configuration');
+}
+
+const prefs = {values: prefValues, serialize: serializeOptions, load: loadOptions, clear: clearOptions}

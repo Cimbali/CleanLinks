@@ -71,13 +71,14 @@ var delayed_save = (function(callback)
 function reset_options()
 {
 	// clear options storage, reload everything
-	browser.storage.sync.clear().then(() =>
+	prefs.clear().then(() =>
+	{
 		browser.runtime.getBackgroundPage().then(page =>
 		{
 			page.location.reload();
 			window.location.reload();
 		})
-	)
+	})
 }
 
 
@@ -100,7 +101,7 @@ function populate_options()
 		input.onkeyup = delayed_save(save_options)
 	}
 
-	document.querySelector('button[name="reset"]').onclick = reset_options;
+	document.querySelector('button[name="reset_options"]').onclick = reset_options;
 	update_page(prefValues);
 }
 
@@ -217,6 +218,20 @@ function save_rule()
 }
 
 
+function reset_rules()
+{
+	// clear rules storage, reload everything
+	Rules.clear().then(() =>
+	{
+		browser.runtime.getBackgroundPage().then(page =>
+		{
+			page.location.reload();
+			window.location.reload();
+		})
+	})
+}
+
+
 function populate_rules(serialized_rules)
 {
 	let select = document.getElementById('rule_selector')
@@ -249,6 +264,7 @@ function populate_rules(serialized_rules)
 	}
 
 	document.getElementById('remove_rule').onclick = erase_rule
+	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
 }
 
 
