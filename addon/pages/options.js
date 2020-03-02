@@ -21,6 +21,8 @@ const Queue = {
 	}
 };
 
+const match_subdomains = '(.+\\.)?';
+
 
 function update_page(prefs)
 {
@@ -156,7 +158,10 @@ function add_rule_item(list, element)
 
 function name_rule(rule)
 {
-	return rule.domain + '.' + rule.suffix + (rule.path.startsWith('/') ? '' : '/') + rule.path;
+	const subdomains = rule.domain.startsWith(match_subdomains)
+
+	return (subdomains ? '*.' + rule.domain.substr(match_subdomains.length) : rule.domain)
+			+ '.' + rule.suffix + (rule.path.startsWith('/') ? '' : '/') + rule.path;
 }
 
 
@@ -171,9 +176,11 @@ function load_rule()
 	let rule = JSON.parse(document.getElementById('rule_selector').value);
 	if (document.getElementById('rule_selector').selectedIndex !== 0)
 	{
-		document.querySelector('input[name="domain"]').value = rule.domain
+		const subdomains = rule.domain.startsWith(match_subdomains)
+		document.querySelector('input[name="domain"]').value = rule.domain.substr(subdomains ? match_subdomains.length : 0)
+		document.querySelector('input[name="subdomains"]').checked = subdomains || rule.domain === '*';
 		document.querySelector('input[name="suffix"]').value = rule.suffix;
-		document.querySelector('input[name="path"]').value = rule.path
+		document.querySelector('input[name="path"]').value = rule.path;
 
 		for (let list of Object.keys(default_actions))
 			for (let val of rule[list])
@@ -184,6 +191,7 @@ function load_rule()
 		document.querySelector('input[name="domain"]').value = '';
 		document.querySelector('input[name="suffix"]').value = '';
 		document.querySelector('input[name="path"]').value = '';
+		document.querySelector('input[name="subdomains"]').checked = true;
 	}
 }
 
@@ -215,6 +223,9 @@ function save_rule()
 		path: document.querySelector('input[name="path"]').value || '*',
 	});
 
+	if (document.querySelector('input[name="subdomains"]').checked && rule.domain !== '*')
+		rule.domain = match_subdomains + rule.domain;
+
 	// Perform the update operation immediately in the DOM
 	let replacing = null;
 	if (select.selectedIndex === 0) {
@@ -222,7 +233,6 @@ function save_rule()
 		selectedOpt = select.appendChild(new Option(name_rule(rule), JSON.stringify(rule), false, true))
 	} else {
 		replacing = JSON.parse(selectedOpt.getAttribute('orig-value'));
-		console.log('replacing ' + replacing)
 		selectedOpt.replaceChild(document.createTextNode(name_rule(rule)), selectedOpt.firstChild);
 	}
 	selectedOpt.setAttribute('orig-value', JSON.stringify(rule));
