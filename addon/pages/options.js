@@ -14,7 +14,13 @@
 
 'use strict'
 
-const default_actions = {'url_ok': [], 'strip': [], 'rewrite': []}
+const Queue = {
+	chain: Promise.resolve(),
+	add: function(async_callable) {
+		this.chain = this.chain.then(async_callable)
+	}
+};
+
 
 function update_page(prefs)
 {
@@ -163,13 +169,7 @@ function load_rule()
 	}
 
 	let rule = JSON.parse(document.getElementById('rule_selector').value);
-	if (Object.keys(rule).length === 0)
-	{
-		document.querySelector('input[name="domain"]').value = '';
-		document.querySelector('input[name="suffix"]').value = '';
-		document.querySelector('input[name="path"]').value = '';
-	}
-	else
+	if (document.getElementById('rule_selector').selectedIndex !== 0)
 	{
 		document.querySelector('input[name="domain"]').value = rule.domain
 		document.querySelector('input[name="suffix"]').value = rule.suffix;
@@ -178,6 +178,12 @@ function load_rule()
 		for (let list of Object.keys(default_actions))
 			for (let val of rule[list])
 				show_rule_item(list, val);
+	}
+	else
+	{
+		document.querySelector('input[name="domain"]').value = '';
+		document.querySelector('input[name="suffix"]').value = '';
+		document.querySelector('input[name="path"]').value = '';
 	}
 }
 
@@ -190,7 +196,8 @@ function erase_rule()
 	if (select.selectedIndex == 0) {
 		selectedOpt.value = '{}';
 	} else {
-		select.selectedIndex = 0;
+		Rules.remove(JSON.parse(selectedOpt.getAttribute('orig-value')))
+		select.selectedIndex--;
 		selectedOpt.remove()
 	}
 	load_rule();
@@ -208,13 +215,23 @@ function save_rule()
 		path: document.querySelector('input[name="path"]').value || '*',
 	});
 
+	// Perform the update operation immediately in the DOM
+	let replacing = null;
 	if (select.selectedIndex === 0) {
-		select[0].value = "{}"
+		select[0].value = JSON.stringify(default_actions)
 		selectedOpt = select.appendChild(new Option(name_rule(rule), JSON.stringify(rule), false, true))
 	} else {
+		replacing = JSON.parse(selectedOpt.getAttribute('orig-value'));
+		console.log('replacing ' + replacing)
 		selectedOpt.replaceChild(document.createTextNode(name_rule(rule)), selectedOpt.firstChild);
 	}
-	console.log(select.selectedIndex, rule)
+	selectedOpt.setAttribute('orig-value', JSON.stringify(rule));
+
+	if (replacing === null) {
+		Queue.add(async () => await Rules.add(rule));
+	} else {
+		Queue.add(async () => await Rules.update(replacing, rule));
+	}
 }
 
 
@@ -236,7 +253,11 @@ function populate_rules(serialized_rules)
 {
 	let select = document.getElementById('rule_selector')
 	for (let rule of serialized_rules)
-		select.appendChild(new Option(name_rule(rule), JSON.stringify({...default_actions, ...rule})))
+	{
+		let opt = select.appendChild(new Option(name_rule(rule), JSON.stringify({...default_actions, ...rule})))
+		opt.setAttribute('orig-value', opt.getAttribute('value'))
+	}
+	select[0].value = JSON.stringify(default_actions)
 
 	select.onchange = load_rule
 

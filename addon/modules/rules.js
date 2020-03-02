@@ -14,13 +14,14 @@
 
 'use strict'
 
+
+const default_actions = {'url_ok': [], 'strip': [], 'rewrite': []}
+
+
 function recursive_find(rules, keys)
 {
 	if (!keys.length)
-	{
-		console.log('Leaf: returning ' + JSON.stringify(rules))
 		return rules
-	}
 
 	var search = keys.shift();
 
@@ -51,12 +52,65 @@ function serialize_rules(rules, bits)
 
 	if (bits.length === 3)
 	{
-		let match = {suffix: bits[0], domain: bits[1], path: bits[2]}, actions = ['strip', 'rewrite', 'url_ok'];
-		// return [bits.concat(['strip', 'rewrite', 'url_ok'].map(key => key in rules ? rules[key] : ''))]
-		return actions.reduce((obj, act) => Object.assign({[act]: act in rules ? rules[act] : ''}, obj), match)
+		return Object.keys(default_actions).reduce((rule, action) => (
+			{[action]: action in rules ? rules[action] : default_actions[action], ...rule}
+		), {suffix: bits[0], domain: bits[1], path: bits[2]})
 	}
 
 	return [].concat(...Object.keys(rules).map(k => serialize_rules(rules[k], bits.concat([k]))))
+}
+
+
+function pop_rule(all_rules, rule)
+{
+	let pos = all_rules, stack = [];
+	for (let key of [rule.suffix, rule.domain, rule.path])
+	{
+		if (!(key in pos))
+			return;
+		else
+		{
+			stack.push([pos, key])
+			pos = pos[key]
+		}
+	}
+
+	for (let [node, key] of stack.reverse())
+	{
+		delete node[key]
+		if (Object.keys(node).length !== 0)
+			break
+	}
+
+	return all_rules
+}
+
+
+function push_rule(all_rules, rule)
+{
+	let pos = all_rules;
+	for (let key of [rule.suffix, rule.domain, rule.path])
+	{
+		if (!(key in pos))
+			pos[key] = {}
+
+		pos = pos[key]
+	}
+	Object.assign(pos, Object.keys(default_actions).reduce((rule_actions, action) => (
+		{[action]: rule[action], ...rule_actions},
+	{})))
+	return all_rules
+}
+
+
+function clear_rules()
+{
+	return browser.storage.sync.remove('rules');
+}
+
+function save_rules(all_rules)
+{
+	return browser.storage.sync.set({rules: all_rules})
 }
 
 
@@ -79,7 +133,7 @@ const load_default_rules = (done) =>
 }
 
 
-const load_rules = new Promise(done =>
+var load_rules = new Promise(done =>
 {
 	var cached = browser.storage.sync.get('rules')
 	if (cached === undefined)
@@ -95,12 +149,6 @@ const load_rules = new Promise(done =>
 });
 
 
-function clear_rules()
-{
-	return browser.storage.sync.remove('rules');
-}
-
-
 let Rules = {
 	find: async url => {
 		let rules = await load_rules
@@ -109,6 +157,25 @@ let Rules = {
 	serialize: async url => {
 		let rules = await load_rules
 		return serialize_rules(rules)
+	},
+	add: async (new_rule) => {
+		let rules = await load_rules
+		rules = push_rule(rules, new_rule)
+		save_rules(rules)
+		load_rules = Promise.resolve(rules)
+	},
+	remove: async (old_rule) => {
+		let rules = await load_rules
+		rules = pop_rule(rules, old_rule)
+		save_rules(rules)
+		load_rules = Promise.resolve(rules)
+	},
+	update: async (old_rule, new_rule) => {
+		let rules = await load_rules
+		pop_rule(rules, old_rule)
+		rules = push_rule(rules, new_rule)
+		save_rules(rules)
+		load_rules = Promise.resolve(rules)
 	},
 	clear: clear_rules,
 }

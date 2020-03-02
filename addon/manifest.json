@@ -1,7 +1,7 @@
 {
 	"name": "Clean Links",
 	"description": "__MSG_addon_description__",
-	"author": "Cimbali (maintainer), \nDiego Casorran (creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
+	"author": "Cimbali (maintainer), \nDiego Casorran (historic creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
 	"manifest_version": 2,
 	"version": "3.2.8",
 	"homepage_url": "https://github.com/Cimbali/CleanLinks",

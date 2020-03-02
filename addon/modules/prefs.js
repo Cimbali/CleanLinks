@@ -103,23 +103,8 @@ function upgradeOptions(options)
 
 function loadOptions()
 {
-	var check_storages = key => new Promise(found =>
-	{
-		browser.storage.local.get(key).then(data =>
-		{
-			if (key in data)
-			{
-				browser.storage.local.clear();
-				browser.storage.sync.set(data);
-				found(data);
-			}
-			else
-				browser.storage.sync.get(key).then(data => found(data))
-		})
-	});
-
 	// return the promise so it can be chained
-	return check_storages('configuration').then(data =>
+	return browser.storage.sync.get('configuration').then(data =>
 	{
 		if ('configuration' in data) {
 			upgradeOptions(data.configuration);
