@@ -96,7 +96,8 @@ function push_rule(all_rules, rule)
 
 		pos = pos[key]
 	}
-	Object.assign(pos, Object.keys(default_actions).reduce((rule_actions, action) => (
+	Object.assign(all_rules[rule.suffix][rule.domain][rule.path],
+		Object.keys(default_actions).reduce((rule_actions, action) => (
 		{[action]: rule[action], ...rule_actions},
 	{})))
 	return all_rules

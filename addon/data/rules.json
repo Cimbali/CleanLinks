@@ -1,20 +1,786 @@
 {
-	"*": {
-		"*": {
-			"*": {
-				"strip": ["^utm_", "fbclid"],
-				"rewrite": ["/ref="]
-			}
-		},
-		"accounts.google": {
-			"/signin/.+/identifier(/.+)?|/ServiceLogin": {
-				"url_ok": ["continue"]
-			}
-		},
-		"www.google": {
-			"/search": {
-				"url_ok": ["q"]
-			}
-		}
-	}
+  "(ru|com)": {
+    "(.+\\.)?yandex": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "lr",
+          "redircnt"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "*": {
+    "(.+\\.)?amazon": {
+      "*": {
+        "rewrite": [
+          "/ref=[^/]*"
+        ],
+        "strip": [
+          "pf_rd_[a-zA-Z]",
+          "qid",
+          "sr",
+          "srs",
+          "pd_rd_[a-zA-Z]*",
+          "__mk_[a-zA-Z]{1,3}_[a-zA-Z]{1,3}",
+          "spIA",
+          "ms3_c",
+          "[a-zA-Z%0-9]*ie",
+          "refRID",
+          "colid",
+          "coliid",
+          "[^a-zA-Z%0-9]adId",
+          "qualifier",
+          "_encoding",
+          "smid",
+          "field-lbr_brands_browse-bin",
+          "ref_?",
+          "th",
+          "sprefix",
+          "crid",
+          "keywords",
+          "cv_ct_[a-zA-Z]+",
+          "linkCode",
+          "creativeASIN",
+          "ascsubtag",
+          "aaxitk",
+          "hsa_cr_id",
+          "sb-ci-[a-zA-Z]+",
+          "rnid",
+          "tag"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?bing": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "cvid",
+          "form",
+          "sk",
+          "sp",
+          "sc",
+          "qs",
+          "qp"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?ebay": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "_trkparms",
+          "_trksid",
+          "_from",
+          "hash"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?facebook": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "hc_[a-zA-Z_%\\[\\]0-9]*",
+          "[a-zA-Z]*ref[a-zA-Z]*",
+          "__tn__",
+          "eid",
+          "__xts__%5B[0-9]%5D",
+          "__xts__\\[[0-9]\\]",
+          "comment_tracking",
+          "dti",
+          "app",
+          "video_source",
+          "ftentidentifier",
+          "pageid",
+          "padding",
+          "ls_ref",
+          "action_history",
+          "fbid",
+          "comment_id"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?google": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ved",
+          "bi[a-zA-Z]*",
+          "gfe_[a-zA-Z]*",
+          "ei",
+          "source",
+          "gs_[a-zA-Z]*",
+          "site",
+          "oq",
+          "esrc",
+          "uact",
+          "cd",
+          "cad",
+          "gws_[a-zA-Z]*",
+          "atyp",
+          "vet",
+          "zx",
+          "_u",
+          "je",
+          "dcr",
+          "ie",
+          "sei",
+          "sa",
+          "dpr",
+          "btn[a-zA-Z]*",
+          "sa",
+          "usg",
+          "cd",
+          "cad",
+          "uact",
+          "aqs",
+          "sourceid",
+          "sxsrf",
+          "rlz",
+          "i-would-rather-use-firefox",
+          "referrer"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?instagram": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "igshid"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?netflix": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "trackId",
+          "tctx",
+          "jb[a-zA-Z]*"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?twitch": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "tt_medium",
+          "tt_content"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?twitter": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "(ref_?)?src",
+          "s",
+          "cn",
+          "ref_url"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?youtube": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "feature",
+          "gclid",
+          "kw"
+        ],
+        "url_ok": []
+      }
+    },
+    "*": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "utm(_[a-zA-Z]*)?",
+          "ga_[a-zA-Z_]+",
+          "yclid",
+          "_openstat",
+          "fb_action_ids",
+          "fb_action_types",
+          "fb_source",
+          "fb_ref",
+          "fbclid",
+          "action_object_map",
+          "action_type_map",
+          "action_ref_map",
+          "gs_l",
+          "mkt_tok",
+          "hmb_campaign",
+          "hmb_medium",
+          "hmb_source",
+          "gclid",
+          "otm_[a-zA-Z_]*",
+          "cmpid",
+          "os_ehash",
+          "_ga",
+          "__twitter_impression",
+          "wt_?z?mc",
+          "wtrid",
+          "[a-zA-Z]?mc",
+          "dclid",
+          "Echobox",
+          "spm",
+          "vn(_[a-zA-Z]*)+"
+        ],
+        "url_ok": []
+      }
+    },
+    "accounts.google": {
+      "/signin/.+/identifier(/.+)?|/ServiceLogin": {
+        "url_ok": [
+          "continue"
+        ]
+      }
+    },
+    "www.google": {
+      "/search": {
+        "url_ok": [
+          "q"
+        ]
+      }
+    }
+  },
+  "com": {
+    "(.+\\.)?9gag": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ref"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?aliexpress": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ws_ab_test",
+          "btsid",
+          "algo_expid",
+          "algo_pvid",
+          "gps-id",
+          "scm[_a-zA-Z\\-]*",
+          "pvid"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?backcountry": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "CMP_SKU",
+          "MER",
+          "mr:trackingCode",
+          "mr:device",
+          "mr:adType",
+          "iv_",
+          "CMP_ID",
+          "k_clickid",
+          "rmatt",
+          "INT_ID",
+          "ti",
+          "fl",
+          "mr:referralID"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?boredpanda": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "h"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?cnet": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ftag"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?dailycodingproblem": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "email"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?diepresse": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "from",
+          "xtor",
+          "xt_at"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?giphy": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ref"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?github": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "email_token",
+          "email_source"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?healio": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ecp",
+          "m_bt"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?imdb": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ref_",
+          "pf_rd_[a-zA-Z]*"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?indeed": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "from",
+          "alid",
+          "[a-zA-Z]*tk"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?linkedin": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "refId",
+          "trk",
+          "li[a-zA-Z]{2}"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?medium": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "source"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?moosejaw": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "cm_lm",
+          "cm_mmc",
+          "webUserId",
+          "spMailingID",
+          "spUserID",
+          "spJobID",
+          "spReportId"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?newsletter.lidl": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "x"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?nypost": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "__twitter_impression"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?nytimes": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "smid"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?readdc": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ref"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?shutterstock": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "src"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?snapchat": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "sc_referrer",
+          "sc_ua"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?spotify": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "si"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?steampowered": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "snr"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?techcrunch": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ncid",
+          "sr",
+          "sr_share"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?vitamix": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "_requestid",
+          "cid",
+          "dl",
+          "di",
+          "sd",
+          "bi"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?vivaldi": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "pk_campaign",
+          "pk_kwd"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?walmart": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "u1",
+          "ath[a-zA-Z]*"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?woot": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ref_?"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?wps": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "from"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?youku": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "tpa"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?zoho": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "iref"
+        ],
+        "url_ok": []
+      }
+    },
+    "(accounts.)?firefox": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "context",
+          "entrypoint",
+          "form_type"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "cz": {
+    "(.+\\.)?prvnizpravy": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "xid"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "de": {
+    "(.+\\.)?bahn": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "dbkanal_[0-9]{3}"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?spiegel": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "b"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?swp": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "source"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?tchibo": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "wbdcd"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "gitlab.io": {
+    "kevinroebert": {
+      "/ClearUrls/void/index.html": {
+        "rewrite": [],
+        "strip": [
+          "test"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "it": {
+    "(.+\\.)?net-parade": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "pl"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "my": {
+    "(.+\\.)?lazada.com": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "ad_src",
+          "did",
+          "pa",
+          "mp",
+          "impsrc",
+          "cid",
+          "pos"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "net": {
+    "(.+\\.)?tweakers": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "nb",
+          "u"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "org": {
+    "(.+\\.)?mozilla": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "src",
+          "platform",
+          "redirect_source"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?mozillazine": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "sid"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?norml": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "link_id",
+          "can_id",
+          "source",
+          "email_referrer",
+          "email_subject"
+        ],
+        "url_ok": []
+      }
+    },
+    "(support.)?mozilla": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "as"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "pl": {
+    "(.+\\.)?allegro": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "reco_id",
+          "sid"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "ru": {
+    "(.+\\.)?hh": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "vss",
+          "t",
+          "swnt",
+          "grpos",
+          "ptl",
+          "stl",
+          "exp",
+          "plim"
+        ],
+        "url_ok": []
+      }
+    },
+    "(.+\\.)?ozon": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "partner"
+        ],
+        "url_ok": []
+      }
+    }
+  },
+  "us": {
+    "(.+\\.)?disq": {
+      "*": {
+        "rewrite": [],
+        "strip": [
+          "cuid"
+        ],
+        "url_ok": []
+      }
+    }
+  }
 }
