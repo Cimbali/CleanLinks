@@ -29,9 +29,9 @@ module.exports = config => Object.assign(config,
 		{type: 'css', included: false, served: true, nocache: true, pattern: "data/*"},
 
 		// The tests, finally
-		//'../tests/publicsuffixlist.test.js',
+		'../tests/publicsuffixlist.test.js',
 		'../tests/rules.test.js',
-		//'../tests/cleanlink.test.js',
+		'../tests/cleanlink.test.js',
 	],
 
 	proxies: {

@@ -1,10 +1,20 @@
 {
-	"rules": {"strip_params": [{"RegExp": "^utm_"}]},
-	 "google.(com?\\.)[a-z]{,3}": {
-		"match": "RegExp",
-		"rules": {"strip_params": ["client"]},
-		"/search": {
-			"rules": {"allow_url": "q"}
+	"*": {
+		"*": {
+			"*": {
+				"strip": ["^utm_", "fbclid"],
+				"rewrite": ["/ref="]
+			}
+		},
+		"accounts.google": {
+			"/signin/.+/identifier(/.+)?|/ServiceLogin": {
+				"url_ok": ["continue"]
+			}
+		},
+		"www.google": {
+			"/search": {
+				"url_ok": ["q"]
+			}
 		}
 	}
 }

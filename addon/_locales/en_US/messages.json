@@ -67,30 +67,6 @@
 	"message": "Disabled",
 	"description": ""
 },
-"skipwhen_title": {
-	"message": "Skip Links matching with:",
-	"description": ""
-},
-"skipwhen_tooltip": {
-	"message": "This is a REGEXP Pattern urls will be checked against so that links to sharing platforms and such will not get broken. case-sensitive.",
-	"description": ""
-},
-"remove_title": {
-	"message": "Remove From Links:",
-	"description": ""
-},
-"remove_tooltip": {
-	"message": "This is a regexp pattern which will be applied over links to remove tracking tags and such. case-insensitive.",
-	"description": ""
-},
-"skipdoms_title": {
-	"message": "Skip Domains:",
-	"description": ""
-},
-"skipdoms_tooltip": {
-	"message": "Comma-separated list of domains whose links won't be cleared.",
-	"description": ""
-},
 "highlight_title": {
 	"message": "Highlight Cleaned Links?",
 	"description": ""
@@ -193,6 +169,42 @@
 },
 "notiftime_tooltip": {
 	"message": "Duration before the cleaned link popup is automatically dismissed, in ms.",
+	"description": ""
+},
+"URL_protocol": {
+	"message": "Protocol",
+	"description": ""
+},
+"URL_domain": {
+	"message": "Domain name",
+	"description": ""
+},
+"URL_suffix": {
+	"message": "Public suffix",
+	"description": ""
+},
+"URL_tld": {
+	"message": "(usually same as top-level domain)",
+	"description": ""
+},
+"URL_subdomain": {
+	"message": "Subdomain",
+	"description": ""
+},
+"URL_fqdn": {
+	"message": "Fully-Qualified Domain Name (FQDN)",
+	"description": ""
+},
+"URL_path": {
+	"message": "Path",
+	"description": ""
+},
+"URL_query": {
+	"message": "Query",
+	"description": ""
+},
+"URL_parameter": {
+	"message": "Parameter",
 	"description": ""
 }
 }

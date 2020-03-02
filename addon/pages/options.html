@@ -3,132 +3,156 @@
 
 <head>
 	<meta charset="utf-8">
-	<style>
-		* {
-			background: white;
-			color: black;
-		}
-		input:disabled {
-			background: #ccc;
-		}
-		label {
-			display: block;
-			margin: 1ex 0;
-		}
-
-		fieldset label span {
-			display:inline-block;
-			min-width: 20em;
-		}
-
-		span.parsing_error {
-			color: red;
-			font-weight:bold;
-		}
-
-		input[name='enabled']:not(:checked) ~ span[i18n_text='extension_enabled'] {
-			display: none;
-		}
-
-		input[name='enabled']:checked ~ span[i18n_text='extension_disabled'] {
-			display: none;
-		}
-
-		input[type=number] {
-			width: 5em;
-		}
-		input[type=text], textarea {
-			width: 100%;
-		}
-		fieldset {
-			width:80%;
-			margin: 0 0 2em;
-		}
-		textarea {
-			height:10em;
-		}
-		legend {
-			font-weight: bold;
-			font-size: 1.2em;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="options.css">
 </head>
 
 <body>
 	<label i18n_title="extension_toggle_tooltip">
 		<h3>
-			<input type="checkbox" name="enabled" value="" />
+			<input type="checkbox" name="enabled" class="toggle" value="" />
 			<span i18n_text="extension_text"></span>
-			<span i18n_text="extension_enabled"></span>
-			<span i18n_text="extension_disabled"></span>
+			<span i18n_text="extension_enabled" class="enabled"></span>
+			<span i18n_text="extension_disabled" class="disabled"></span>
 		</h3>
 	</label>
-	<h2>Options</h2>
 
-	<fieldset>
-	<legend>Link cleaning</legend>
-	<label i18n_title="skipwhen_tooltip"><span i18n_text="skipwhen_title"></span>
-		<span class="parsing_error" id="skipwhen_error"></span>
-		<br /><input type="text" name="skipwhen" value="" />
-	</label>
-	<label i18n_title="remove_tooltip"><span i18n_text="remove_title"></span>
-		<span class="parsing_error" id="remove_error"></span>
-		<br /><input type="text" name="remove" value="" />
-	</label>
-	<label i18n_title="skipdoms_tooltip"><span i18n_text="skipdoms_title"></span>
-		<br /><textarea name="skipdoms"></textarea>
-	</label>
-	<label i18n_title="ignhttp_tooltip"><span i18n_text="ignhttp_title"></span>
-		<input type="checkbox" name="ignhttp" value="" />
-	</label>
+	<fieldset id="rule_editor">
+	<legend>Link cleaning rules</legend>
+
+		<label i18n_title="ignhttp_tooltip"><span i18n_text="ignhttp_title"></span>
+			<input type="checkbox" name="ignhttp" value="" />
+		</label>
+
+		<fieldset class="example">
+			<input type="checkbox" id="show_URL_legend" class="toggle" />
+
+			<legend>URL example <label for="show_URL_legend">
+					<span class="enabled">Hide</span><span class="disabled">Show</span> legend
+			</label></legend>
+			<p class="URL">
+				<span class="protocol" i18n_title="URL_protocol">https</span>://<span class="subdomain" i18n_title="URL_subdomain">addons.</span><span class="domain" i18n_title="URL_domain">mozilla.<span class="suffix" i18n_title="URL_suffix">org</span></span><span class="path" i18n_title="URL_path">/en-GB/firefox/addon/clean-links-webext/reviews/</span><span class="query" i18n_title="URL_query">?<span class="parameter" i18n_title="URL_parameter">score</span>=5</span>
+			</p>
+
+			<dl class="enabled">
+				<dt class="protocol">https</dt> <dd i18n_text="URL_protocol"></dd>
+				<dt class="suffix">org</dt> <dd>
+					<a i18n_text="URL_suffix" href="https://publicsuffix.org/"></a>
+					<span i18n_text="URL_tld"></span>
+				</dd>
+				<dt class="domain">mozilla.org</dt> <dd i18n_text="URL_domain"></dd>
+				<dt class="subdomain">addons.</dt> <dd i18n_text="URL_subdomain"></dd>
+				<dt class="fqdn">addons.mozilla.org</dt> <dd i18n_text="URL_fqdn"></dd>
+				<dt class="path">/en-GB/firefox/addon/clean-links-webext/reviews/</dt> <dd i18n_text="URL_path"></dd>
+				<dt class="query">?score=5</dt> <dd i18n_text="URL_query"></dd>
+				<dt class="parameter">score</dt> <dd i18n_text="URL_parameter"></dd>
+			</dl>
+		</fieldset>
+
+		<h4 id="rule_legend"><label for="rule_selector">Rule to edit:</label></h4>
+		<button id="remove_rule">Delete rule</button>
+		<p>
+			<select id="rule_selector" name="rule" size="2">
+				<option value="{}" selected="selected">-- New rule --</option>
+			</select>
+		</p>
+
+		<fieldset>
+			<legend>URLs matched</legend>
+			<label><span>Domain</span>
+				<span class="parsing_error" id="domain_error"></span>
+				<span class="parsing_error" id="suffix_error"></span>
+				<br /><input type="text" name="domain" value="" />.<input type="text" name="suffix" value="" />
+			</label>
+			<label><span>Match subdomains</span>
+				<input type="checkbox" name="subdomains" checked="checked" />
+			</label>
+			<label><span>Path</span>
+				<span class="parsing_error" id="path_error"></span>
+				<br /><input type="text" name="path" value="" />
+			</label>
+		</fieldset>
+
+		<fieldset>
+			<legend>Whitelist embedded URLs</legend>
+			<p>CleanLinks directly redirects URLs to any embedded URL inside the path, unless they are whitelisted.</p>
+			<label><span>Allow URL inside query parameters:</span>
+				<span class="parsing_error" id="url_ok_edit_error"></span>
+				<br /><input type="text" name="url_ok_edit" value="" />
+				<button id="url_ok_add" class="add_to_list" title="Add to the list">+</button>
+				<span class="url_ok_list whitelist"></span>
+			</label>
+			<label><span>Allow URL inside path</span>
+				<input type="checkbox" name="url_ok_path" value="" />
+			</label>
+		</fieldset>
+
+		<fieldset>
+			<legend>Remove URL tracking</legend>
+			<p>CleanLinks also supports removing tracking data in URLs.</p>
+			<label><span>Remove parameters from the query:</span>
+				<span class="parsing_error" id="strip_edit_error"></span>
+				<br /><input type="text" name="strip_edit" value="" />
+				<button id="strip_add" class="add_to_list" title="Add to the list">+</button>
+				<span class="strip_list whitelist"></span>
+			</label>
+			<label><span>Remove from path (does not affect domain and query):</span>
+				<br /><input type="text" name="rewrite_edit" value="" />
+				<button id="rewrite_add" class="add_to_list" title="Add to the list">+</button>
+				<span class="rewrite_list whitelist"></span>
+			</label>
+		</fieldset>
 	</fieldset>
 
 	<fieldset>
-	<legend>Features</legend>
-	<label i18n_title="switchToTab_tooltip"><span i18n_text="switchToTab_title"></span>
-		<input type="checkbox" name="switchToTab" value="" />
-	</label>
-	<label i18n_title="cbc_tooltip"><span i18n_text="cbc_title"></span>
-		<input type="checkbox" name="cbc" value="" />
-	</label>
-	<label i18n_title="progltr_tooltip"><span i18n_text="progltr_title"></span>
-		<input type="checkbox" name="progltr" value="" />
-	</label>
-	<label i18n_title="httpall_tooltip"><span i18n_text="httpall_title"></span>
-		<input type="checkbox" name="httpall" value="" />
-	</label>
-	<label i18n_title="gotarget_tooltip"><span i18n_text="gotarget_title"></span>
-		<input type="checkbox" name="gotarget" value="" />
-	</label>
-	<label i18n_title="textcl_tooltip"><span i18n_text="textcl_title"></span>
-		<input type="checkbox" name="textcl" value="" />
-	</label>
-	<label><span i18n_text="cltrack_title"></span>
-		<input type="checkbox" name="cltrack" value="" />
-	</label>
+		<legend>Features</legend>
+		<label i18n_title="switchToTab_tooltip"><span i18n_text="switchToTab_title"></span>
+			<input type="checkbox" name="switchToTab" value="" />
+		</label>
+		<label i18n_title="cbc_tooltip"><span i18n_text="cbc_title"></span>
+			<input type="checkbox" name="cbc" value="" />
+		</label>
+		<label i18n_title="progltr_tooltip"><span i18n_text="progltr_title"></span>
+			<input type="checkbox" name="progltr" value="" />
+		</label>
+		<label i18n_title="httpall_tooltip"><span i18n_text="httpall_title"></span>
+			<input type="checkbox" name="httpall" value="" />
+		</label>
+		<label i18n_title="gotarget_tooltip"><span i18n_text="gotarget_title"></span>
+			<input type="checkbox" name="gotarget" value="" />
+		</label>
+		<label i18n_title="textcl_tooltip"><span i18n_text="textcl_title"></span>
+			<input type="checkbox" name="textcl" value="" />
+		</label>
+		<label><span i18n_text="cltrack_title"></span>
+			<input type="checkbox" name="cltrack" value="" />
+		</label>
 	</fieldset>
 
 	<fieldset>
-	<legend>Display</legend>
-	<label><span i18n_text="highlight_title"></span>
-		<input type="checkbox" name="highlight" value="" />
-	</label>
-	<label i18n_title="hlstyle_content"><span i18n_text="hlstyle_title"></span>
-		<br /><input type="text" name="hlstyle" i18n_title="hlstyle_emptytext" />
-	</label>
-	<label><span i18n_text="notifications_title"></span>
-		<input type="checkbox" name="notifications" value="" />
-	</label>
-	<label i18n_title="notiftime_tooltip"><span i18n_text="notiftime_title"></span>
-		<input type="number" name="notiftime" value="" />
-	</label>
+		<legend>Display</legend>
+		<label><span i18n_text="highlight_title"></span>
+			<input type="checkbox" name="highlight" value="" />
+		</label>
+		<label i18n_title="hlstyle_content"><span i18n_text="hlstyle_title"></span>
+			<br /><input type="text" name="hlstyle" i18n_title="hlstyle_emptytext" />
+		</label>
+		<label><span i18n_text="notifications_title"></span>
+			<input type="checkbox" name="notifications" value="" />
+		</label>
+		<label i18n_title="notiftime_tooltip"><span i18n_text="notiftime_title"></span>
+			<input type="number" name="notiftime" value="" />
+		</label>
 	</fieldset>
 
 	<fieldset>
-	<legend>Reset</legend>
-	<p><button name="reset" i18n_text="reset_label" i18n_title="reset_tooltip"></button></p>
+		<legend>Reset</legend>
+		<p><button name="reset" i18n_text="reset_label" i18n_title="reset_tooltip"></button></p>
 	</fieldset>
 
+	<script src="/modules/prefs.js"></script>
+	<script src="/modules/punycode.js"></script>
+	<script src="/modules/publicsuffixlist.js"></script>
+	<script src="/modules/rules.js"></script>
 	<script src="/modules/cleanlink.js"></script>
 	<script src="options.js"></script>
 </body>

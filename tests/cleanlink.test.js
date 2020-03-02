@@ -75,6 +75,13 @@ describe('cleanLink', function() {
 			.to.equal('https://www.foobar2000.org/')
 		done();
 	});
+	it('should succeed on ClearUrl examples', done =>
+	{
+		expect(cleanLink('https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.fsf.org%2Fcampaigns%2F&h=ATP1kf98S0FxqErjoW8VmdSllIp4veuH2_m1jl69sEEeLzUXbkNXrVnzRMp65r5vf21LJGTgJwR2b66m97zYJoXx951n-pr4ruS1osMvT2c9ITsplpPU37RlSqJsSgba&s=1')).to.equal('https://www.fsf.org/campaigns/')
+		expect(cleanLink('https://out.reddit.com/t3_5pq7qd?url=https%3A%2F%2Finternethealthreport.org%2Fv01%2F&token=AQAAZV6JWHBBnIcVjV1wvxVg5gKyCQQSdUhGIvuEUmdPZhxhm8kH&app_name=reddit.com')).to.equal('https://internethealthreport.org/v01/')
+		expect(cleanLink('https://steamcommunity.com/linkfilter/?url=https://getfedora.org/')).to.equal('https://getfedora.org/')
+		done();
+	});
 });
 
 describe('extractJavascriptLink', function() {

@@ -66,6 +66,15 @@ function log()
 	if (prefValues.debug) console.log.apply(null, arguments)
 }
 
+function apply_i18n()
+{
+	for (let elem of document.querySelectorAll('[i18n_text]'))
+		elem.prepend(document.createTextNode(_(elem.getAttribute('i18n_text'))));
+
+	for (let elem of document.querySelectorAll('[i18n_title]'))
+		elem.setAttribute('title', _(elem.getAttribute('i18n_title')));
+}
+
 
 function serializeOptions()
 {
