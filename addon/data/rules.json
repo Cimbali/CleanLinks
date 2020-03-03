@@ -1,19 +1,107 @@
 {
   ".*": {
+    ".amazon": {
+      "actions": {
+        "remove": [
+          "pf_rd_[a-zA-Z]",
+          "qid",
+          "sr",
+          "srs",
+          "pd_rd_[a-zA-Z]*",
+          "__mk_[a-zA-Z]{1,3}_[a-zA-Z]{1,3}",
+          "spIA",
+          "ms3_c",
+          "[a-zA-Z%0-9]*ie",
+          "refRID",
+          "colid",
+          "coliid",
+          "[^a-zA-Z%0-9]adId",
+          "qualifier",
+          "_encoding",
+          "smid",
+          "field-lbr_brands_browse-bin",
+          "ref_?",
+          "th",
+          "sprefix",
+          "crid",
+          "keywords",
+          "cv_ct_[a-zA-Z]+",
+          "linkCode",
+          "creativeASIN",
+          "ascsubtag",
+          "aaxitk",
+          "hsa_cr_id",
+          "sb-ci-[a-zA-Z]+",
+          "rnid",
+          "tag"
+        ],
+        "rewrite": [
+          "/ref=[^/]*"
+        ]
+      }
+    },
+    ".bing": {
+      "actions": {
+        "remove": [
+          "cvid",
+          "form",
+          "sk",
+          "sp",
+          "sc",
+          "qs",
+          "qp"
+        ]
+      }
+    },
+    ".ebay": {
+      "actions": {
+        "remove": [
+          "_trkparms",
+          "_trksid",
+          "_from",
+          "hash"
+        ]
+      }
+    },
+    ".facebook": {
+      "actions": {
+        "remove": [
+          "hc_[a-zA-Z_%\\[\\]0-9]*",
+          "[a-zA-Z]*ref[a-zA-Z]*",
+          "__tn__",
+          "eid",
+          "__xts__%5B[0-9]%5D",
+          "__xts__\\[[0-9]\\]",
+          "comment_tracking",
+          "dti",
+          "app",
+          "video_source",
+          "ftentidentifier",
+          "pageid",
+          "padding",
+          "ls_ref",
+          "action_history",
+          "fbid",
+          "comment_id"
+        ]
+      }
+    },
     ".google": {
+      ".accounts": {
+        "/signin/.+/identifier(/.+)?|/ServiceLogin": {
+          "actions": {
+            "whitelist": [
+              "continue"
+            ]
+          }
+        }
+      },
       ".www": {
         "/search": {
           "actions": {
             "whitelist": [
               "q"
             ]
-          }
-        }
-      },
-      ".accounts": {
-        "/signin/.+/identifier(/.+)?|/ServiceLogin": {
-          "actions": {
-            "whitelist": ["continue"]
           }
         }
       },
@@ -57,78 +145,27 @@
         ]
       }
     },
-    ".amazon": {
+    ".instagram": {
       "actions": {
-        "rewrite": [
-          "/ref=[^/]*"
-        ],
         "remove": [
-          "pf_rd_[a-zA-Z]",
-          "qid",
-          "sr",
-          "srs",
-          "pd_rd_[a-zA-Z]*",
-          "__mk_[a-zA-Z]{1,3}_[a-zA-Z]{1,3}",
-          "spIA",
-          "ms3_c",
-          "[a-zA-Z%0-9]*ie",
-          "refRID",
-          "colid",
-          "coliid",
-          "[^a-zA-Z%0-9]adId",
-          "qualifier",
-          "_encoding",
-          "smid",
-          "field-lbr_brands_browse-bin",
-          "ref_?",
-          "th",
-          "sprefix",
-          "crid",
-          "keywords",
-          "cv_ct_[a-zA-Z]+",
-          "linkCode",
-          "creativeASIN",
-          "ascsubtag",
-          "aaxitk",
-          "hsa_cr_id",
-          "sb-ci-[a-zA-Z]+",
-          "rnid",
-          "tag"
+          "igshid"
         ]
       }
     },
-    ".amazon-adsystem": {
-      "actions": {}
-    },
-    ".youtube": {
+    ".netflix": {
       "actions": {
         "remove": [
-          "feature",
-          "gclid",
-          "kw"
+          "trackId",
+          "tctx",
+          "jb[a-zA-Z]*"
         ]
       }
     },
-    ".facebook": {
+    ".twitch": {
       "actions": {
         "remove": [
-          "hc_[a-zA-Z_%\\[\\]0-9]*",
-          "[a-zA-Z]*ref[a-zA-Z]*",
-          "__tn__",
-          "eid",
-          "__xts__%5B[0-9]%5D",
-          "__xts__\\[[0-9]\\]",
-          "comment_tracking",
-          "dti",
-          "app",
-          "video_source",
-          "ftentidentifier",
-          "pageid",
-          "padding",
-          "ls_ref",
-          "action_history",
-          "fbid",
-          "comment_id"
+          "tt_medium",
+          "tt_content"
         ]
       }
     },
@@ -142,53 +179,6 @@
         ]
       }
     },
-    ".netflix": {
-      "actions": {
-        "remove": [
-          "trackId",
-          "tctx",
-          "jb[a-zA-Z]*"
-        ]
-      }
-    },
-    ".bing": {
-      "actions": {
-        "remove": [
-          "cvid",
-          "form",
-          "sk",
-          "sp",
-          "sc",
-          "qs",
-          "qp"
-        ]
-      }
-    },
-    ".twitch": {
-      "actions": {
-        "remove": [
-          "tt_medium",
-          "tt_content"
-        ]
-      }
-    },
-    ".ebay": {
-      "actions": {
-        "remove": [
-          "_trkparms",
-          "_trksid",
-          "_from",
-          "hash"
-        ]
-      }
-    },
-    ".instagram": {
-      "actions": {
-        "remove": [
-          "igshid"
-        ]
-      }
-    },
     ".yandex": {
       "actions": {
         "remove": [
@@ -196,149 +186,34 @@
           "redircnt"
         ]
       }
+    },
+    ".youtube": {
+      "actions": {
+        "remove": [
+          "feature",
+          "gclid",
+          "kw"
+        ]
+      }
     }
   },
-  "actions": {
-    "remove": [
-      "utm(_[a-zA-Z]*)?",
-      "ga_[a-zA-Z_]+",
-      "yclid",
-      "_openstat",
-      "fb_action_ids",
-      "fb_action_types",
-      "fb_source",
-      "fb_ref",
-      "fbclid",
-      "action_object_map",
-      "action_type_map",
-      "action_ref_map",
-      "gs_l",
-      "mkt_tok",
-      "hmb_campaign",
-      "hmb_medium",
-      "hmb_source",
-      "ref[\\_]?",
-      "gclid",
-      "otm_[a-zA-Z_]*",
-      "cmpid",
-      "os_ehash",
-      "_ga",
-      "__twitter_impression",
-      "wt_?z?mc",
-      "wtrid",
-      "[a-zA-Z]?mc",
-      "dclid",
-      "Echobox",
-      "spm",
-      "vn(_[a-zA-Z]*)+"
-    ]
-  },
   ".com": {
-    ".techcrunch": {
-      "actions": {
-        "remove": [
-          "ncid",
-          "sr",
-          "sr_share"
-        ]
-      }
-    },
-    ".stackoverflow": {
-      "/users/login": {
-        "actions": {
-          "whitelist": [
-            "returnurl"
-          ]
+    ".9gag": {
+      ".comment-cdn": {
+        "/comment-list.json$": {
+          "actions": {
+            "remove": [
+              "origin"
+            ],
+            "whitelist": [
+              "url"
+            ]
+          }
         }
-      }
-    },
-    ".vivaldi": {
-      "actions": {
-        "remove": [
-          "pk_campaign",
-          "pk_kwd"
-        ]
-      }
-    },
-    ".indeed": {
-      "actions": {
-        "remove": [
-          "from",
-          "alid",
-          "[a-zA-Z]*tk"
-        ]
-      }
-    },
-    ".cnet": {
-      "actions": {
-        "remove": [
-          "ftag"
-        ]
-      }
-    },
-    ".imdb": {
-      "actions": {
-        "remove": [
-          "ref_",
-          "pf_rd_[a-zA-Z]*"
-        ]
-      }
-    },
-    ".walmart": {
-      "actions": {
-        "remove": [
-          "u1",
-          "ath[a-zA-Z]*"
-        ]
-      }
-    },
-    ".youku": {
-      "actions": {
-        "remove": [
-          "tpa"
-        ]
-      }
-    },
-    ".nytimes": {
-      "actions": {
-        "remove": [
-          "smid"
-        ]
-      }
-    },
-    ".steampowered": {
-      "actions": {
-        "remove": [
-          "snr"
-        ]
-      }
-    },
-    ".shutterstock": {
-      "actions": {
-        "remove": [
-          "src"
-        ]
-      }
-    },
-    ".readdc": {
+      },
       "actions": {
         "remove": [
           "ref"
-        ]
-      }
-    },
-    ".dailycodingproblem": {
-      "actions": {
-        "remove": [
-          "email"
-        ]
-      }
-    },
-    ".github": {
-      "actions": {
-        "remove": [
-          "email_token",
-          "email_source"
         ]
       }
     },
@@ -355,52 +230,22 @@
         ]
       }
     },
-    ".9gag": {
+    ".backcountry": {
       "actions": {
         "remove": [
-          "ref"
-        ]
-      }
-    },
-    ".giphy": {
-      "actions": {
-        "remove": [
-          "ref"
-        ]
-      }
-    },
-    ".woot": {
-      "actions": {
-        "remove": [
-          "ref_?"
-        ]
-      }
-    },
-    ".vitamix": {
-      "actions": {
-        "remove": [
-          "_requestid",
-          "cid",
-          "dl",
-          "di",
-          "sd",
-          "bi"
-        ]
-      }
-    },
-    ".nypost": {
-      "actions": {
-        "remove": [
-          "__twitter_impression"
-        ]
-      }
-    },
-    ".linkedin": {
-      "actions": {
-        "remove": [
-          "refId",
-          "trk",
-          "li[a-zA-Z]{2}"
+          "CMP_SKU",
+          "MER",
+          "mr:trackingCode",
+          "mr:device",
+          "mr:adType",
+          "iv_",
+          "CMP_ID",
+          "k_clickid",
+          "rmatt",
+          "INT_ID",
+          "ti",
+          "fl",
+          "mr:referralID"
         ]
       }
     },
@@ -411,60 +256,26 @@
         ]
       }
     },
-    ".moosejaw": {
+    ".cnet": {
       "actions": {
         "remove": [
-          "cm_lm",
-          "cm_mmc",
-          "webUserId",
-          "spMailingID",
-          "spUserID",
-          "spJobID",
-          "spReportId"
+          "ftag"
         ]
       }
     },
-    ".spotify": {
+    ".dailycodingproblem": {
       "actions": {
         "remove": [
-          "si"
+          "email"
         ]
       }
     },
-    ".healio": {
+    ".diepresse": {
       "actions": {
         "remove": [
-          "ecp",
-          "m_bt"
-        ]
-      }
-    },
-    ".zoho": {
-      "actions": {
-        "remove": [
-          "iref"
-        ]
-      }
-    },
-    ".snapchat": {
-      "actions": {
-        "remove": [
-          "sc_referrer",
-          "sc_ua"
-        ]
-      }
-    },
-    ".medium": {
-      "actions": {
-        "remove": [
-          "source"
-        ]
-      }
-    },
-    ".wps": {
-      "actions": {
-        "remove": [
-          "from"
+          "from",
+          "xtor",
+          "xt_at"
         ]
       }
     },
@@ -490,12 +301,43 @@
         }
       }
     },
-    ".diepresse": {
+    ".giphy": {
+      "actions": {
+        "remove": [
+          "ref"
+        ]
+      }
+    },
+    ".github": {
+      "actions": {
+        "remove": [
+          "email_token",
+          "email_source"
+        ]
+      }
+    },
+    ".healio": {
+      "actions": {
+        "remove": [
+          "ecp",
+          "m_bt"
+        ]
+      }
+    },
+    ".imdb": {
+      "actions": {
+        "remove": [
+          "ref_",
+          "pf_rd_[a-zA-Z]*"
+        ]
+      }
+    },
+    ".indeed": {
       "actions": {
         "remove": [
           "from",
-          "xtor",
-          "xt_at"
+          "alid",
+          "[a-zA-Z]*tk"
         ]
       }
     },
@@ -508,22 +350,232 @@
         }
       }
     },
-    ".backcountry": {
+    ".linkedin": {
       "actions": {
         "remove": [
-          "CMP_SKU",
-          "MER",
-          "mr:trackingCode",
-          "mr:device",
-          "mr:adType",
-          "iv_",
-          "CMP_ID",
-          "k_clickid",
-          "rmatt",
-          "INT_ID",
-          "ti",
-          "fl",
-          "mr:referralID"
+          "refId",
+          "trk",
+          "li[a-zA-Z]{2}"
+        ]
+      }
+    },
+    ".medium": {
+      "actions": {
+        "remove": [
+          "source"
+        ]
+      }
+    },
+    ".moosejaw": {
+      "actions": {
+        "remove": [
+          "cm_lm",
+          "cm_mmc",
+          "webUserId",
+          "spMailingID",
+          "spUserID",
+          "spJobID",
+          "spReportId"
+        ]
+      }
+    },
+    ".nypost": {
+      "actions": {
+        "remove": [
+          "__twitter_impression"
+        ]
+      }
+    },
+    ".nytimes": {
+      "actions": {
+        "remove": [
+          "smid"
+        ]
+      }
+    },
+    ".readdc": {
+      "actions": {
+        "remove": [
+          "ref"
+        ]
+      }
+    },
+    ".shutterstock": {
+      "actions": {
+        "remove": [
+          "src"
+        ]
+      }
+    },
+    ".snapchat": {
+      "actions": {
+        "remove": [
+          "sc_referrer",
+          "sc_ua"
+        ]
+      }
+    },
+    ".spotify": {
+      "actions": {
+        "remove": [
+          "si"
+        ]
+      }
+    },
+    ".stackoverflow": {
+      "/users/login": {
+        "actions": {
+          "whitelist": [
+            "returnurl"
+          ]
+        }
+      }
+    },
+    ".steampowered": {
+      "actions": {
+        "remove": [
+          "snr"
+        ]
+      }
+    },
+    ".techcrunch": {
+      "actions": {
+        "remove": [
+          "ncid",
+          "sr",
+          "sr_share"
+        ]
+      }
+    },
+    ".vitamix": {
+      "actions": {
+        "remove": [
+          "_requestid",
+          "cid",
+          "dl",
+          "di",
+          "sd",
+          "bi"
+        ]
+      }
+    },
+    ".vivaldi": {
+      "actions": {
+        "remove": [
+          "pk_campaign",
+          "pk_kwd"
+        ]
+      }
+    },
+    ".walmart": {
+      "actions": {
+        "remove": [
+          "u1",
+          "ath[a-zA-Z]*"
+        ]
+      }
+    },
+    ".woot": {
+      "actions": {
+        "remove": [
+          "ref_?"
+        ]
+      }
+    },
+    ".wps": {
+      "actions": {
+        "remove": [
+          "from"
+        ]
+      }
+    },
+    ".youku": {
+      "actions": {
+        "remove": [
+          "tpa"
+        ]
+      }
+    },
+    ".zoho": {
+      "actions": {
+        "remove": [
+          "iref"
+        ]
+      }
+    }
+  },
+  ".com.my": {
+    ".lazada": {
+      "actions": {
+        "remove": [
+          "ad_src",
+          "did",
+          "pa",
+          "mp",
+          "impsrc",
+          "cid",
+          "pos"
+        ]
+      }
+    }
+  },
+  ".cz": {
+    ".prvnizpravy": {
+      "actions": {
+        "remove": [
+          "xid"
+        ]
+      }
+    }
+  },
+  ".de": {
+    ".bahn": {
+      "actions": {
+        "remove": [
+          "dbkanal_[0-9]{3}"
+        ]
+      }
+    },
+    ".spiegel": {
+      "actions": {
+        "remove": [
+          "b"
+        ]
+      }
+    },
+    ".swp": {
+      "actions": {
+        "remove": [
+          "source"
+        ]
+      }
+    },
+    ".tchibo": {
+      "actions": {
+        "remove": [
+          "wbdcd"
+        ]
+      }
+    }
+  },
+  ".gitlab.io": {
+    ".kevinroebert": {
+      ".": {
+        "/ClearUrls/void/index.html": {
+          "actions": {
+            "remove": [
+              "test"
+            ]
+          }
+        }
+      }
+    }
+  },
+  ".it": {
+    ".net-parade": {
+      "actions": {
+        "remove": [
+          "pl"
         ]
       }
     }
@@ -534,6 +586,61 @@
         "remove": [
           "nb",
           "u"
+        ]
+      }
+    }
+  },
+  ".org": {
+    ".mozilla": {
+      ".": {
+        "actions": {
+          "remove": [
+            "as"
+          ]
+        }
+      },
+      ".support": {
+        ".": {
+          "actions": {
+            "remove": [
+              "as"
+            ]
+          }
+        }
+      },
+      "actions": {
+        "remove": [
+          "src",
+          "platform",
+          "redirect_source"
+        ]
+      }
+    },
+    ".mozillazine": {
+      "actions": {
+        "remove": [
+          "sid"
+        ]
+      }
+    },
+    ".norml": {
+      "actions": {
+        "remove": [
+          "link_id",
+          "can_id",
+          "source",
+          "email_referrer",
+          "email_subject"
+        ]
+      }
+    }
+  },
+  ".pl": {
+    ".allegro": {
+      "actions": {
+        "remove": [
+          "reco_id",
+          "sid"
         ]
       }
     }
@@ -561,114 +668,6 @@
       }
     }
   },
-  ".it": {
-    ".net-parade": {
-      "actions": {
-        "remove": [
-          "pl"
-        ]
-      }
-    }
-  },
-  ".cz": {
-    ".prvnizpravy": {
-      "actions": {
-        "remove": [
-          "xid"
-        ]
-      }
-    }
-  },
-  ".de": {
-    ".tchibo": {
-      "actions": {
-        "remove": [
-          "wbdcd"
-        ]
-      }
-    },
-    ".spiegel": {
-      "actions": {
-        "remove": [
-          "b"
-        ]
-      }
-    },
-    ".bahn": {
-      "actions": {
-        "remove": [
-          "dbkanal_[0-9]{3}"
-        ]
-      }
-    },
-    ".swp": {
-      "actions": {
-        "remove": [
-          "source"
-        ]
-      }
-    }
-  },
-  ".org": {
-    ".mozilla": {
-      "actions": {
-        "remove": [
-          "src",
-          "platform",
-          "redirect_source"
-        ]
-      },
-      ".": {
-        "actions": {
-          "remove": [
-            "as"
-          ]
-        }
-      },
-      ".support": {
-        ".": {
-          "actions": {
-            "remove": [
-              "as"
-            ]
-          }
-        }
-      }
-    },
-    ".mozillazine": {
-      "actions": {
-        "remove": [
-          "sid"
-        ]
-      }
-    },
-    ".norml": {
-      "actions": {
-        "remove": [
-          "link_id",
-          "can_id",
-          "source",
-          "email_referrer",
-          "email_subject"
-        ]
-      }
-    }
-  },
-  ".com.my": {
-    ".lazada": {
-      "actions": {
-        "remove": [
-          "ad_src",
-          "did",
-          "pa",
-          "mp",
-          "impsrc",
-          "cid",
-          "pos"
-        ]
-      }
-    }
-  },
   ".us": {
     ".disq": {
       "actions": {
@@ -678,27 +677,38 @@
       }
     }
   },
-  ".gitlab.io": {
-    ".kevinroebert": {
-      ".": {
-        "/ClearUrls/void/index.html": {
-          "actions": {
-            "remove": [
-              "test"
-            ]
-          }
-        }
-      }
-    }
-  },
-  ".pl": {
-    ".allegro": {
-      "actions": {
-        "remove": [
-          "reco_id",
-          "sid"
-        ]
-      }
-    }
+  "actions": {
+    "remove": [
+      "utm(_[a-zA-Z]*)?",
+      "ga_[a-zA-Z_]+",
+      "yclid",
+      "_openstat",
+      "fb_action_ids",
+      "fb_action_types",
+      "fb_source",
+      "fb_ref",
+      "fbclid",
+      "action_object_map",
+      "action_type_map",
+      "action_ref_map",
+      "gs_l",
+      "mkt_tok",
+      "hmb_campaign",
+      "hmb_medium",
+      "hmb_source",
+      "gclid",
+      "otm_[a-zA-Z_]*",
+      "cmpid",
+      "os_ehash",
+      "_ga",
+      "__twitter_impression",
+      "wt_?z?mc",
+      "wtrid",
+      "[a-zA-Z]?mc",
+      "dclid",
+      "Echobox",
+      "spm",
+      "vn(_[a-zA-Z]*)+"
+    ]
   }
 }
