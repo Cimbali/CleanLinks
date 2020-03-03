@@ -36,7 +36,7 @@
           "tag"
         ],
         "rewrite": [
-          "/ref=[^/]*"
+          {"search": "/ref=[^/]*", "replace": ""}
         ]
       }
     },
@@ -486,6 +486,13 @@
       "actions": {
         "remove": [
           "from"
+        ]
+      }
+    },
+    ".yahoo": {
+      "actions": {
+        "rewrite": [
+          {"search": "/R[KS]=\\d.*$", "replace": ""}
         ]
       }
     },

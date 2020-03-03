@@ -26,7 +26,7 @@ describe('find_rules', function() {
 		{
 			let result = find_rules(amazon_url, all_rules)
 			console.log(amazon_url.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
-			expect(result.rewrite).to.have.members(['/ref=[^/]*'])
+			expect(result.rewrite).to.deep.equal([{search: '/ref=[^/]*', replace: ''}])
 		})
 	);
 	it('should return correct whitelist and removing for 9gag CDN pages', () =>

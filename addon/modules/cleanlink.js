@@ -97,16 +97,6 @@ function getBaseURL(base)
 	return base;
 }
 
-// pre-process base-64 matches, before decoding them
-function domainRulesBase64(link, base, base64match)
-{
-	if (/\.yahoo.com$/.test(base.host))
-		return base64match.replace(/\/RS.*$/, '');
-	else
-		return base64match;
-}
-
-
 // pre-process plain/url-encoded matches, before decoding them
 function domainRulesGeneral(link, base)
 {
@@ -119,10 +109,6 @@ function domainRulesGeneral(link, base)
 					return new URL(decodeURIComponent(link.replace(/_+([a-f\d]{2})/gi, '%$1')
 						.replace(/_|%5f/ig, '')).split('-aurl.').pop().split('-aurlKey').shift());
 		}
-
-
-		if (/\.yahoo.com$/.test(base.host))
-			link.path = link.path.replace(/\/R[KS]=\d.*$/, '');
 	}
 
 	switch (link.host) // alt: (link.match(/^\w+:\/\/([^/]+)/) || [])
@@ -139,13 +125,12 @@ function domainRulesGeneral(link, base)
 function decodeEmbeddedURI(link, base, rules)
 {
 	// first try to find a base64-encoded link
-	let base64match, skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp(rules.whitelist.join('|')) : null;
+	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp(rules.whitelist.join('|')) : null;
 	for (let str of getLinkSearchStrings(link, skip))
 	{
-		[base64match] = str.match(base64_encoded_url) || [];
+		let [base64match] = str.match(base64_encoded_url) || [];
 		if (base64match)
 		{
-			base64match = domainRulesBase64(link, base, base64match);
 			try
 			{
 				let decoded = decodeURIComponent(atob(base64match));
@@ -244,8 +229,8 @@ function filterParams(link, base, rules)
 {
 	if ('rewrite' in rules && rules.rewrite.length)
 	{
-		for (let rewrite of rules.rewrite)
-			link.pathname = link.pathname.replace(new RegExp(rewrite), '')
+		for (let {search, replace} of rules.rewrite)
+			link.pathname = link.pathname.replace(new RegExp(search), replace)
 	}
 
 	if ('remove' in rules && rules.remove.length)
