@@ -73,22 +73,10 @@
 		</fieldset>
 
 		<fieldset>
-			<legend>Whitelist embedded URLs</legend>
-			<p>CleanLinks directly redirects URLs to any embedded URL inside the path, unless they are whitelisted.</p>
-			<label><span>Allow URL inside query parameters:</span>
-				<span class="parsing_error" id="url_ok_edit_error"></span>
-				<br /><input type="text" name="url_ok_edit" value="" />
-				<button id="url_ok_add" class="add_to_list" title="Add to the list">+</button>
-				<span class="url_ok_list whitelist"></span>
-			</label>
-			<label><span>Allow URL inside path</span>
-				<input type="checkbox" name="url_ok_path" value="" />
-			</label>
-		</fieldset>
+			<legend>Cleaning actions</legend>
+			<p>CleanLinks directly redirects URLs to any embedded URL inside the path, unless they are whitelisted.
+			<br />CleanLinks also supports removing tracking data in URLs.</p>
 
-		<fieldset>
-			<legend>Remove URL tracking</legend>
-			<p>CleanLinks also supports removing tracking data in URLs.</p>
 			<label><span>Remove parameters from the query:</span>
 				<span class="parsing_error" id="strip_edit_error"></span>
 				<br /><input type="text" name="strip_edit" value="" />
@@ -99,6 +87,16 @@
 				<br /><input type="text" name="rewrite_edit" value="" />
 				<button id="rewrite_add" class="add_to_list" title="Add to the list">+</button>
 				<span class="rewrite_list whitelist"></span>
+			</label>
+
+			<label><span>Whitelist query parameters (prevent removing and allow embedded URL):</span>
+				<span class="parsing_error" id="whitelist_edit_error"></span>
+				<br /><input type="text" name="whitelist_edit" value="" />
+				<button id="whitelist_add" class="add_to_list" title="Add to the list">+</button>
+				<span class="whitelist_list whitelist"></span>
+			</label>
+			<label><span>Allow URL embedded inside path</span>
+				<input type="checkbox" name="whitelist_path" value="" />
 			</label>
 		</fieldset>
 	</fieldset>

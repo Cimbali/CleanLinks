@@ -15,28 +15,51 @@
 'use strict'
 
 
-const default_actions = {'url_ok': [], 'strip': [], 'rewrite': []}
+const default_actions = {'whitelist': [], 'remove': [], 'rewrite': []}
 
 
-function recursive_find(rules, keys)
+function recursive_find(rules, domain_bits, path)
 {
-	if (!keys.length)
-		return rules
+	let matches = []
+	if ('actions' in rules)
+		matches.push(rules.actions)
 
-	var search = keys.shift();
+	if (domain_bits.length !== 0)
+	{
+		let bit = domain_bits[0]
 
-	let matches = Object.keys(rules).filter(val => val === '*' || search.match(RegExp(val)))
-	return matches.reduce((acc, val) => acc.concat(recursive_find(rules[val], [...keys])), [])
+		// wildcard domain match
+		if (bit !== '.' && '.*' in rules)
+			matches.push(...recursive_find(rules['.*'], domain_bits.slice(1), path))
+
+		// normal (exact) domain match
+		if (bit in rules)
+			matches.push(...recursive_find(rules[bit], domain_bits.slice(1), path))
+	}
+
+	if (path === undefined)
+		return matches
+
+	// wildcard path match
+	if (path !== '/' && '/*' in rules)
+		matches.push(...recursive_find(rules['/*'], []))
+
+	// normal (regexp) path match
+	let path_matches = Object.keys(rules).filter(key => key.startsWith('/') && key !== '/*')
+										 .filter(key => path.match(new RegExp(key)))
+
+	return path_matches.reduce((list, matching_key) => list.concat(recursive_find(rules[matching_key], [])), matches)
 }
 
 
 function find_rules(url, all_rules)
 {
 	// use public domain instead of TLD
-	var suffix = '.' + publicSuffixList.getPublicSuffix(url.hostname);
-	var domain = url.hostname.substr(0, url.hostname.length - suffix.length);
+	let suffix = publicSuffixList.getPublicSuffix(url.hostname);
+	let domain = url.hostname.substr(0, url.hostname.length - suffix.length - 1)
+	let domain_bits = [suffix].concat(...domain.split('.').reverse(), '').map(d => '.' + d);
 
-	let aggregated = {}, action_list = recursive_find(all_rules, [suffix, domain, url.pathname])
+	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
 	for (let actions of action_list)
 		for (let key of Object.keys(actions))
 			aggregated[key] = actions[key].concat(key in aggregated ? aggregated[key] : [])
@@ -123,14 +146,9 @@ const load_default_rules = (done) =>
 		{
 			let rules = JSON.parse(data);
 			browser.storage.sync.set({rules: rules})
-			done(rules);
+			publicSuffixList.loaded.then(() => done(rules));
 		})
-	}).catch(err =>
-	{
-		console.error(err)
-		console.log('Trying: ' + local_url)
-		fetch(new Request(local_url)).then(populate)
-	});
+	})
 }
 
 
@@ -143,7 +161,7 @@ var load_rules = new Promise(done =>
 		cached.then(data =>
 		{
 			if ('rules' in data)
-				done(data.rules);
+				publicSuffixList.loaded.then(() => done(data.rules));
 			else
 				load_default_rules(done);
 		})

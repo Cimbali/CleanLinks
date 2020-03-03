@@ -158,10 +158,8 @@ function add_rule_item(list, element)
 
 function name_rule(rule)
 {
-	const subdomains = rule.domain.startsWith(match_subdomains)
-
-	return (subdomains ? '*.' + rule.domain.substr(match_subdomains.length) : rule.domain)
-			+ '.' + rule.suffix + (rule.path.startsWith('/') ? '' : '/') + rule.path;
+	return rule.domain.substr(rule.domain.startsWith('.') ? 1 : 0) + '.' + rule.suffix
+			+ (rule.path.startsWith('/') ? '' : '/') + rule.path;
 }
 
 
