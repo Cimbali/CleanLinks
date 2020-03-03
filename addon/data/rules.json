@@ -36,7 +36,7 @@
           "tag"
         ],
         "rewrite": [
-          {"search": "/ref=[^/]*", "replace": ""}
+          {"search": "/ref=[^/]*", "replace": "", "flags": ""}
         ]
       }
     },
@@ -159,6 +159,16 @@
           "tctx",
           "jb[a-zA-Z]*"
         ]
+      }
+    },
+    ".tripadvisor": {
+      "/ShowUrl.*-a_urlKey": {
+        "actions": {
+          "rewrite": [
+            {"search": "__([0-9A-F]{2})__", "replace": "%$1", "flags": "g"},
+            {"search": "-a_urlKey\\.\\d.*", "replace": "", "flags": ""}
+          ]
+        }
       }
     },
     ".twitch": {
@@ -492,7 +502,7 @@
     ".yahoo": {
       "actions": {
         "rewrite": [
-          {"search": "/R[KS]=\\d.*$", "replace": ""}
+          {"search": "/R[KS]=\\d.*$", "replace": "", "flags": ""}
         ]
       }
     },

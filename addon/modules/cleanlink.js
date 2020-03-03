@@ -100,17 +100,6 @@ function getBaseURL(base)
 // pre-process plain/url-encoded matches, before decoding them
 function domainRulesGeneral(link, base)
 {
-	if (typeof base !== 'undefined')
-	{
-		switch (base.host)
-		{
-			case 'www.tripadvisor.com':
-				if (link.indexOf('-a_urlKey') !== -1)
-					return new URL(decodeURIComponent(link.replace(/_+([a-f\d]{2})/gi, '%$1')
-						.replace(/_|%5f/ig, '')).split('-aurl.').pop().split('-aurlKey').shift());
-		}
-	}
-
 	switch (link.host) // alt: (link.match(/^\w+:\/\/([^/]+)/) || [])
 	{
 		case 'redirect.disqus.com':
@@ -229,8 +218,8 @@ function filterParams(link, base, rules)
 {
 	if ('rewrite' in rules && rules.rewrite.length)
 	{
-		for (let {search, replace} of rules.rewrite)
-			link.pathname = link.pathname.replace(new RegExp(search), replace)
+		for (let {search, replace, flags} of rules.rewrite)
+			link.pathname = link.pathname.replace(new RegExp(search, flags), replace)
 	}
 
 	if ('remove' in rules && rules.remove.length)
