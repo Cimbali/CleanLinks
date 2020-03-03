@@ -21,14 +21,26 @@ const Queue = {
 	}
 };
 
-const match_subdomains = '(.+\\.)?';
-
 
 function update_page(prefs)
 {
 	document.querySelector('input[name="notiftime"]').disabled = !prefs.notifications;
 	document.querySelector('input[name="hlstyle"]').disabled = !prefs.highlight;
 }
+
+
+function check_regexp(expr, error_span)
+{
+	try {
+		var r = new RegExp(expr);
+		error_span.innerText = '';
+		return true;
+	} catch (e) {
+		error_span.innerText = 'Error parsing RegExp: ' + e.message;
+		return false;
+	}
+}
+
 
 function save_options()
 {
@@ -39,14 +51,10 @@ function save_options()
 		else if (prefValues[field.name] instanceof RegExp)
 		{
 			var error_span = document.querySelector('span#' + field.name + '_error');
-			try {
-				var r = new RegExp(field.value || '.^');
+			if (check_regexp(field.value || '.^', document.getElementById('path_error')))
 				prefs[field.name] = field.value;
-				error_span.innerText = '';
-			} catch (e) {
+			else
 				prefs[field.name] = prefValues[field.name].source;
-				error_span.innerText = 'Error parsing RegExp: ' + e.message;
-			}
 		}
 		else if (field.name in prefs)
 			prefs[field.name] = field.value;
@@ -128,15 +136,17 @@ function remove_rule_item(list, element)
 }
 
 
-function show_rule_item(list, element)
+function show_rule_item(list, element, elemtype)
 {
 	let span = document.createElement('span');
 	span.appendChild(document.createTextNode(element));
-	span.onclick = () => {
-		remove_rule_item(list, element)
-		span.remove()
+	if (elemtype !== 'inherit') {
+		span.onclick = () => {
+			remove_rule_item(list, element)
+			span.remove()
+		}
 	}
-	document.querySelector('.' + list + '_list').appendChild(span)
+	document.getElementById(list + '_' + elemtype + 'list').appendChild(span)
 }
 
 
@@ -151,21 +161,34 @@ function add_rule_item(list, element)
 	{
 		rule[list].push(element)
 		selectedOpt.value = JSON.stringify(rule);
-		show_rule_item(list, element)
+		show_rule_item(list, element, 'item')
 	}
+
+	return true;
 }
 
 
 function name_rule(rule)
 {
-	return rule.domain.substr(rule.domain.startsWith('.') ? 1 : 0) + '.' + rule.suffix
-			+ (rule.path.startsWith('/') ? '' : '/') + rule.path;
+	let domain = rule.domain.substr(1), path = rule.path;
+
+	if (domain.startsWith('.'))
+		domain = domain.substr(1)
+	else if (domain !== '*')
+		domain = '*.' + domain
+
+	if (!(path.startsWith('/')))
+		path = '/' + path
+	if (path === '/*')
+		path = ''
+
+	return domain + rule.suffix + path;
 }
 
 
 function load_rule()
 {
-	for (let list of document.querySelectorAll('span.whitelist')) {
+	for (let list of document.querySelectorAll('span.itemlist, span.inheritlist')) {
 		while (list.lastChild) {
 			list.removeChild(list.lastChild)
 		}
@@ -174,15 +197,21 @@ function load_rule()
 	let rule = JSON.parse(document.getElementById('rule_selector').value);
 	if (document.getElementById('rule_selector').selectedIndex !== 0)
 	{
-		const subdomains = rule.domain.startsWith(match_subdomains)
-		document.querySelector('input[name="domain"]').value = rule.domain.substr(subdomains ? match_subdomains.length : 0)
-		document.querySelector('input[name="subdomains"]').checked = subdomains || rule.domain === '*';
-		document.querySelector('input[name="suffix"]').value = rule.suffix;
-		document.querySelector('input[name="path"]').value = rule.path;
+		const subdomains = !rule.domain.startsWith('..')
+		document.querySelector('input[name="domain"]').value = rule.domain.substr(subdomains ? 1 : 2)
+		document.querySelector('input[name="subdomains"]').checked = subdomains;
+		document.querySelector('input[name="suffix"]').value = rule.suffix.substr(1)
+		document.querySelector('input[name="path"]').value = rule.path === '/*' ? '' : rule.path;
 
 		for (let list of Object.keys(default_actions))
+		{
 			for (let val of rule[list])
-				show_rule_item(list, val);
+				show_rule_item(list, val, 'item');
+			for (let val of rule.inherited[list])
+				show_rule_item(list, val, 'inherit');
+		}
+
+		document.getElementById('remove_rule').disabled = false
 	}
 	else
 	{
@@ -190,6 +219,8 @@ function load_rule()
 		document.querySelector('input[name="suffix"]').value = '';
 		document.querySelector('input[name="path"]').value = '';
 		document.querySelector('input[name="subdomains"]').checked = true;
+
+		document.getElementById('remove_rule').disabled = true
 	}
 }
 
@@ -216,13 +247,17 @@ function save_rule()
 	let selectedOpt = select[select.selectedIndex];
 
 	let rule = Object.assign(JSON.parse(selectedOpt.value), {
-		domain: document.querySelector('input[name="domain"]').value || '*',
-		suffix: document.querySelector('input[name="suffix"]').value || '*',
-		path: document.querySelector('input[name="path"]').value || '*',
+		domain: '.' + (document.querySelector('input[name="domain"]').value || '*'),
+		suffix: '.' + (document.querySelector('input[name="suffix"]').value || '*'),
+		path: document.querySelector('input[name="path"]').value || '/*',
 	});
 
-	if (document.querySelector('input[name="subdomains"]').checked && rule.domain !== '*')
-		rule.domain = match_subdomains + rule.domain;
+
+	if (rule.path !== '/*' && !check_regexp(rule.path, document.getElementById('path_error')))
+		return;
+
+	if (!document.querySelector('input[name="subdomains"]').checked && rule.domain !== '.*')
+		rule.domain = '.' + rule.domain;
 
 	// Perform the update operation immediately in the DOM
 	let replacing = null;
@@ -256,7 +291,6 @@ function reset_rules()
 	})
 }
 
-
 function populate_rules(serialized_rules)
 {
 	let select = document.getElementById('rule_selector')
@@ -275,21 +309,26 @@ function populate_rules(serialized_rules)
 		let input = document.querySelector('input[name="' + list + '_edit"]');
 		button.onclick = () =>
 		{
-			if (input.value)
+			if (input.value && check_regexp(input.value, document.getElementById(list + '_edit_error')))
 			{
 				add_rule_item(list, input.value);
 				input.value = '';
+				save_rule()
 			}
 		}
+
+		let check_val = () => check_regexp(input.value, document.getElementById(list + '_edit_error'));
+		input.onchange = check_val;
+		input.onkeyup = delayed_save(check_val);
 	}
 
 	for (let input of document.querySelectorAll('#rule_editor input'))
 	{
-		if (input.getAttribute('name') === 'ignhttp')
+		if (input.getAttribute('name') === 'ignhttp' || input.classList.contains('noautosave'))
 			continue;
 
-		input.onchange = save_rule
-		input.onkeyup = delayed_save(save_rule)
+		if (input.onchange !== null) input.onchange = save_rule
+		if (input.onkeyup !== null) input.onkeyup = delayed_save(save_rule)
 	}
 
 	document.getElementById('remove_rule').onclick = erase_rule

@@ -27,20 +27,22 @@ span.parsing_error {
 	color: red;
 	font-weight:bold;
 }
-span.whitelist {
+span.itemlist, span.inheritlist {
 	display: block;
 	margin: 0;
 	padding: 0;
 }
-span.whitelist > span {
+span.itemlist > span, span.inheritlist > span {
 	display: inline-block;
 	border: black thin solid;
 	padding: 5px;
 	margin: 2px 5px 2px 0px;
 	border-radius: 5px;
 }
-
-span.whitelist > span::after {
+span.inheritlist > span {
+	background: #eee;
+}
+span.itemlist > span::after {
 	content: ' ❌';
 	padding: 0 2px;
 }
@@ -66,11 +68,13 @@ input[type=text][name$=_edit] + button {
 	margin-left: 2%;
 	width: 10%;
 }
-input[type=text][name=domain] {
+#domain_edit, label[for=domain_edit] {
+	display: inline-block;
 	width: calc(70% - 2ch);
 	margin-right: .5ch;
 }
-input[type=text][name=suffix] {
+#suffix_edit, label[for=suffix_edit] {
+	display: inline-block;
 	width: 30%;
 	margin-left: .5ch;
 }
@@ -144,4 +148,38 @@ dd {
 }
 #reset_buttons button {
 	margin: 0 2em;
+}
+
+.help {
+	position: relative;
+	font-weight: normal;
+}
+.tooltip {
+	font-weight: bold;
+	border:thin solid black;
+	border-radius: 2em;
+	display: inline-block;
+	width:1.3em;
+	text-align: center;
+	cursor: help;
+}
+.help .tooltiptext {
+	visibility: hidden;
+	position: absolute;
+	z-index: 1;
+
+	width: 20em;
+	left: 50%;
+	width: 20em;
+	bottom: 100%;
+
+	background: white;
+	border:thin solid black;
+	padding: 5px;
+	border-radius: 6px;
+
+	text-align: justify;
+}
+.help:hover .tooltiptext {
+	visibility: visible;
 }

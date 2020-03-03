@@ -68,62 +68,109 @@ function find_rules(url, all_rules)
 }
 
 
-function serialize_rules(rules, bits)
+function unserialize_rule(serialized_rule)
 {
-	if (bits === undefined)
-		bits = []
+	let actions = {}
+	for (let key of Object.keys(default_actions))
+		if (serialized_rule.hasOwnProperty(key))
+			actions[key] = serialized_rule[key]
 
-	if (bits.length === 3)
-	{
-		return Object.keys(default_actions).reduce((rule, action) => (
-			{[action]: action in rules ? rules[action] : default_actions[action], ...rule}
-		), {suffix: bits[0], domain: bits[1], path: bits[2]})
-	}
+	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
+	let pos = [serialized_rule.suffix], subdom = serialized_rule.domain.startsWith('..');
 
-	return [].concat(...Object.keys(rules).map(k => serialize_rules(rules[k], bits.concat([k]))))
+	pos.push(...serialized_rule.domain.substr(subdom ? 2 : 1).split('.').reverse().map(d => '.' + d))
+
+	if (subdom)
+		pos.push('.')
+
+	if (serialized_rule.path !== '/*')
+		pos.push(serialized_rule.path)
+
+	return {keys: pos, actions: actions}
 }
 
 
-function pop_rule(all_rules, rule)
+function serialize_rules(rules, serialized_rule)
 {
-	let pos = all_rules, stack = [];
-	for (let key of [rule.suffix, rule.domain, rule.path])
+	if (serialized_rule === undefined)
+		serialized_rule = {inherited: {...default_actions}}
+
+	let list = []
+
+	if ('actions' in rules)
 	{
-		if (!(key in pos))
+		let obj = {...serialized_rule, ...rules.actions};
+		if (!('suffix' in obj)) obj.suffix = '.*'
+		if (!('domain' in obj)) obj.domain = '.*'
+		if (!('path' in obj)) obj.path = '/*'
+		list.push(obj)
+
+		// Add the actions to the set of inherited actions to pass on to the children
+		serialized_rule.inherited = Object.assign({}, serialized_rule.inherited)
+		for (let key of Object.keys(rules.actions))
+			serialized_rule.inherited[key] = serialized_rule.inherited[key].concat(rules.actions[key])
+	}
+
+	for (let [key, value] of Object.entries(rules))
+	{
+		if (key[0] === '.' && serialized_rule.suffix === undefined)
+			list.push(...serialize_rules(value, {...serialized_rule, suffix: key}))
+		else if (key[0] === '.')
+			list.push(...serialize_rules(value, {...serialized_rule, domain: key + ('domain' in serialized_rule ? serialized_rule.domain : '')}))
+		else if (key[0] === '/')
+			list.push(...serialize_rules(value, {...serialized_rule, path: key}))
+		else if (key !== 'actions')
+			console.error('Unexpected key while serializing rules', key)
+	}
+
+	return list
+}
+
+
+function pop_rule(all_rules, serialized_rule)
+{
+	let {keys, actions} = unserialize_rule(serialized_rule)
+
+	let node = all_rules, stack = [];
+	for (let key of keys)
+	{
+		if (!(key in node))
 			return;
 		else
 		{
-			stack.push([pos, key])
-			pos = pos[key]
+			stack.push([node, key])
+			node = node[key]
 		}
 	}
 
-	for (let [node, key] of stack.reverse())
+	delete node.actions
+
+	while (stack.length !== 0)
 	{
-		delete node[key]
-		if (Object.keys(node).length !== 0)
+		let [node, key] = stack.pop()
+
+		if (Object.keys(node).length === 0)
+			delete node[key]
+		else
 			break
 	}
-
-	return all_rules
 }
 
 
-function push_rule(all_rules, rule)
+function push_rule(all_rules, serialized_rule)
 {
-	let pos = all_rules;
-	for (let key of [rule.suffix, rule.domain, rule.path])
-	{
-		if (!(key in pos))
-			pos[key] = {}
+	let {keys, actions} = unserialize_rule(serialized_rule)
 
-		pos = pos[key]
+	let node = all_rules;
+	for (let key of keys)
+	{
+		if (!(key in node))
+			node[key] = {}
+
+		node = node[key]
 	}
-	Object.assign(all_rules[rule.suffix][rule.domain][rule.path],
-		Object.keys(default_actions).reduce((rule_actions, action) => (
-		{[action]: rule[action], ...rule_actions},
-	{})))
-	return all_rules
+
+	node.actions = actions
 }
 
 
@@ -160,7 +207,7 @@ var load_rules = new Promise(done =>
 	else
 		cached.then(data =>
 		{
-			if ('rules' in data)
+			if ('rules' in data && data.rules)
 				publicSuffixList.loaded.then(() => done(data.rules));
 			else
 				load_default_rules(done);
@@ -185,14 +232,14 @@ let Rules = {
 	},
 	remove: async (old_rule) => {
 		let rules = await load_rules
-		rules = pop_rule(rules, old_rule)
+		pop_rule(rules, old_rule)
 		save_rules(rules)
 		load_rules = Promise.resolve(rules)
 	},
 	update: async (old_rule, new_rule) => {
 		let rules = await load_rules
 		pop_rule(rules, old_rule)
-		rules = push_rule(rules, new_rule)
+		push_rule(rules, new_rule)
 		save_rules(rules)
 		load_rules = Promise.resolve(rules)
 	},

@@ -24,7 +24,7 @@
 		</label>
 
 		<fieldset class="example">
-			<input type="checkbox" id="show_URL_legend" class="toggle" />
+			<input type="checkbox" id="show_URL_legend" class="toggle noautosave" />
 
 			<legend>URL example <label for="show_URL_legend">
 					<span class="enabled">Hide</span><span class="disabled">Show</span> legend
@@ -49,7 +49,7 @@
 		</fieldset>
 
 		<h4 id="rule_legend"><label for="rule_selector">Rule to edit:</label></h4>
-		<button id="remove_rule">Delete rule</button>
+		<button id="remove_rule" disabled="disabled">❌ Delete rule</button>
 		<p>
 			<select id="rule_selector" name="rule" size="2">
 				<option value="{}" selected="selected">-- New rule --</option>
@@ -57,12 +57,24 @@
 		</p>
 
 		<fieldset>
-			<legend>URLs matched</legend>
-			<label><span>Domain</span>
-				<span class="parsing_error" id="domain_error"></span>
-				<span class="parsing_error" id="suffix_error"></span>
-				<br /><input type="text" name="domain" value="" />.<input type="text" name="suffix" value="" />
-			</label>
+			<legend>URLs matched
+				<span class="help">
+					<span class="tooltip">?</span>
+					<span class="tooltiptext">
+						Defines for which URLs cleaning actions are taken or prevented.<br />
+						The <strong>domain suffix</strong> (see legend) can be either a domain or * to catch domains with multiple TLDs
+						such as google or amazon. The rest of the <strong>domain</strong> must match exactly, except for the optional inclusion
+						of subdomains.<br />
+						The <strong>path</strong> is matched as a <a
+							href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">Regular
+							Expression</a>. Leave empty to match all paths, and set to / to match an empty path.
+					</span>
+				</span>
+			</legend>
+
+			<p><label for="domain_edit">Domain</label><label for="suffix_edit">Suffix</label><br />
+				<input type="text" name="domain" id="domain_edit" value="" />.<input type="text" name="suffix" id="suffix_edit" value="" />
+			</p>
 			<label><span>Match subdomains</span>
 				<input type="checkbox" name="subdomains" checked="checked" />
 			</label>
@@ -73,31 +85,46 @@
 		</fieldset>
 
 		<fieldset>
-			<legend>Cleaning actions</legend>
-			<p>CleanLinks directly redirects URLs to any embedded URL inside the path, unless they are whitelisted.
-			<br />CleanLinks also supports removing tracking data in URLs.</p>
+			<legend>Cleaning actions
+				<span class="help">
+					<span class="tooltip">?</span>
+					<span class="tooltiptext">
+						CleanLinks directly redirects URLs to any embedded URL inside the path, and also supports removing
+						tracking data from URLs.<br />
+						Here we display the rules for the matched URL, as well as inherited rules from broader matches
+						(on a greyed background).
+					</span>
+				</span>
+			</legend>
+			<p></p>
 
-			<label><span>Remove parameters from the query:</span>
-				<span class="parsing_error" id="strip_edit_error"></span>
-				<br /><input type="text" name="strip_edit" value="" />
-				<button id="strip_add" class="add_to_list" title="Add to the list">+</button>
-				<span class="strip_list whitelist"></span>
+			<label><span>Remove query parameters:</span>
+				<span class="parsing_error" id="remove_edit_error"></span>
+				<br /><input type="text" name="remove_edit" value="" />
+				<button id="remove_add" class="add_to_list" title="Add to the list">+</button>
+				<span id="remove_itemlist" class="itemlist"></span>
+				<span id="remove_inheritlist" class="inheritlist"></span>
 			</label>
-			<label><span>Remove from path (does not affect domain and query):</span>
+			<label><span>Remove from path:</span>
+				<span class="parsing_error" id="rewrite_edit_error"></span>
 				<br /><input type="text" name="rewrite_edit" value="" />
 				<button id="rewrite_add" class="add_to_list" title="Add to the list">+</button>
-				<span class="rewrite_list whitelist"></span>
+				<span id="rewrite_itemlist" class="itemlist"></span>
+				<span id="rewrite_inheritlist" class="inheritlist"></span>
 			</label>
 
 			<label><span>Whitelist query parameters (prevent removing and allow embedded URL):</span>
 				<span class="parsing_error" id="whitelist_edit_error"></span>
 				<br /><input type="text" name="whitelist_edit" value="" />
 				<button id="whitelist_add" class="add_to_list" title="Add to the list">+</button>
-				<span class="whitelist_list whitelist"></span>
+				<span id="whitelist_itemlist" class="itemlist"></span>
+				<span id="whitelist_inheritlist" class="inheritlist"></span>
 			</label>
+			<!--
 			<label><span>Allow URL embedded inside path</span>
 				<input type="checkbox" name="whitelist_path" value="" />
 			</label>
+			-->
 		</fieldset>
 	</fieldset>
 
