@@ -67,6 +67,11 @@ describe('cleanLink', function() {
 			expect(result).to.equal('https://www.foobar2000.org/')
 		)
 	);
+	it('should detect tripadvisor obscured redirects', () =>
+		cleanLink('https://www.tripadvisor.com.au/ShowUrl-a_partnerKey.1-a_url.https%3A__2F____2F__play__2E__google__2E__com__2F__store__2F__apps__2F__details__3F__id%3Dcom__2E__tripadvisor__2E__tripadvisor__26__hl%3Den__26__referrer%3Dutm__5F__download__5F__tracking%253DBrand__5F__AppPage__5F__0__5F__18034-a_urlKey.8817ea41f0fea6faa.html').then(result =>
+			expect(result).to.equal('https://play.google.com/store/apps/details?id=com.tripadvisor.tripadvisor&hl=en&referrer=utm_download_tracking=Brand_AppPage_0_18034')
+		)
+	);
 	it('should succeed on ClearUrl examples', () =>
 		Promise.all([
 			cleanLink('https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.fsf.org%2Fcampaigns%2F&h=ATP1kf98S0FxqErjoW8VmdSllIp4veuH2_m1jl69sEEeLzUXbkNXrVnzRMp65r5vf21LJGTgJwR2b66m97zYJoXx951n-pr4ruS1osMvT2c9ITsplpPU37RlSqJsSgba&s=1').then(result =>
