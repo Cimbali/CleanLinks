@@ -25,21 +25,18 @@ function skipLinkType(link)
 }
 
 
-function getLinkSearchStrings(link, depth)
+function getSimpleLinkSearchStrings(link, skip)
 {
-	// Safety for recursive calls
-	if (typeof depth === 'undefined')
-		depth = 0;
-	else if (depth > 2)
-		return [];
-
-	var arr = [decodeURIComponent(link.pathname)], vals = [];
+	let arr = [decodeURIComponent(link.pathname)], vals = [];
 	if (link.search)
 	{
 		// NB searchParams.values() does not work reliably, probably because URLSearchParams are some kind of generator:
 		// they need to be manually iterated.
 		for (let [key, val] of link.searchParams)
 		{
+			if (key.match(skip))
+				continue;
+
 			if (key)
 				arr.push(key);
 			if (val)
@@ -47,34 +44,34 @@ function getLinkSearchStrings(link, depth)
 		}
 		arr = arr.concat(vals);
 	}
+	return arr;
+}
+
+
+function getLinkSearchStrings(link, skip)
+{
+	let arr = getSimpleLinkSearchStrings(link, skip)
 
 	if (link.hash.startsWith('#!'))
 	{
-		var noHashLink = new URL(link.href);
+		let noHashLink = new URL(link.href), hashLink = null;
 		noHashLink.hash = '';
 		try
 		{
-			var hashLink = new URL(link.hash.slice(2), noHashLink.href);
+			hashLink = new URL(link.hash.slice(2), noHashLink.href);
 			log('Parsing from hash-bang type URL: ' + hashLink.href);
+
+			arr.push(...getSimpleLinkSearchStrings(hashLink, skip));
 		}
 		catch (e)
 		{
-			return arr.concat(link.hash.slice(1));
+			return arr.push(link.hash.slice(1));
 		}
-
-		var hashLinkSearchStrings = getLinkSearchStrings(hashLink, depth + 1);
-		// remove common prefix of both arrays
-		for (let item of arr)
-		{
-			if (hashLinkSearchStrings.length > 0 && item == hashLinkSearchStrings[0])
-				hashLinkSearchStrings.shift();
-			else
-				break;
-		}
-		return arr.concat(hashLinkSearchStrings);
 	}
+	else if (link.hash)
+		arr.push(link.hash.slice(1))
 
-	return link.hash ? arr.concat(link.hash.slice(1)) : arr;
+	return arr
 }
 
 function getBaseURL(base)
@@ -139,11 +136,11 @@ function domainRulesGeneral(link, base)
 }
 
 
-function decodeEmbeddedURI(link, base)
+function decodeEmbeddedURI(link, base, rules)
 {
 	// first try to find a base64-encoded link
-	var base64match;
-	for (let str of getLinkSearchStrings(link))
+	let base64match, skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp(rules.whitelist.join('|')) : null;
+	for (let str of getLinkSearchStrings(link, skip))
 	{
 		[base64match] = str.match(base64_encoded_url) || [];
 		if (base64match)
@@ -177,7 +174,7 @@ function decodeEmbeddedURI(link, base)
 		console.log(link.href)
 
 		// check every parsed (URL-decoded) substring in the URL
-		for (let str of getLinkSearchStrings(link))
+		for (let str of getLinkSearchStrings(link, null))  // TODO: get the rules of the newly matched domain
 		{
 			[all, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
 			if (capture)
@@ -243,14 +240,23 @@ function decodeEmbeddedURI(link, base)
 }
 
 
-function filterParams(link, base)
+function filterParams(link, base, rules)
 {
-	if (prefs.values.remove.test(link))
+	if ('rewrite' in rules && rules.rewrite.length)
 	{
-		var cleanParams = new URLSearchParams();
+		for (let rewrite of rules.rewrite)
+			link.pathname = link.pathname.replace(new RegExp(rewrite), '')
+	}
+
+	if ('remove' in rules && rules.remove.length)
+	{
+		let cleanParams = new URLSearchParams();
+		let strip = new RegExp(rules.remove.join('|')) || null;
+		let keep = new RegExp('whitelist' in rules && rules.whitelist.length ? rules.whitelist.join('|') : '.^');
+
 		for (let [key, val] of link.searchParams)
 		{
-			if (!key.match(prefs.values.remove))
+			if (key.match(keep) || !key.match(strip))
 				cleanParams.append(key, val);
 		}
 		link.search = cleanParams.toString();
@@ -262,24 +268,11 @@ function filterParams(link, base)
 
 async function cleanLink(link, base)
 {
-	var origLink = link;
+	let origLink = link;
 
 	if (!link || skipLinkType(link))
 	{
 		log('not cleaning ' + link + ' : empty, source, or matches skipwhen');
-		return link;
-	}
-
-	base = getBaseURL(base);
-	link = new URL(link)
-
-	let rules = await Rules.find(link)
-
-	// (prefs.values.skipwhen && prefs.values.skipwhen.test(link)));
-
-	if (prefs.values.skipdoms && prefs.values.skipdoms.indexOf(link.host) !== -1)
-	{
-		log('not cleaning ' + link + ' : host in skipdoms');
 		return link;
 	}
 
@@ -289,16 +282,40 @@ async function cleanLink(link, base)
 		return link;
 	}
 
-	link = decodeEmbeddedURI(link, base)
+	if (prefs.values.skipwhen && prefs.values.skipwhen.test(link))
+	{
+		log('not cleaning ' + link + ' : in skip preferences');
+		return link;
+	}
 
-	if (link.href == new URL(origLink))
+	base = getBaseURL(base);
+	link = new URL(link)
+
+	let rules = await Rules.find(link)
+	console.log('Rules found', rules)
+
+	// first remove parameters or rewrite
+	let filteredLink = filterParams(link, base, rules);
+
+	// TODO: move the loop (< 4) from decodeEmbeddedURI() here
+	// {
+	let embeddedLink = decodeEmbeddedURI(filteredLink, base, rules)
+
+	if (embeddedLink.href !== filteredLink.href)
+	{
+		// remove parameters or rewrite again, if we redirected on an embedded URL
+		let rules = await Rules.find(embeddedLink)
+		link = filterParams(embeddedLink, base, rules);
+	}
+	else
+		link = embeddedLink
+	// }
+
+	if (link.href == new URL(origLink).href)
 	{
 		log('cleaning ' + origLink + ' : unchanged')
 		return origLink;
 	}
-
-	// Should params be filtered only here, when no whitelist is applied? All the time? With a separate whitelist mechanism?
-	link = filterParams(link, base);
 
 	log('cleaning ' + origLink + ' : ' + link.href)
 

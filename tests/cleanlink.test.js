@@ -49,7 +49,7 @@ describe('cleanLink', function() {
 	it('should detect unencoded embedded URLs', () =>
 		cleanLink('https://forum.donanimhaber.com/externallinkredirect?url=https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19').then(result =>
 		{
-			expect(result).to.equal('https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19')
+			expect(result).to.equal('https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV?fst=as%3Aoff')
 		})
 	);
 	it('should detect and decode partially encoded URLs', () =>
