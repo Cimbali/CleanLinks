@@ -77,6 +77,11 @@ describe('cleanLink', function() {
 			expect(result).to.equal('http://pjmedia.com/')
 		)
 	);
+	it('should handle disqus links with %3A suffixes', () =>
+		cleanLink('https://disq.us/url?url=https%3A%2F%2Fscholarlyoa.com%2Fpublishers%2F%3A-EibzAO-QGxTovjeNTBl4GVHW68&cuid=1072384').then(result =>
+			expect(result).to.equal('https://scholarlyoa.com/publishers/')
+		)
+	);
 	it('should succeed on ClearUrl examples', () =>
 		Promise.all([
 			cleanLink('https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.fsf.org%2Fcampaigns%2F&h=ATP1kf98S0FxqErjoW8VmdSllIp4veuH2_m1jl69sEEeLzUXbkNXrVnzRMp65r5vf21LJGTgJwR2b66m97zYJoXx951n-pr4ruS1osMvT2c9ITsplpPU37RlSqJsSgba&s=1').then(result =>
