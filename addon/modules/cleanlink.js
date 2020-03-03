@@ -104,7 +104,10 @@ function domainRulesGeneral(link, base)
 	{
 		case 'redirect.disqus.com':
 			if (link.indexOf('/url?url=') !== -1)
-				return new URL(link.match(/url\?url=([^&]+)/).pop().split(/%3a[\w-]+$/i).shift());
+				return new URL(
+					link.match(/url\?url=([^&]+)/)
+					.pop()
+					.split(/%3a[\w-]+$/i).shift());
 	}
 
 	return link;
