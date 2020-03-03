@@ -6,7 +6,8 @@ label {
 	margin: 1ex 0;
 }
 
-fieldset > label > span:first-child {
+fieldset > label > span:first-child,
+p.replace_editor > label > span:first-child {
 	display:inline-block;
 	min-width: 20em;
 }
@@ -73,6 +74,14 @@ input[type=text][name$=_edit] + button {
 	width: calc(70% - 2ch);
 	margin-right: .5ch;
 }
+p.replace_editor > label {
+	display: inline-block;
+	width: calc(50% - 2ch - 2.5em);
+}
+p.replace_editor > input[type="text"] {
+	display: inline-block;
+	width: calc(50% - 4em);
+}
 #suffix_edit, label[for=suffix_edit] {
 	display: inline-block;
 	width: 30%;
@@ -97,6 +106,9 @@ fieldset.example legend {
 }
 #rule_selector {
 	height: 15em;
+}
+p.replace_editor {
+	margin: 0;
 }
 button#remove_rule {
 	position: absolute;

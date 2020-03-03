@@ -138,8 +138,11 @@ function remove_rule_item(list, element)
 
 function show_rule_item(list, element, elemtype)
 {
-	let span = document.createElement('span');
-	span.appendChild(document.createTextNode(element));
+	let span = document.createElement('span'), text = element;
+	if (list === 'rewrite')
+		text = element.search + ' → ' + element.replace
+
+	span.appendChild(document.createTextNode(text));
 	if (elemtype !== 'inherit') {
 		span.onclick = () => {
 			remove_rule_item(list, element)
@@ -150,10 +153,13 @@ function show_rule_item(list, element, elemtype)
 }
 
 
-function add_rule_item(list, element)
+function add_rule_item(list, element, replace, flags)
 {
 	let selection = document.getElementById('rule_selector');
 	let selectedOpt = selection[selection.selectedIndex];
+
+	if (list === 'rewrite')
+		element = {search: element, replace: replace, flags: flags}
 
 	let rule = JSON.parse(selectedOpt.value);
 	let pos = rule[list].indexOf(element);
@@ -305,6 +311,7 @@ function populate_rules(serialized_rules)
 
 	for (const list of Object.keys(default_actions))
 	{
+		if (list == 'rewrite') continue;
 		let button = document.getElementById(list + '_add');
 		let input = document.querySelector('input[name="' + list + '_edit"]');
 		button.onclick = () =>
@@ -320,6 +327,29 @@ function populate_rules(serialized_rules)
 		let check_val = () => check_regexp(input.value, document.getElementById(list + '_edit_error'));
 		input.onchange = check_val;
 		input.onkeyup = delayed_save(check_val);
+	}
+
+	{
+		let button = document.getElementById('rewrite_add');
+		let input_s = document.querySelector('input[name="search_edit"]');
+		let input_r = document.querySelector('input[name="replace_edit"]');
+		let flags_g = document.querySelector('input[name="rewrite_repeat"]');
+		let flags_i = document.querySelector('input[name="rewrite_icase"]');
+		button.onclick = () =>
+		{
+			if (input_s.value && check_regexp(input_s.value, document.getElementById('search_edit_error')))
+			{
+				let flags = (flags_g.checked ? 'g' : '') + (flags_g.checked ? 'i' : '');
+				add_rule_item('rewrite', input_s.value, input_r.value, flags);
+				input_s.value = input_r.value = '';
+				flags_g.checked = flags_i.checked = true;
+				save_rule()
+			}
+		}
+
+		let check_val = () => check_regexp(input_s.value, document.getElementById('search_edit_error'));
+		input_s.onchange = check_val;
+		input_s.onkeyup = delayed_save(check_val);
 	}
 
 	for (let input of document.querySelectorAll('#rule_editor input'))
