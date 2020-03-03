@@ -260,7 +260,7 @@ function filterParams(link, base)
 }
 
 
-function cleanLink(link, base)
+async function cleanLink(link, base)
 {
 	var origLink = link;
 
@@ -273,7 +273,8 @@ function cleanLink(link, base)
 	base = getBaseURL(base);
 	link = new URL(link)
 
-	let rules = find_rules(link, load_rules)
+	let rules = await Rules.find(link)
+
 	// (prefs.values.skipwhen && prefs.values.skipwhen.test(link)));
 
 	if (prefs.values.skipdoms && prefs.values.skipdoms.indexOf(link.host) !== -1)

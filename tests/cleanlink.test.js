@@ -1,87 +1,85 @@
 describe('cleanLink', function() {
-	it('should clean the link to the target in path', done =>
-	{
-		expect(cleanLink('http://www.foobar.com/track=ftp://gnu.org')).to.equal('ftp://gnu.org/');
-		done();
-	});
-	it('should clean the link to the base 64 encoded URL', done =>
-	{
-		expect(cleanLink('http://example.com/aHR0cDovL3d3dy5nb29nbGUuY29t?arg=val')).to.equal('http://www.google.com/');
-		done();
-	});
-	it('should clean the link to the URL-encoded URL in parameters', done =>
-	{
-		expect(cleanLink('https://l.messenger.com/l.php?u=https%3A%2F%2Fwww.airbnb.co.uk%2Frooms%2F123456789&h=ATO7e0WkmJSY2jU_U6fyz6-MmwWZvfV4NAQwuaK1aB9QwmXdOZuHbPceKl8FCqHYTbEpoSWufsOmj36S4K0DI6BLpuIyGoRK_OcE5UHyPnY'))
-			.to.equal('https://www.airbnb.co.uk/rooms/123456789');
-		done();
-	});
-	it('should clean the link to the Doubly encoded URL in path and parameters', done =>
-	{
-		expect(cleanLink('http://two.level.redir.ect/https%3A%2F%2Fl.messenger.com%2Fl.php%3Fu%3Dhttps%253A%252F%252Fwww.airbnb.co.uk%252Frooms%252F123456789%26h%3DATO7e0WkmJSY2jU_U6fyz6-MmwWZvfV4NAQwuaK1aB9QwmXdOZuHbPceKl8FCqHYTbEpoSWufsOmj36S4K0DI6BLpuIyGoRK_OcE5UHyPnY'))
-			.to.equal('https://www.airbnb.co.uk/rooms/123456789');
-		done();
-	});
-	it('should preserve a link without redirects', done =>
+	it('should clean the link to the target in path', () =>
+		cleanLink('http://www.foobar.com/track=ftp://gnu.org').then(result =>
+			expect(result).to.equal('ftp://gnu.org/')
+		)
+	);
+	it('should clean the link to the base 64 encoded URL', () =>
+		cleanLink('http://example.com/aHR0cDovL3d3dy5nb29nbGUuY29t?arg=val').then(result =>
+			expect(result).to.equal('http://www.google.com/')
+		)
+	);
+	it('should clean the link to the URL-encoded URL in parameters', () =>
+		cleanLink('https://l.messenger.com/l.php?u=https%3A%2F%2Fwww.airbnb.co.uk%2Frooms%2F123456789&h=ATO7e0WkmJSY2jU_U6fyz6-MmwWZvfV4NAQwuaK1aB9QwmXdOZuHbPceKl8FCqHYTbEpoSWufsOmj36S4K0DI6BLpuIyGoRK_OcE5UHyPnY').then(result =>
+			expect(result).to.equal('https://www.airbnb.co.uk/rooms/123456789')
+		)
+	);
+	it('should clean the link to the Doubly encoded URL in path and parameters', () =>
+		cleanLink('http://two.level.redir.ect/https%3A%2F%2Fl.messenger.com%2Fl.php%3Fu%3Dhttps%253A%252F%252Fwww.airbnb.co.uk%252Frooms%252F123456789%26h%3DATO7e0WkmJSY2jU_U6fyz6-MmwWZvfV4NAQwuaK1aB9QwmXdOZuHbPceKl8FCqHYTbEpoSWufsOmj36S4K0DI6BLpuIyGoRK_OcE5UHyPnY').then(result =>
+			expect(result).to.equal('https://www.airbnb.co.uk/rooms/123456789')
+		)
+	);
+	it('should preserve a link without redirects', () =>
 	{
 		let link = 'https://assets-cdn.github.com/assets/frameworks-95aff0b550d3fe338b645a4deebdcb1b.css?arg=val&ref=stuff#hashtag'
-		expect(cleanLink(link)).to.equal(link);
-		done();
+		return cleanLink(link).then(result => expect(result).to.equal(link));
 	});
-	it('should identify a www-link in a path component', done =>
+	it('should identify a www-link in a path component', () =>
 	{
 		let link = 'https://www.laas.fr/public/sites/www.laas.fr.public/files/logos/LAAS-2016.png'
-		expect(cleanLink(link)).to.equal('https://www.laas.fr.public/files/logos/LAAS-2016.png');
-		done();
+		return cleanLink(link).then(result => expect(result).to.equal('https://www.laas.fr.public/files/logos/LAAS-2016.png'));
 	});
-	it('should manage fb mobile URLs with all the path in the hash', done =>
+	it('should manage fb mobile URLs with all the path in the hash', () =>
 	{
 		let link = 'https://m.facebook.com/home.php#!/photo.php?fbid=1234567890&id=1234567890&set=a.1234567890&source=1234567890&refid=1234567890&_ft_=qid.1234567890%1234567890Amf_story_key.1234567890%1234567890Aog_action_id.1234567890%1234567890Atop_level_post_id.1234567890%1234567890Asrc.1234567890%1234567890Aphoto_id.1234567890&__tn__=EH-R'
-		expect(cleanLink(link)).to.equal(link);
-		done();
+		return cleanLink(link).then(result => expect(result).to.equal(link));
 	});
-	it('should keep valid encoded characters in cleaned links', done =>
+	it('should keep valid encoded characters in cleaned links', () =>
 	{
 		let link ='https://www.google.com/url?sa=t&rct=j&url=https%3A%2F%2Fzh.wikipedia.org%2Fzh%2F%25E6%25B1%2589%25E8%25AF%25AD&source=web'
-		expect(cleanLink(link)).to.equal('https://zh.wikipedia.org/zh/%E6%B1%89%E8%AF%AD');
-		done();
+		return cleanLink(link).then(result => expect(result).to.equal('https://zh.wikipedia.org/zh/%E6%B1%89%E8%AF%AD'))
 	});
-	it('should keep valid ~username in cleaned links', done =>
+	it('should keep valid ~username in cleaned links', () =>
 	{
 		let link ='https://www.google.com/url?url=https%3A%2F%2Fwww.mcs.anl.gov%2F~zhenxie%2Farchive%2FLetterANL%2Fletter.html'
-		expect(cleanLink(link)).to.equal('https://www.mcs.anl.gov/~zhenxie/archive/LetterANL/letter.html');
-		done();
+		return cleanLink(link).then(result =>
+			expect(result).to.equal('https://www.mcs.anl.gov/~zhenxie/archive/LetterANL/letter.html')
+		)
 	});
-	it('should detect unencoded embedded URLs', done =>
-	{
-		expect(cleanLink('https://forum.donanimhaber.com/externallinkredirect?url=https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19'))
-			.to.equal('https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19')
-		done();
-	});
-	it('should detect and decode partially encoded URLs', done =>
-	{
-		expect(cleanLink('https://www.google.com/url?q=https://some.thing/forum/viewtopic.php%3Ft%3D4960084'))
-			.to.equal('https://some.thing/forum/viewtopic.php?t=4960084')
-		done();
-	});
-	it('should manage', done =>
+	it('should detect unencoded embedded URLs', () =>
+		cleanLink('https://forum.donanimhaber.com/externallinkredirect?url=https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19').then(result =>
+		{
+			expect(result).to.equal('https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19')
+		})
+	);
+	it('should detect and decode partially encoded URLs', () =>
+		cleanLink('https://www.google.com/url?q=https://some.thing/forum/viewtopic.php%3Ft%3D4960084').then(result =>
+			expect(result).to.equal('https://some.thing/forum/viewtopic.php?t=4960084')
+		)
+	);
+	it('should manage blob links correctly', () =>
 	{
 		let url = 'blob:https://web.whatsapp.com/a-hash-code-here'
-		expect(cleanLink(url)).to.equal(url)
-		done();
+		return cleanLink(url).then(result => expect(result).to.equal(url))
 	});
-	it('should detect and decode partially encoded URLs', done =>
-	{
-		expect(cleanLink('https://www.google.com/url?q=https://www.foobar2000.org/&sa=U&ved=2ahUKEwi8l6qs2dbnAhXeDmMBHYvBCVMQFjAAegQIBhAB&usg=AOvVaw2YoonF8M2_JRbtpQrjT0dE'))
-			.to.equal('https://www.foobar2000.org/')
-		done();
-	});
-	it('should succeed on ClearUrl examples', done =>
-	{
-		expect(cleanLink('https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.fsf.org%2Fcampaigns%2F&h=ATP1kf98S0FxqErjoW8VmdSllIp4veuH2_m1jl69sEEeLzUXbkNXrVnzRMp65r5vf21LJGTgJwR2b66m97zYJoXx951n-pr4ruS1osMvT2c9ITsplpPU37RlSqJsSgba&s=1')).to.equal('https://www.fsf.org/campaigns/')
-		expect(cleanLink('https://out.reddit.com/t3_5pq7qd?url=https%3A%2F%2Finternethealthreport.org%2Fv01%2F&token=AQAAZV6JWHBBnIcVjV1wvxVg5gKyCQQSdUhGIvuEUmdPZhxhm8kH&app_name=reddit.com')).to.equal('https://internethealthreport.org/v01/')
-		expect(cleanLink('https://steamcommunity.com/linkfilter/?url=https://getfedora.org/')).to.equal('https://getfedora.org/')
-		done();
-	});
+	it('should detect and decode partially encoded URLs', () =>
+		cleanLink('https://www.google.com/url?q=https://www.foobar2000.org/&sa=U&ved=2ahUKEwi8l6qs2dbnAhXeDmMBHYvBCVMQFjAAegQIBhAB&usg=AOvVaw2YoonF8M2_JRbtpQrjT0dE').then(result =>
+			expect(result).to.equal('https://www.foobar2000.org/')
+		)
+	);
+	it('should succeed on ClearUrl examples', () =>
+		Promise.all([
+			cleanLink('https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.fsf.org%2Fcampaigns%2F&h=ATP1kf98S0FxqErjoW8VmdSllIp4veuH2_m1jl69sEEeLzUXbkNXrVnzRMp65r5vf21LJGTgJwR2b66m97zYJoXx951n-pr4ruS1osMvT2c9ITsplpPU37RlSqJsSgba&s=1').then(result =>
+				expect(result).to.equal('https://www.fsf.org/campaigns/')
+			),
+			cleanLink('https://out.reddit.com/t3_5pq7qd?url=https%3A%2F%2Finternethealthreport.org%2Fv01%2F&token=AQAAZV6JWHBBnIcVjV1wvxVg5gKyCQQSdUhGIvuEUmdPZhxhm8kH&app_name=reddit.com').then(result =>
+				expect(result).to.equal('https://internethealthreport.org/v01/')
+			),
+			cleanLink('https://steamcommunity.com/linkfilter/?url=https://getfedora.org/').then(result =>
+				expect(result).to.equal('https://getfedora.org/')
+			),
+		])
+	);
 });
 
 describe('extractJavascriptLink', function() {
@@ -98,22 +96,22 @@ describe('extractJavascriptLink', function() {
 });
 
 describe('extractJavascriptLink + cleanLink', function() {
-	it('should clean the link to the javascript function relative path argument', done =>
+	it('should clean the link to the javascript function relative path argument', () =>
 	{
 		let rel_url = "javascript:displayWindowzdjecie('/_misc/zdj_wym.php?url_zdjecie=https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg',1100,778);";
 		let unjs_url = extractJavascriptLink(rel_url, 'http://somedomain.com/a/page.html?foo=qux')
 		console.log('After cleaning JS link: ' + unjs_url)
-		expect(cleanLink(unjs_url))
-			.to.equal('https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg');
-		done();
+		return cleanLink(unjs_url).then(result => expect(result).to
+			.equal('https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg')
+		)
 	});
 });
 
-/*
-	it('should strip the utm parameters', done =>
-	{
-		expect(cleanLink('https://www.aboutamazon.com/?keep=this&utm_source=gateway&utm_medium=footer'))
-			.to.equal('https://www.aboutamazon.com/?keep=this');
-		done();
-	});
-*/
+describe('full cleanLink functionality', function() {
+	it('should strip the utm parameters', () =>
+		cleanLink('https://www.aboutamazon.com/?keep=this&utm_source=gateway&utm_medium=footer').then(result =>
+		{
+			expect(result).to.equal('https://www.aboutamazon.com/?keep=this');
+		})
+	);
+});

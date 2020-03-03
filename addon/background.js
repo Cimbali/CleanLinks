@@ -49,7 +49,7 @@ var get_browser_version = (async () => await browser.runtime.getBrowserInfo())()
 // Links that are whitelisted just once (rudimentary)
 var temporaryWhitelist = []
 
-function cleanRedirectHeaders(details)
+async function cleanRedirectHeaders(details)
 {
 	if (30 != parseInt(details.statusCode / 10) || 304 == details.statusCode)
 		return {};
@@ -58,7 +58,7 @@ function cleanRedirectHeaders(details)
 	if (!loc || !loc.value)
 		return {};
 
-	var dest = new URL(loc.value, details.url).href, cleanDest = cleanLink(dest, details.url);
+	var dest = new URL(loc.value, details.url).href, cleanDest = await cleanLink(dest, details.url);
 
 	if (cleanDest == dest)
 		return {};
@@ -84,7 +84,7 @@ function cleanRedirectHeaders(details)
 }
 
 
-function onRequest(details)
+async function onRequest(details)
 {
 	var dest = details.url, curLink = details.originUrl;
 
@@ -98,7 +98,7 @@ function onRequest(details)
 		return {};
 	}
 
-	var cleanDest = cleanLink(dest, curLink);
+	var cleanDest = await cleanLink(dest, curLink);
 
 	if (!cleanDest) return {};
 
@@ -315,7 +315,7 @@ prefs.load().then(() =>
 			link = info.selectionText;
 
 		// Clean & copy
-		navigator.clipboard.writeText(cleanLink(link, tab.url))
+		cleanLink(link, tab.url).then(cleanUrl => navigator.clipboard.writeText(cleanUrl))
 	});
 
 	if (!prefs.values.enabled)
