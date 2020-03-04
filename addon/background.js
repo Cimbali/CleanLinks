@@ -57,6 +57,9 @@ async function cleanRedirectHeaders(details)
 	if (!loc || !loc.value)
 		return {};
 
+	if (disabledTabs.indexOf(details.tabId) !== -1)
+		return {}
+
 	var dest = new URL(loc.value, details.url).href, cleanDest = await cleanLink(dest, details.url);
 
 	if (cleanDest == dest)
