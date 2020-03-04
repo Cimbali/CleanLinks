@@ -200,34 +200,39 @@ function load_rule()
 		}
 	}
 
-	let rule = JSON.parse(document.getElementById('rule_selector').value);
-	if (document.getElementById('rule_selector').selectedIndex !== 0)
-	{
-		const subdomains = !rule.domain.startsWith('..')
-		document.querySelector('input[name="domain"]').value = rule.domain.substring(subdomains ? 1 : 2)
-		document.querySelector('input[name="subdomains"]').checked = subdomains;
-		document.querySelector('input[name="suffix"]').value = rule.suffix.substring(1)
-		document.querySelector('input[name="path"]').value = rule.path === '/*' ? '' : rule.path;
-
-		for (let list of Object.keys(default_actions))
-		{
-			for (let val of rule[list])
-				show_rule_item(list, val, 'item');
-			for (let val of rule.inherited[list])
-				show_rule_item(list, val, 'inherit');
-		}
-
-		document.getElementById('remove_rule').disabled = false
-	}
-	else
+	if (document.getElementById('rule_selector').selectedIndex === 0)
 	{
 		document.querySelector('input[name="domain"]').value = '';
 		document.querySelector('input[name="suffix"]').value = '';
 		document.querySelector('input[name="path"]').value = '';
 		document.querySelector('input[name="subdomains"]').checked = true;
+		document.querySelector('input[name="whitelist_path"]').checked = false;
 
 		document.getElementById('remove_rule').disabled = true
+		return;
 	}
+
+	let rule = JSON.parse(document.getElementById('rule_selector').value);
+	console.log(document.getElementById('rule_selector').value)
+	const subdomains = !rule.domain.startsWith('..')
+	document.querySelector('input[name="domain"]').value = rule.domain.substring(subdomains ? 1 : 2)
+	document.querySelector('input[name="subdomains"]').checked = subdomains;
+	document.querySelector('input[name="suffix"]').value = rule.suffix.substring(1)
+	document.querySelector('input[name="path"]').value = rule.path === '/*' ? '' : rule.path;
+	document.querySelector('input[name="whitelist_path"]').checked = rule.whitelist_path
+
+	for (let [list, action] of Object.entries(default_actions))
+	{
+		if (!Array.isArray(action))
+			continue;
+
+		for (let val of rule[list])
+			show_rule_item(list, val, 'item');
+		for (let val of rule.inherited[list])
+			show_rule_item(list, val, 'inherit');
+	}
+
+	document.getElementById('remove_rule').disabled = false
 }
 
 
@@ -256,6 +261,7 @@ function save_rule()
 		domain: '.' + (document.querySelector('input[name="domain"]').value || '*'),
 		suffix: '.' + (document.querySelector('input[name="suffix"]').value || '*'),
 		path: document.querySelector('input[name="path"]').value || '/*',
+		whitelist_path: document.querySelector('input[name="whitelist_path"]').checked
 	});
 
 
@@ -274,8 +280,12 @@ function save_rule()
 		replacing = JSON.parse(selectedOpt.getAttribute('orig-value'));
 		selectedOpt.replaceChild(document.createTextNode(name_rule(rule)), selectedOpt.firstChild);
 	}
-	selectedOpt.setAttribute('orig-value', JSON.stringify(rule));
 
+	let rule_str = JSON.stringify(rule)
+	selectedOpt.setAttribute('value', rule_str);
+	selectedOpt.setAttribute('orig-value', rule_str);
+
+	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
 	if (replacing === null) {
 		Queue.add(async () => await Rules.add(rule));
 	} else {
@@ -309,9 +319,8 @@ function populate_rules(serialized_rules)
 
 	select.onchange = load_rule
 
-	for (const list of Object.keys(default_actions))
+	for (const list of ['remove', 'whitelist'])
 	{
-		if (list == 'rewrite') continue;
 		let button = document.getElementById(list + '_add');
 		let input = document.querySelector('input[name="' + list + '_edit"]');
 		button.onclick = () =>
@@ -351,6 +360,8 @@ function populate_rules(serialized_rules)
 		input_s.onchange = check_val;
 		input_s.onkeyup = delayed_save(check_val);
 	}
+
+	document.querySelector('input[name="whitelist_path"]').onchange = save_rule
 
 	for (let input of document.querySelectorAll('#rule_editor input'))
 	{

@@ -246,19 +246,13 @@ async function cleanLink(link, base)
 
 	if (!link || skipLinkType(link))
 	{
-		log('not cleaning ' + link + ' : empty, source, or matches skipwhen');
+		log('not cleaning ' + link + ' : empty or ignored link type');
 		return link;
 	}
 
 	if (prefs.values.ignhttp && !(/^https?:$/.test(link.protocol)))
 	{
 		log('not cleaning ' + link + ' : ignoring non-http(s) links');
-		return link;
-	}
-
-	if (prefs.values.skipwhen && prefs.values.skipwhen.test(link))
-	{
-		log('not cleaning ' + link + ' : in skip preferences');
 		return link;
 	}
 

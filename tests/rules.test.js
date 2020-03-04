@@ -2,6 +2,7 @@ let so_login = new URL("https://stackoverflow.com/users/login?ssrc=head&returnur
 let google_search = new URL("https://www.google.com/search?client=firefox-b-ab&q=some+search+terms")
 let amazon_url = new URL("https://www.amazon.es/gp/product/B06Y1VKRXJ/ref=ppx_od_dt_b_asin_title_s00?ie=UTF8&psc=1")
 let cdn9gag_url = new URL("https://comment-cdn.9gag.com/v1/cacheable/comment-list.json?appId=a_dd8f2b7d304a10edaf6f29517ea0ca4100a43d1b&url=http:%2F%2F9gag.com%2Fgag%2FaY7v84w&count=10&order=score")
+let wayback = new URL('https://web.archive.org/web/20200304112831/http://www.google.com/#spf=1583321325361')
 
 
 describe('find_rules', function() {
@@ -25,7 +26,7 @@ describe('find_rules', function() {
 		load_rules.then(all_rules =>
 		{
 			let result = find_rules(amazon_url, all_rules)
-			console.log(amazon_url.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
+			console.log(amazon_url.href + '\nrewrites found: ' + JSON.stringify(result.rewrite))
 			expect(result.rewrite).to.deep.equal([{search: '/ref=[^/]*', replace: '', flags: ''}])
 		})
 	);
@@ -35,6 +36,14 @@ describe('find_rules', function() {
 			let result = find_rules(cdn9gag_url, all_rules)
 			console.log(cdn9gag_url.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
 			expect(result.whitelist).to.have.members(['url'])
+		})
+	);
+	it('should return correct whitelist and removing for 9gag CDN pages', () =>
+		load_rules.then(all_rules =>
+		{
+			let result = find_rules(wayback, all_rules)
+			console.log(wayback.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
+			expect(result.whitelist_path).to.equal(true)
 		})
 	);
 });

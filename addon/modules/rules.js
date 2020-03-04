@@ -15,7 +15,7 @@
 'use strict'
 
 
-const default_actions = {'whitelist': [], 'remove': [], 'rewrite': []}
+const default_actions = {'whitelist': [], 'remove': [], 'rewrite': [], 'whitelist_path': false}
 
 
 function recursive_find(rules, domain_bits, path)
@@ -60,9 +60,22 @@ function find_rules(url, all_rules)
 	let domain_bits = [suffix].concat(...domain.split('.').reverse(), '').map(d => '.' + d);
 
 	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
+	for (let [key, action] of Object.entries(default_actions))
+	{
+		if (Array.isArray(action))
+			aggregated[key] = [...action]
+		else if (typeof action === 'boolean')
+			aggregated[key] = action
+	}
+
 	for (let actions of action_list)
-		for (let key of Object.keys(actions))
-			aggregated[key] = actions[key].concat(key in aggregated ? aggregated[key] : [])
+		for (let [key, action] of Object.entries(actions))
+		{
+			if (Array.isArray(action))
+				aggregated[key].push(...action)
+			else if (typeof action === 'boolean')
+				aggregated[key] = aggregated[key] || action
+		}
 
 	return aggregated;
 }
@@ -71,9 +84,12 @@ function find_rules(url, all_rules)
 function unserialize_rule(serialized_rule)
 {
 	let actions = {}
-	for (let key of Object.keys(default_actions))
-		if (serialized_rule.hasOwnProperty(key))
-			actions[key] = serialized_rule[key]
+	for (let [key, default_val] of Object.entries(default_actions))
+		if (serialized_rule.hasOwnProperty(key) && (
+			(Array.isArray(default_val) && serialized_rule[key].length !== 0) ||
+			(typeof default_val === 'boolean' && default_val !== serialized_rule[key])
+		))
+			actions[key] = serialized_rule[key];
 
 	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
 	let pos = [serialized_rule.suffix], subdom = serialized_rule.domain.startsWith('..');
@@ -107,8 +123,13 @@ function serialize_rules(rules, serialized_rule)
 
 		// Add the actions to the set of inherited actions to pass on to the children
 		serialized_rule.inherited = Object.assign({}, serialized_rule.inherited)
-		for (let key of Object.keys(rules.actions))
-			serialized_rule.inherited[key] = serialized_rule.inherited[key].concat(rules.actions[key])
+		for (let [key, value] of Object.entries(rules.actions))
+		{
+			if (Array.isArray(value))
+				serialized_rule.inherited[key] = serialized_rule.inherited[key].concat(value)
+			else if (typeof value === 'boolean')
+				serialized_rule.inherited[key] = serialized_rule.inherited[key] || value
+		}
 	}
 
 	for (let [key, value] of Object.entries(rules))

@@ -103,6 +103,13 @@
               "q"
             ]
           }
+        },
+        "/searchbyimage": {
+          "actions": {
+            "whitelist": [
+              "image_url"
+            ]
+          }
         }
       },
       "actions": {
@@ -608,6 +615,15 @@
     }
   },
   ".org": {
+    ".archive": {
+      ".web": {
+        "/web/.*": {
+          "actions": {
+              "whitelist_path": true
+          }
+        }
+      }
+    },
     ".mozilla": {
       ".": {
         "actions": {

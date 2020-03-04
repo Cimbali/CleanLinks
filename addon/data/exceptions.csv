@@ -19,7 +19,6 @@ google	.*	mail.google	^/mail/u/0
 google	.*	google	^(/upload)?/drive/
 google	.*	docs.google	/
 google	.*	accounts.google	/*
-google	.*	google	^/searchbyimage$	image_url
 google	.*	hangouts.google	^/webchat	zx
 google	.*	client-channel.google	^/client-channel	zx
 google	.*	google	^/complete/search$	gs_[a-zA-Z]
@@ -29,6 +28,8 @@ google	.*	google	^/setprefs$	hl
 google	.*	google	^/appsactivity/
 google	.*	google	^/aclk$
 google	.*	drive.google	^/videoplayback
+
+global	.*	myaccount.google	/*
 
 global	.*	([a-zA-Z0-9-.]*.)?amazon	/message-us$
 global	.ca	tangerine	/*
@@ -49,7 +50,6 @@ global	.*	facebook	/groups/member_bio/bio_dialog/
 global	.*	git..*	/.*/-/branches$
 global	.*	git..*	/commit/.*/pipelines$
 global	.io	prismic
-global	.*	myaccount.google	/*
 global	.net	([a-zA-Z0-9-.]*.)?v-player	/player.aspx$
 global	.net	battle	^/login
 global	.net	tweakers	^/ext/lt.dsp$	ref[\_]?
@@ -59,5 +59,5 @@ global	.*	*	^/refs/switch	ref[\_]?
 global	.ru	tinkoff	/*
 
 bing	.*	bing	^/WS/redirect/
-indeed.com	.com	indeed	^/rc/clk
-mozilla.org	.org	mozilla	^/api
+indeed	.com	indeed	^/rc/clk
+mozilla	.org	mozilla	^/api

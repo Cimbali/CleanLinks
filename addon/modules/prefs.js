@@ -26,8 +26,6 @@ const copyright = browser.runtime.getManifest().author;
 
 const icon_default = '';
 const icon_disabled = '-';
-const icon_fire = '~';
-const icon_green = '!';
 
 const same_tab = 0;
 const new_tab = 1;
@@ -35,16 +33,6 @@ const new_window = 2;
 
 var prefValues = {
 	enabled   : true,
-	skipwhen  : new RegExp('/ServiceLogin|imgres\\?|searchbyimage\\?|watch%3Fv|auth\\?client_id|signup|bing\\.com/widget|'
-		+ 'oauth|openid\\.ns|\\.mcstatic\\.com|sVidLoc|[Ll]ogout|submit\\?url=|magnet:|google\\.com/recaptcha/|'
-		+ '\\.google\\.[a-z.]+\\/search\\?(.+&)?q=http|^https?:\\/\\/www\\.amazon\\.[a-z.]+\\/.*\\/voting\\/cast\\/'),
-	remove    : /\b((?:ref|aff)\w*|utm_\w+|(?:merchant|programme|media)ID)|fbclid/,
-	skipdoms  : ['accounts.google.com', 'docs.google.com', 'translate.google.com',
-				'login.live.com', 'plus.google.com', 'twitter.com',
-				'static.ak.facebook.com', 'www.linkedin.com', 'www.virustotal.com',
-				'account.live.com', 'admin.brightcove.com', 'www.mywot.com',
-				'webcache.googleusercontent.com', 'web.archive.org', 'accounts.youtube.com',
-				'signin.ebay.com'],
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
 	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
