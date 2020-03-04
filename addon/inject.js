@@ -34,7 +34,7 @@ function eventDoClick(url, node, evt)
 		return false; // alt+click, do nothing
 
 	let wnd = window;
-	let open_newtab = evt.ctrlKey || evt.button == 1;
+	let open_newtab = evt.ctrlKey || evt.button == 1 || evt.metaKey;
 	let open_newwin = evt.shiftKey;
 
 	if (/*prefValues.gotarget && */ evt.button == 0 && !(evt.shiftKey || evt.ctrlKey || evt.metaKey || evt.altKey))
