@@ -1,6 +1,3 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: Node.js CI
 
 on: [push, pull_request]
@@ -10,19 +7,17 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x]
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup Firefox
+    - name: Install Firefox
       run: sudo apt-get install firefox
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Install Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm i
-    - run: npm test
+        node-version: '12.x'
+    - uses: actions/checkout@v2
+    - name: Install package and dependencies
+      run: npm i
+    - name: Run tests
+      run: npm test
       env:
         CI: true
