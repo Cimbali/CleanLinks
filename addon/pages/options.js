@@ -24,7 +24,6 @@ const Queue = {
 
 function update_page(prefs)
 {
-	document.querySelector('input[name="notiftime"]').disabled = !prefs.notifications;
 	document.querySelector('input[name="hlstyle"]').disabled = !prefs.highlight;
 }
 

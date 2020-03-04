@@ -150,8 +150,6 @@ function handleMessage(message, sender)
 {
 	log('received message : ' + JSON.stringify(message))
 
-	let p = Promise.resolve(null);
-
 	switch (message.action)
 	{
 	case 'cleaned list':
@@ -161,18 +159,6 @@ function handleMessage(message, sender)
 		return Promise.resolve({enabled: disabledTabs.indexOf(message.tab_id) === -1});
 
 	case 'notify':
-		if (prefs.values.notifications)
-		{
-			p = browser.notifications.create(message.url,
-			{
-				type: 'basic',
-				iconUrl: browser.extension.getURL('/icons/CleanLinks.png'),
-				title: 'Link cleaned!',
-				message: message.url
-			});
-			browser.alarms.create('clearNotification:' + message.url, {when: Date.now() + prefs.values.notiftime});
-		}
-
 		if (!('tab_id' in message))
 			message['tab_id'] = 'tab' in sender ? sender.tab.id : browser.tabs.TAB_ID_NONE;
 		else if (message.tab_id == -1)
@@ -190,7 +176,7 @@ function handleMessage(message, sender)
 
 		browser.browserAction.setBadgeText({tabId: message.tab_id, text: '' + cleanedPerTab.getCount(message.tab_id)});
 
-		return p;
+		return Promise.resolve(null);;
 
 	case 'open bypass':
 		log('Adding to one-time whitelist ' + message.link);
@@ -293,16 +279,6 @@ function handleMessage(message, sender)
 	}
 }
 
-function handleAlarm(alarm)
-{
-	if (alarm.name.startsWith('clearNotification:')) {
-		var notif = alarm.name.substring('clearNotification:'.length);
-		browser.notifications.clear(notif);
-	}
-}
-
-
-browser.alarms.onAlarm.addListener(handleAlarm);
 browser.runtime.onMessage.addListener(handleMessage);
 browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
 browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});

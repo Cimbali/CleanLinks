@@ -20,7 +20,6 @@
 		"<all_urls>",
 		"activeTab",
 		"storage",
-		"notifications",
 		"https://publicsuffix.org/list/public_suffix_list.dat"
 	],
 

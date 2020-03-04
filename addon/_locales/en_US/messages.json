@@ -163,22 +163,6 @@
 	"message": "When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present.",
 	"description": ""
 },
-"notifications_title": {
-	"message": "Show notifications for cleaned links",
-	"description": ""
-},
-"notifications_tooltip": {
-	"message": "Show the cleaned link in a popup when either a clicked link is cleaned or an HTTP request is cleaned.",
-	"description": ""
-},
-"notiftime_title": {
-	"message": "Notification duration",
-	"description": ""
-},
-"notiftime_tooltip": {
-	"message": "Duration before the cleaned link popup is automatically dismissed, in ms.",
-	"description": ""
-},
 "URL_protocol": {
 	"message": "Protocol",
 	"description": ""
