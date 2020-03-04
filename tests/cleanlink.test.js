@@ -96,6 +96,11 @@ describe('cleanLink', function() {
 		])
 	);
 
+	it('should clean BBC campaign tracking parameters', () =>
+		cleanLink('https://www.bbc.com/news/world-latin-america-45982501?ocid=socialflow_facebook&ns_source=facebook&ns_mchannel=social&ns_campaign=bbcnews').then(result =>
+			expect(result).to.equal('https://www.bbc.com/news/world-latin-america-45982501')
+		)
+	);
 	it('should handle disqus links with %3A suffixes', () =>
 		cleanLink('https://www.google.com/url?q=https://some.thing/forum/viewtopic.php%3Ft%3D4960084').then(result =>
 			expect(result).to.equal('https://some.thing/forum/viewtopic.php?t=4960084')

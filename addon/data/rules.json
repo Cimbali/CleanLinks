@@ -40,6 +40,14 @@
         ]
       }
     },
+    ".bbc": {
+      "actions": {
+        "remove": [
+          "ocid",
+          "ns_\\w+"
+        ]
+      }
+    },
     ".bing": {
       "actions": {
         "remove": [
