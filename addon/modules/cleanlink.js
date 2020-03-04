@@ -15,7 +15,7 @@
 const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or "="}[a-z]+://{more stuff}
 const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
 const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i					// {base64-encoded http or www.}{more valid base64 chars}
-const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;:@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
+const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
 const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComponent('=')], ['&', encodeURIComponent('&')]];
 
 
@@ -98,10 +98,27 @@ function getBaseURL(base)
 }
 
 
-function decodeEmbeddedURI(link, base, rules)
+function findRawEmbeddedLink(haystack, embeddedLink, matched_protocol)
 {
+	let unencoded_match_start;
+	if (matched_protocol)
+		unencoded_match_start = embeddedLink.href.slice(0, embeddedLink.origin.length);
+	else
+		unencoded_match_start = embeddedLink.href.slice(embeddedLink.protocol.length + 2, embeddedLink.origin.length + 1);
+
+	let raw_pos = haystack.indexOf(unencoded_match_start)
+	if (raw_pos === -1)
+		return null;
+
+	return haystack.slice(raw_pos);
+}
+
+
+function decodeEmbeddedURI(link, base, rules, originalString)
+{
+	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$') : null;
+
 	// first try to find a base64-encoded link
-	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp(rules.whitelist.join('|')) : null;
 	for (let str of getLinkSearchStrings(link, skip))
 	{
 		let [base64match] = str.match(base64_encoded_url) || [];
@@ -116,6 +133,7 @@ function decodeEmbeddedURI(link, base, rules)
 				if (decoded.startsWith('www.'))
 					decoded = link.protocol + '//' + decoded;
 
+				// found? return it, this is pretty much unambiguous
 				return new URL(decoded);
 			}
 			catch (e)
@@ -125,21 +143,20 @@ function decodeEmbeddedURI(link, base, rules)
 		}
 	}
 
-	var capture = undefined, all, embeddedLink;
-	var haystack = link.href.slice(link.origin.length), needle;
+	let capture = undefined, matchedString, embeddedLink;
 	console.log(link.href)
 
 	// check every parsed (URL-decoded) substring in the URL
-	for (let str of getLinkSearchStrings(link, null))  // TODO: get the rules of the newly matched domain
+	for (let str of getLinkSearchStrings(link, skip))
 	{
-		[all, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
+		[, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
 		if (capture)
 		{
 			// got the new link!
 			embeddedLink = new URL((capture.startsWith('www.') ? link.protocol + '//' : '') + capture);
 			log('decoded URI Component = ' + capture + ' → ' + embeddedLink.origin +
 				' + ' + embeddedLink.href.slice(embeddedLink.origin.length))
-			all = str;
+			matchedString = str;
 			break;
 		}
 	}
@@ -147,41 +164,40 @@ function decodeEmbeddedURI(link, base, rules)
 	if (capture === undefined)
 		return link;
 
-	// check if the URL appears unencoded or partially encoded in the URL
-	if (capture.startsWith(embeddedLink.protocol))
-		needle = embeddedLink.href.slice(0, embeddedLink.origin.length);
-	else
-		needle = embeddedLink.href.slice(embeddedLink.protocol.length + 2, embeddedLink.origin.length + 1);
+	// check if the embedded URL appears unencoded or partially encoded in the containing URL
+	let raw_url = findRawEmbeddedLink(originalString.slice(link.origin.length), embeddedLink,
+									  capture.startsWith(embeddedLink.protocol))
 
-	let raw_pos = haystack.indexOf(needle)
-	if (raw_pos === -1)
+	// No unencoded occurrence of the embedded URL in the parent URL: encoding was done correctly. 99% of the cases here.
+	if (raw_url === null)
 	{
-		// trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
-		// but only in the (path + search params + hash) part.
-		// Only do this for properly encoded URLs.
-		capture = capture.replace(trailing_invalid_chars, '').replace(/&amp;/g, '&')
+		// Trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
+		// but only for properly encoded URLs, and in the (path + search params + hash) part.
+		let prefix_length = embeddedLink.origin.length;
+		if (!capture.startsWith(embeddedLink.protocol))
+			prefix_length -= embeddedLink.protocol.length;
 
-		// TODO: ugly hardcoded case, as there is no post-cleaning rewriting or param rewriting yet.
-		if (link.hostname.endsWith('disq.us'))
-			capture = capture.replace(/:-[a-z0-9-]*$/i, '')
-
-		return new URL(capture, embeddedLink.origin);
+		return new URL(capture.substring(prefix_length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'),
+						embeddedLink.origin);
 	}
+	else
+		console.log('raw url:', raw_url)
 
 	// The URL is incorrectly encoded: either fully or partially unencoded.
-	// We must decide what to do!
-	// - "all" contains the string in which we matched the URL
-	// - "haystack.slice(raw_pos)" contains the URL assuming it is fully unencoded
-	// - "link" contains the URL assuming it is partially unencoded, i.e. with & and = properly encoded
-	// => if we find indications that the encoding is indeed partial, do nothing. Otherwise, use "all" as the URL string.
-	var raw_url = haystack.slice(raw_pos), semi_encoded = false;
+	// embeddedLink:  contains the embedded URL assuming it is partially encoded, i.e. & and = encoded but : and / not
+	// matchedString: contains the string in which we matched embeddedLink
+	// raw_url:       contains the embedded URL assuming it is fully unencoded, i.e. until the end of the containing URL
+
+	// => if we find indications that the encoding is indeed partial, return embeddedLink
+	let semi_encoded = false;
 	for (let [dec, enc] of encoded_param_chars)
-		if (all.includes(dec) && raw_url.includes(enc))
+		if (matchedString.includes(dec) && raw_url.includes(enc))
 			semi_encoded = true;
 
 	if (semi_encoded)
 		return embeddedLink;
 
+	// => Otherwise, use "raw_url" as the URL string. Use some heuristics on & and ? to remove garbage from the result.
 	log('using raw URL: ' + raw_url)
 	var qmark_pos = raw_url.indexOf('?')
 	var qmark_end = raw_url.lastIndexOf('?')
@@ -207,12 +223,14 @@ function filterParamsAndPath(link, base, rules)
 	if ('remove' in rules && rules.remove.length)
 	{
 		let cleanParams = new URLSearchParams();
-		let strip = new RegExp(rules.remove.join('|')) || null;
-		let keep = new RegExp('whitelist' in rules && rules.whitelist.length ? rules.whitelist.join('|') : '.^');
+		let strip = new RegExp('^(' + rules.remove.join('|') + ')$');
+		let keep = null;
+		if ('whitelist' in rules && rules.whitelist.length)
+			keep = new RegExp('^(' + rules.whitelist.join('|') + ')$')
 
 		for (let [key, val] of link.searchParams)
 		{
-			if (key.match(keep) || !key.match(strip))
+			if (keep && key.match(keep) || !key.match(strip))
 				cleanParams.append(key, val);
 		}
 		link.search = cleanParams.toString();
@@ -255,7 +273,7 @@ async function cleanLink(link, base)
 
 	for (let lmt = 4; lmt > 0; --lmt)
 	{
-		let embeddedLink = decodeEmbeddedURI(link, base, rules)
+		let embeddedLink = decodeEmbeddedURI(link, base, rules, origLink)
 		if (embeddedLink.href === link.href)
 			break;
 

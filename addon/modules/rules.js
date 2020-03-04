@@ -56,7 +56,7 @@ function find_rules(url, all_rules)
 {
 	// use public domain instead of TLD
 	let suffix = publicSuffixList.getPublicSuffix(url.hostname);
-	let domain = url.hostname.substr(0, url.hostname.length - suffix.length - 1)
+	let domain = url.hostname.substring(0, url.hostname.length - suffix.length - 1)
 	let domain_bits = [suffix].concat(...domain.split('.').reverse(), '').map(d => '.' + d);
 
 	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
@@ -78,7 +78,7 @@ function unserialize_rule(serialized_rule)
 	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
 	let pos = [serialized_rule.suffix], subdom = serialized_rule.domain.startsWith('..');
 
-	pos.push(...serialized_rule.domain.substr(subdom ? 2 : 1).split('.').reverse().map(d => '.' + d))
+	pos.push(...serialized_rule.domain.substring(subdom ? 2 : 1).split('.').reverse().map(d => '.' + d))
 
 	if (subdom)
 		pos.push('.')

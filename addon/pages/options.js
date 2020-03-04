@@ -176,10 +176,10 @@ function add_rule_item(list, element, replace, flags)
 
 function name_rule(rule)
 {
-	let domain = rule.domain.substr(1), path = rule.path;
+	let domain = rule.domain.substring(1), path = rule.path;
 
 	if (domain.startsWith('.'))
-		domain = domain.substr(1)
+		domain = domain.substring(1)
 	else if (domain !== '*')
 		domain = '*.' + domain
 
@@ -204,9 +204,9 @@ function load_rule()
 	if (document.getElementById('rule_selector').selectedIndex !== 0)
 	{
 		const subdomains = !rule.domain.startsWith('..')
-		document.querySelector('input[name="domain"]').value = rule.domain.substr(subdomains ? 1 : 2)
+		document.querySelector('input[name="domain"]').value = rule.domain.substring(subdomains ? 1 : 2)
 		document.querySelector('input[name="subdomains"]').checked = subdomains;
-		document.querySelector('input[name="suffix"]').value = rule.suffix.substr(1)
+		document.querySelector('input[name="suffix"]').value = rule.suffix.substring(1)
 		document.querySelector('input[name="path"]').value = rule.path === '/*' ? '' : rule.path;
 
 		for (let list of Object.keys(default_actions))

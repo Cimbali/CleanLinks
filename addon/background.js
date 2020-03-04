@@ -290,7 +290,7 @@ function handleMessage(message, sender)
 function handleAlarm(alarm)
 {
 	if (alarm.name.startsWith('clearNotification:')) {
-		var notif = alarm.name.substr('clearNotification:'.length);
+		var notif = alarm.name.substring('clearNotification:'.length);
 		browser.notifications.clear(notif);
 	}
 }
