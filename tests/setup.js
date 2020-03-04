@@ -11,4 +11,9 @@ browser.runtime = Object.assign({
 		"homepage_url": "https://github.com/Cimbali/CleanLinks",
 	}),
 	getURL: (url) => ('/' + url.replace(/^\/+/, '')),
+	onMessage: {addListener: () => {}}
 }, browser.runtime)
+
+// sinon-chrome also does not handle storage
+let nop = () => Promise.resolve({})
+browser.storage.sync = browser.storage.local = Object.assign({get: nop, set: nop, remove: nop})

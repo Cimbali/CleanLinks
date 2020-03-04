@@ -95,6 +95,12 @@ describe('cleanLink', function() {
 			),
 		])
 	);
+
+	it('should handle disqus links with %3A suffixes', () =>
+		cleanLink('https://www.google.com/url?q=https://some.thing/forum/viewtopic.php%3Ft%3D4960084').then(result =>
+			expect(result).to.equal('https://some.thing/forum/viewtopic.php?t=4960084')
+		)
+	);
 });
 
 describe('extractJavascriptLink', function() {

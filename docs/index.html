@@ -7,6 +7,7 @@
 
 	<!-- Mock browser object so cleanLink can be loaded -->
 	<script>
+	let nop = () => Promise.resolve({})
 	var browser = {
 		runtime: Object.assign({getManifest: () => ({
 			"name": "Clean Links",
@@ -16,7 +17,7 @@
 			"homepage_url": "https://github.com/Cimbali/CleanLinks",
 			})
 		}),
-		storage: {local: {get: () => {}, set: () => {}}},
+		storage: {sync: {get: nop, set: nop, remove: nop}, local: {get: nop, set: nop, remove: nop}},
 		getURL: (url) => ('https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/' + url.replace(/^\/+/, '')),
 		i18n: {getMessage: () => "string"}.
 	}
