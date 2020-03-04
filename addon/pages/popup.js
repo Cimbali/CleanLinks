@@ -63,14 +63,6 @@ function filter_from_input(input)
 
 function populate_popup()
 {
-	var list = document.querySelectorAll('[i18n_text]');
-	for (var n = 0; n < list.length; n++)
-		list[n].prepend(document.createTextNode(_(list[n].getAttribute('i18n_text'))));
-
-	var titles = document.querySelectorAll('[i18n_title]');
-	for (var n = 0; n < titles.length; n++)
-		titles[n].setAttribute('title', _(titles[n].getAttribute('i18n_title')));
-
 	document.querySelector('#title').prepend(document.createTextNode(title + ' v' + version));
 	document.querySelector('#homepage').setAttribute('href', homepage);
 	document.querySelector('#homepage').setAttribute('title', title + ' homepage');
@@ -95,13 +87,20 @@ function populate_popup()
 	document.querySelector('button#whitelist').disabled = !prefValues.cltrack;
 	document.querySelector('button#clearlist').disabled = !prefValues.cltrack;
 
-	document.querySelector('input#enabled').checked = prefValues.enabled;
-	document.querySelector('#toggle').onclick = () =>
+	browser.tabs.query({active: true, currentWindow: true}).then(tabList =>
 	{
-		prefValues.enabled = !prefValues.enabled;
-		document.querySelector('input#enabled').checked = prefValues.enabled;
-		browser.runtime.sendMessage({action: 'toggle'});
-	}
+		let tab_id = tabList[0].id;
+		browser.runtime.sendMessage({action: 'check tab enabled', tab_id: tab_id}).then(answer =>
+		{
+			document.querySelector('input#enabled').checked = answer.enabled;
+		})
+
+		document.querySelector('#toggle').onclick = () =>
+		{
+			browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
+			document.querySelector('input#enabled').checked = !document.querySelector('input#enabled').checked;
+		}
+	});
 
 	document.querySelector('#whitelist').onclick = () =>
 	{
@@ -146,4 +145,5 @@ function populate_popup()
 	});
 }
 
+apply_i18n()
 loadOptions().then(() => populate_popup());

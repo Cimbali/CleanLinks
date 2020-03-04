@@ -26,6 +26,7 @@ function highlightLink(node, remove)
 }
 */
 
+let tab_enabled = true;
 
 function eventDoClick(url, node, evt)
 {
@@ -145,28 +146,28 @@ function onClick(evt)
 }
 
 
-/*
 loadOptions().then(() =>
 {
-	if (prefValues.enabled)
+	if (tab_enabled)
 		window.addEventListener('click', onClick, true);
 })
 
 browser.runtime.onMessage.addListener(message =>
 {
 	if (message.action === 'reload options')
-	{
-		if (prefValues.enabled != message.enabled)
-		{
-			if (message.enabled)
-				window.addEventListener('click', onClick, true);
-			else
-				window.removeEventListener('click', onClick, true);
-		}
 		return loadOptions()
+	else if (message.action === 'toggle')
+	{
+		if (tab_enabled == message.enabled)
+			;
+		else if (message.enabled)
+			window.addEventListener('click', onClick, true);
+		else
+			window.removeEventListener('click', onClick, true);
+
+		tab_enabled = message.enabled;
+		return Promise.resolve(null)
 	}
 	else
 		return Promise.reject('Unexpected message: ' + String(message));
 })
-*/
-window.addEventListener('click', onClick, true);

@@ -32,7 +32,6 @@ const new_tab = 1;
 const new_window = 2;
 
 var prefValues = {
-	enabled   : true,
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
 	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
