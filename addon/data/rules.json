@@ -442,6 +442,17 @@
         ]
       }
     },
+    ".paypal": {
+      ".www": {
+        "/authflow/.*": {
+          "actions": {
+            "whitelist": [
+              "stsReturnUrl"
+            ]
+          }
+        }
+      }
+    },
     ".readdc": {
       "actions": {
         "remove": [
