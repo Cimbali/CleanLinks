@@ -4,8 +4,7 @@
 	"description": "Converts obfuscated/nested links to genuine clean links",
 	"author": "Cimbali <me@cimba.li>",
 	"license": "MPL-2.0",
-	"scripts":
-	{
+	"scripts": {
 		"lint": "web-ext -s ./addon lint",
 		"start": "web-ext -s ./addon run",
 		"bundle": "web-ext -s ./addon -a ./dist build",
@@ -13,15 +12,15 @@
 		"release": "scripts/version_bump.sh",
 		"test": "karma start tests/karma.conf.js --single-run"
 	},
-	"devDependencies":
-	{
+	"devDependencies": {
 		"chai": "^4.1.1",
 		"karma": "^1.3.0",
+		"karma-chai": "^0.1.0",
 		"karma-firefox-launcher": "^1.0.0",
 		"karma-mocha": "^1.3.0",
+		"karma-sinon-chrome": "^0.2.0",
 		"mocha": "^3.5.0",
 		"sinon-chrome": "^2.1.2",
-		"web-ext": "^1.6.0",
-		"karma-chai": "^0.1.0"
+		"web-ext": "^1.6.0"
 	}
 }
