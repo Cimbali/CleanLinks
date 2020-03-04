@@ -91,19 +91,6 @@ function eventDoClick(url, node, evt)
 	return true;
 }
 
-function extractJavascriptLink(textLink, baseURL)
-{
-	var [all, quote, cleanedLink] = textLink.match(/^(?:javascript:)?.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
-
-	console.log('matched: ' + cleanedLink)
-	try {
-		return new URL(cleanedLink, baseURL).href
-	} catch (e) {
-		return;
-	}
-
-}
-
 
 function onClick(evt)
 {

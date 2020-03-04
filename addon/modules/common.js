@@ -62,6 +62,18 @@ function apply_i18n()
 		elem.setAttribute('title', _(elem.getAttribute('i18n_title')));
 }
 
+// Here only because it needs inclusion in both background and injected scripts
+function extractJavascriptLink(textLink, baseURL)
+{
+	var [all, quote, cleanedLink] = textLink.match(/^(?:javascript:)?.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
+
+	console.log('matched: ' + cleanedLink)
+	try {
+		return new URL(cleanedLink, baseURL).href
+	} catch (e) {
+		return;
+	}
+}
 
 function serializeOptions()
 {

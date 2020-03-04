@@ -19,7 +19,7 @@ module.exports = config => Object.assign(config,
 		'../tests/setup.js',
 
 		// The files to be tested have to be served
-		"modules/prefs.js",
+		"modules/common.js",
 		"modules/punycode.js",
 		"modules/publicsuffixlist.js",
 		"modules/rules.js",

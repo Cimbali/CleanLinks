@@ -321,6 +321,7 @@ prefs.load().then(() =>
 			link = info.selectionText;
 
 		// Clean & copy
+		link = extractJavascriptLink(link, tab.url) || link;
 		cleanLink(link, tab.url).then(cleanUrl => navigator.clipboard.writeText(cleanUrl))
 	});
 
