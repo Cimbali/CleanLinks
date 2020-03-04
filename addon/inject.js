@@ -132,13 +132,16 @@ function onClick(evt)
 
 	} while (!textLink && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
 
+	if (!textLink)
+		return;
+
 	var cleanedLink = extractJavascriptLink(textLink, window.location);
 
 	if (!cleanedLink || cleanedLink === textLink)
 		return;
 
 	console.log('Cleaning ' + textLink + ' to ' + cleanedLink)
-	if (eventDoClick(url.href, node, evt))
+	if (eventDoClick(cleanedLink, node, evt))
 	{
 		// instead of blinking the URL bar, tell the background to show a notification.
 		browser.runtime.sendMessage({action: 'notify', url: cleanedLink, orig: textLink, type: 'clicked'});
