@@ -119,6 +119,7 @@ function loadOptions()
 					prefValues[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
 			}
 		}
+		return prefValues;
 	});
 }
 

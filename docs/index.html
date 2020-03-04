@@ -9,17 +9,17 @@
 	<script>
 	let nop = () => Promise.resolve({})
 	var browser = {
-		runtime: Object.assign({getManifest: () => ({
+		runtime: {getManifest: () => ({
 			"name": "Clean Links",
 			"description": "Converts obfuscated/nested links to genuine clean links",
 			"author": "Cimbali (maintainer), \nDiego Casorran (creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
 			"version": "3.0.3",
 			"homepage_url": "https://github.com/Cimbali/CleanLinks",
-			})
-		}),
+			}),
+			getURL: (url) => ('https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/' + url.replace(/^\/+/, '')),
+		},
 		storage: {sync: {get: nop, set: nop, remove: nop}, local: {get: nop, set: nop, remove: nop}},
-		getURL: (url) => ('https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/' + url.replace(/^\/+/, '')),
-		i18n: {getMessage: () => "string"}.
+		i18n: {getMessage: () => "string"}
 	}
 	</script>
 
@@ -28,7 +28,7 @@
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/punycode.js"></script>
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/publicsuffixlist.js"></script>
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/rules.js"></script>
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/cleanlink.js"></script>
+	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/cleanlink.js"></script>
 
 	<!-- Inner workings of this page -->
 	<script>
@@ -50,7 +50,8 @@
 	function testCleaning()
 	{
 		var link = document.querySelector('#paste_link input').value;
-		if (link) addToList(link, cleanLink(link))
+		if (link)
+			cleanLink(link).then(result => addToList(link, result))
 	}
 
 	window.onload = () =>
