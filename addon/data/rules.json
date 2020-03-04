@@ -242,6 +242,21 @@
         ]
       }
     },
+    ".amazon": {
+      ".aws": {
+        ".signin": {
+          ".": {
+            "/signin": {
+              "actions": {
+                "whitelist": [
+                  "redirect_uri"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     ".aliexpress": {
       "actions": {
         "remove": [
