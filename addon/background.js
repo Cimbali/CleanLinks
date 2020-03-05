@@ -135,8 +135,15 @@ function on_request(details)
 
 
 	let cleaning_notif = { action: 'notify', url: clean_dest, orig: dest, tab_id: details.tabId };
-	if (details.type != 'main_frame')
-		cleaning_notif.type = 'request';
+	if (details.type !== 'main_frame')
+	{
+		// Google opens some-tab redirects in an iframe in the current document, so simple redirection is not enough.
+		// We need to cancel this request and direct the current tab to the cleaned destination URL.
+		if (dest.match(/^https:\/\/www.google.[a-z.]+\/url\?/))
+			cleaning_notif.type = 'promoted';
+		else
+			cleaning_notif.type = 'request';
+	}
 
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (contains_parent_url && details.type != 'main_frame')
@@ -151,7 +158,19 @@ function on_request(details)
 
 
 	handle_message(cleaning_notif);
-	return {redirectUrl: clean_dest};
+
+	if (cleaning_notif.type === 'promoted')
+	{
+		handle_message({
+			action: 'open url',
+			link: clean_dest,
+			target: same_tab,
+			tab_id: details.tabId
+		})
+		return {cancel: true}
+	}
+	else
+		return {redirectUrl: clean_dest};
 }
 
 
@@ -159,37 +178,40 @@ function handle_message(message, sender)
 {
 	log('received message : ' + JSON.stringify(message))
 
+	let tab_id = browser.tabs.TAB_ID_NONE;
+	if ('tab_id' in message)
+		tab_id = message.tab_id;
+	else if ('tab' in sender)
+		tab_id = sender.tab.id;
+
 	switch (message.action)
 	{
 	case 'cleaned list':
-		return Promise.resolve(cleaned_per_tab.get_history(message.tab_id));
+		return Promise.resolve(cleaned_per_tab.get_history(tab_id));
 
 	case 'check tab enabled':
-		return Promise.resolve({enabled: disabled_tabs.indexOf(message.tab_id) === -1});
+		return Promise.resolve({enabled: disabled_tabs.indexOf(tab_id) === -1});
 
 	case 'notify':
-		if (!('tab_id' in message))
-			message['tab_id'] = 'tab' in sender ? sender.tab.id : browser.tabs.TAB_ID_NONE;
-		else if (message.tab_id == -1)
-			message.tab_id = browser.tabs.TAB_ID_NONE;
-
 		if (Prefs.values.cltrack)
 		{
-			let hist = cleaned_per_tab.get(message.tab_id).history;
+			let hist = cleaned_per_tab.get(tab_id).history;
 			hist.push(Object.assign({}, message));
 			if (hist.length > 100)
 				hist.splice(0, hist.length - 100);
 		}
 
-		cleaned_per_tab.get(message.tab_id).count += 1;
+		cleaned_per_tab.get(tab_id).count += 1;
 
-		browser.browserAction.setBadgeText({tabId: message.tab_id, text: '' + cleaned_per_tab.get_count(message.tab_id)});
+		browser.browserAction.setBadgeText({tabId: tab_id, text: '' + cleaned_per_tab.get_count(tab_id)});
 
 		return Promise.resolve(null);;
 
 	case 'open bypass':
 		log('Adding to one-time whitelist ' + message.link);
 		temporary_whitelist.push(message.link);
+
+		return Promise.resolve(null);;
 
 	case 'open url':
 		if (message.target == new_window)
@@ -198,15 +220,15 @@ function handle_message(message, sender)
 		{
 			return get_browser_version.then(v =>
 				browser.tabs.create(Object.assign({ url: message.link, active: Prefs.values.switch_to_tab },
-												  isNaN(v) || v < 57 ? {} : { openerTabId: sender.tab.id })))
+												  isNaN(v) || v < 57 ? {} : { openerTabId: tab_id })))
 		}
 		else
-			return browser.tabs.update({ url: message.link });
+			return browser.tabs.update(tab_id, { url: message.link });
 
 	case 'whitelist':
 		let non_tab_history = cleaned_per_tab.get(browser.tabs.TAB_ID_NONE).history, entry;
 		if (message.item >= non_tab_history.length)
-			entry = cleaned_per_tab.get(message.tab_id).history.splice(message.item - non_tab_history.length, 1)[0];
+			entry = cleaned_per_tab.get(tab_id).history.splice(message.item - non_tab_history.length, 1)[0];
 		else
 			entry = non_tab_history.splice(message.item, 1)[0];
 
@@ -220,24 +242,24 @@ function handle_message(message, sender)
 			return Promise.resolve(null)
 
 	case 'clearlist':
-		cleaned_per_tab.clear(message.tab_id);
-		browser.browserAction.setBadgeText({tabId: message.tab_id, text: null});
+		cleaned_per_tab.clear(tab_id);
+		browser.browserAction.setBadgeText({tabId: tab_id, text: null});
 		return Promise.resolve(null);
 
 	case 'toggle':
-		let pos = disabled_tabs.indexOf(message.tab_id);
+		let pos = disabled_tabs.indexOf(tab_id);
 		if (pos === -1)
 		{
-			disabled_tabs.push(message.tab_id)
-			update_icon(icon_disabled, message.tab_id);
+			disabled_tabs.push(tab_id)
+			update_icon(icon_disabled, tab_id);
 		}
 		else
 		{
 			disabled_tabs.splice(pos, 1)
-			update_icon(icon_default, message.tab_id);
+			update_icon(icon_default, tab_id);
 		}
 
-		return browser.tabs.sendMessage(message.tab_id, {action: 'toggle', enabled: pos === -1}).catch(() => {})
+		return browser.tabs.sendMessage(tab_id, {action: 'toggle', enabled: pos === -1}).catch(() => {})
 
 	case 'options':
 		let old_pref_values = {...Prefs.values};
@@ -328,12 +350,14 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 		});
 
 	// Auto update badge text for pages when loading is complete
-	browser.tabs.onUpdated.addListener((id, change_info, tab) => {
+	browser.tabs.onUpdated.addListener((id, change_info, tab) =>
+	{
 		if (cleaned_per_tab.get_count(tab.id))
 			browser.browserAction.setBadgeText({tabId: id, text: '' + cleaned_per_tab.get_count(tab.id)});
 	});
 
-	browser.tabs.onRemoved.addListener((id, remove_info) => {
+	browser.tabs.onRemoved.addListener((id, remove_info) =>
+	{
 		cleaned_per_tab.clear(id);
 		let pos = disabled_tabs.indexOf(id);
 		if (pos !== -1)
