@@ -220,20 +220,22 @@ function filter_params_and_path(link, base, rules)
 			link.pathname = link.pathname.replace(new RegExp(search, flags), replace)
 	}
 
-	if ('remove' in rules && rules.remove.length)
+	if ('remove' in rules && rules.remove.length && link.search.length > 1)
 	{
-		let cleanParams = new URLSearchParams();
+		let params = new URLSearchParams(link.search.slice(1));
 		let strip = new RegExp('^(' + rules.remove.join('|') + ')$');
 		let keep = null;
 		if ('whitelist' in rules && rules.whitelist.length)
 			keep = new RegExp('^(' + rules.whitelist.join('|') + ')$')
 
-		for (let [key, val] of link.searchParams)
-		{
-			if (keep && key.match(keep) || !key.match(strip))
-				cleanParams.append(key, val);
-		}
-		link.search = cleanParams.toString();
+		for (let [key, val] of link.searchParams.entries())
+			if ((!keep || !key.match(keep)) && key.match(strip))
+				params.delete(key)
+
+		// Space encoding is sometimes inconsistent: URL() uses + while we might encounter %20 in the wild
+		let updated_path = params.toString();
+		if (link.search.slice(1).replace('%20', '+') !== updated_path)
+			link.search = updated_path.length ? ('?' + updated_path) : '';
 	}
 
 	return link;
