@@ -408,6 +408,26 @@
         ]
       }
     },
+    ".livejournal": {
+      ".www": {
+        ".": {
+          "/misc/get_domain_session.bml$" : {
+            "actions": {
+              "whitelist": [
+                "return"
+              ]
+            }
+          }
+        }
+      },
+      "/__setdomsess": {
+        "actions": {
+          "whitelist": [
+            "dest"
+          ]
+        }
+      }
+    },
     ".medium": {
       "actions": {
         "remove": [

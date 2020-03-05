@@ -110,6 +110,18 @@ describe('clean_link', function() {
 			.to.equal('https://some.thing/forum/viewtopic.php?t=4960084')
 		)
 	);
+	it('should preserve query encoding', () =>
+		Rules.loaded.then(() => expect(clean_link('https://test.com/?plus=%20'))
+			.to.equal('https://test.com/?plus=%20')
+		)
+	);
+	it('should preserve livejournal redirects', () =>
+		Rules.loaded.then(() =>
+		{
+			for (let url of ['https://www.livejournal.com/misc/get_domain_session.bml?return=https%3A%2F%2Fcomment-fic.livejournal.com%2F&sign=RANDOM_HEX_STRING&t=UNIX_TIMESTAMP', 'https://comment-fic.livejournal.com/__setdomsess?dest=https%3A%2F%2Fcomment-fic.livejournal.com%2F&k=ljdomsess.comment-fic&v=v1%3Au12345678%3As45%3AtUNIX_TIMESTAMP%3ARANDOM_HEX_STRING%2F%2F1'])
+				expect(clean_link(url)).to.equal(url);
+		})
+	);
 });
 
 describe('extract_javascript_link', function() {
