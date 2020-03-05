@@ -1,0 +1,166 @@
+html, button, input, select {
+	background: white;
+}
+* {
+	color: black;
+	margin: 0;
+	padding: 0;
+}
+button {
+	padding: 0 5px;
+}
+html, body {
+	max-height: 500px;
+	width: 400px;
+	overflow-x: hidden;
+}
+body {
+	display: flex;
+	font-size: .8em;
+	flex-direction: column;
+	align-content: stretch;
+}
+.disabled, button:disabled {
+	 background: #ddd;
+}
+#history {
+	display: block;
+	min-height: 3.5em;
+	max-height: 15em;
+	flex: 1 1 auto;
+	border: black thin solid;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 17px;
+}
+#history p {
+	width: 384px;
+	border-bottom: black thin solid;
+}
+#history p > span {
+	display: block;
+	padding: 2px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	border-left: black thin solid;
+}
+#history p > span.cleaned::before {
+	content: " → ";
+}
+#history p.selected > span {
+	background: #BBF;
+	white-space: normal;
+	word-break: break-all;
+}
+#history p[value] {
+	cursor: pointer;
+}
+#history p .del {
+	text-decoration: line-through;
+	color: red;
+}
+#history p .ins {
+	text-decoration: underline;
+	color: green;
+}
+#history p .keep {
+}
+#history p .url {
+	text-decoration: underline overline;
+	color: #339;
+}
+#icon {
+	float: left;
+	margin: 5px 15px 5px 5px;
+}
+#icon img {
+	width: 45px;
+	height: 45px;
+}
+#title {
+	margin-top: 5px;
+}
+#toggle, #options {
+	display: block;
+	float: right;
+	margin: 5px 5px 0 0;
+	width: 30px;
+	height: 30px;
+	background: center / 80% no-repeat;
+}
+#toggle {
+	background-image: url("/icons/onoff.svg");
+}
+#options  {
+	background-image: url("/icons/settings.svg");
+}
+#whitelist, #clearlist {
+	display: block;
+	margin: 5px 0 5px 10px;
+}
+.dropped {
+	background: rgb(255, 128, 128)
+}
+#filters {
+	margin-bottom: 5px;
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+	align-items: center;
+}
+#filters input {
+	margin: 0 5px 0 15px;
+}
+#filters label:last-child {
+	margin-right: 15px;
+}
+.help {
+	position: relative;
+}
+.tooltip {
+	font-weight: bold;
+	border:thin solid black;
+	border-radius: 2em;
+	display: inline-block;
+	width:1.3em;
+	text-align:center;
+	cursor: help;
+}
+.help .tooltiptext {
+	visibility: hidden;
+	position: absolute;
+	z-index: 1;
+
+	width: 20em;
+	left: 50%;
+	width: 20em;
+	bottom: 100%;
+
+	background: white;
+	border:thin solid black;
+	padding: 5px;
+	border-radius: 6px;
+
+	text-align: center;
+}
+.help:hover .tooltiptext {
+	visibility: visible;
+}
+#bottom {
+	margin: 0 5px;
+	display: flex;
+	align-items: center;
+}
+.spacer {
+	flex-grow: 1;
+}
+input#enabled {
+	display: none;
+}
+input#enabled:checked ~ * .when_disabled {
+	display: none !important;
+}
+input#enabled:not(:checked) ~ * .when_enabled {
+	display: none !important;
+}
+
