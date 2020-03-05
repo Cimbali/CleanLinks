@@ -1,15 +1,15 @@
 let tests = {'publicsuffix.org': 'org', 'www.popsugar.co.uk': 'co.uk', 'www.perkins.pvt.k12.ma.us': 'pvt.k12.ma.us',
 			'outgoing.prod.mozaws.net': 'net', 'subdomain.gitlab.io': 'gitlab.io'}
 
-describe('publicSuffixList.getPublicSuffix', function()
+describe('PublicSuffixList.get_public_suffix', function()
 {
 	Object.keys(tests).forEach(domain =>
 	{
 		it('should identify public domain ' + tests[domain], done =>
 		{
-			publicSuffixList.loaded.then(() =>
+			PublicSuffixList.loaded.then(() =>
 			{
-				expect(publicSuffixList.getPublicSuffix(domain)).to.equal(tests[domain])
+				expect(PublicSuffixList.get_public_suffix(domain)).to.equal(tests[domain])
 				done();
 			}).catch(err => {console.error(err); done();});
 		});
@@ -48,6 +48,3 @@ describe('base64utf8encode', function()
 		done()
 	});
 });
-
-let string = '^/[a-z]+'
-console.log('/foo'.match(string))

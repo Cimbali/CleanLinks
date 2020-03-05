@@ -14,7 +14,7 @@
 
 'use strict'
 
-function setIcon(marker, tab_id)
+function update_icon(marker, tab_id)
 {
 	browser.browserAction.setIcon(
 	{
@@ -29,50 +29,52 @@ function setIcon(marker, tab_id)
 
 
 // Count of clean links per page, reset it at every page load
-let cleanedPerTab = {}
-cleanedPerTab.get = tab_id =>
-{
-	if  (!(tab_id in cleanedPerTab))
-		cleanedPerTab[tab_id] = {count: 0, history: []};
-	return cleanedPerTab[tab_id];
+const cleaned_per_tab = {
+	get: tab_id =>
+	{
+		if  (!(tab_id in cleaned_per_tab))
+			cleaned_per_tab[tab_id] = {count: 0, history: []};
+		return cleaned_per_tab[tab_id];
+	},
+	clear: tab_id => { delete cleaned_per_tab[tab_id]; },
+	get_history: tab_id => cleaned_per_tab.get(browser.tabs.TAB_ID_NONE).history.concat(cleaned_per_tab.get(tab_id).history),
+	get_count: tab_id => cleaned_per_tab.get(tab_id).count,
 }
-cleanedPerTab.clear = tab_id => { delete cleanedPerTab[tab_id]; };
-cleanedPerTab.getHistory = tab_id => cleanedPerTab.get(browser.tabs.TAB_ID_NONE).history.concat(cleanedPerTab.get(tab_id).history);
-cleanedPerTab.getCount = tab_id => cleanedPerTab.get(tab_id).count;
 
 // wrap the promise in an async function call, to catch a potential ReferenceError
-let get_browser_version = (async () => await browser.runtime.getBrowserInfo())()
+const get_browser_version = (async () => await browser.runtime.getBrowserInfo())()
 							.then(info => parseFloat(info.version)).catch(() => NaN)
 
-// Links that are whitelisted just once (rudimentary)
-let disabledTabs = []
-let temporaryWhitelist = []
+const disabled_tabs = []
 
-async function cleanRedirectHeaders(details)
+// Links that are whitelisted just once (rudimentary)
+const temporary_whitelist = []
+
+function clean_redirect_headers(details)
 {
 	if (30 != parseInt(details.statusCode / 10) || 304 == details.statusCode)
 		return {};
 
-	var loc = details.responseHeaders.find(element => element.name.toLowerCase() == 'location')
+	let loc = details.responseHeaders.find(element => element.name.toLowerCase() == 'location')
 	if (!loc || !loc.value)
 		return {};
 
-	if (disabledTabs.indexOf(details.tabId) !== -1)
+	if (disabled_tabs.indexOf(details.tabId) !== -1)
 		return {}
 
-	var dest = new URL(loc.value, details.url).href, cleanDest = await cleanLink(dest, details.url);
+	let dest = new URL(loc.value, details.url).href, clean_dest = clean_link(dest, details.url);
 
-	if (cleanDest == dest)
+	if (clean_dest == dest)
 		return {};
 
-	var cleaning_notif = { action: 'notify', url: cleanDest, orig: dest, type: 'header', tab_id: details.tabId };
+	let cleaning_notif = { action: 'notify', url: clean_dest, orig: dest, type: 'header', tab_id: details.tabId };
 
-	if (details.originUrl && cleanDest == new URL(details.originUrl).href ||
-			details.originUrl != details.documentUrl && cleanDest == new URL(details.documentUrl).href)
+	if (details.originUrl && clean_dest == new URL(details.originUrl).href ||
+			details.originUrl != details.documentUrl && clean_dest == new URL(details.documentUrl).href)
 	{
 		/* Risking an infinite loop of redirects here.
 		 * Try it once (i.e. it's not in history yet), but if we already tried then allow it. */
-		if (cleanedPerTab.get(details.tabId).history.some(historic_message =>
+		if (cleaned_per_tab.get(details.tabId).history.some(historic_message =>
 			Object.keys(cleaning_notif).every(key => cleaning_notif[key] === historic_message[key])
 		))
 		{
@@ -81,85 +83,89 @@ async function cleanRedirectHeaders(details)
 		}
 	}
 
-	handleMessage(cleaning_notif);
-	return {redirectUrl: cleanDest};
+	handle_message(cleaning_notif);
+	return {redirectUrl: clean_dest};
 }
 
 
-async function onRequest(details)
+function on_request(details)
 {
-	var dest = details.url, curLink = details.originUrl;
+	let dest = details.url, current_page = details.originUrl;
 
-	if (!prefs.values.httpall && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
+	if (!Prefs.values.httpall && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
 		return {};
-	else if (disabledTabs.indexOf(details.tabId) !== -1)
-		return {}
 
-	var urlpos = temporaryWhitelist.indexOf(dest);
+	else if (disabled_tabs.indexOf(details.tabId) !== -1)
+	{
+		log('Disabled CleanLinks for tab ' + details.tabId);
+		return {}
+	}
+
+	let urlpos = temporary_whitelist.indexOf(dest);
 	if (urlpos >= 0) {
 		log('One-time whitelist for ' + JSON.stringify(dest));
-		temporaryWhitelist.splice(urlpos, 1);
+		temporary_whitelist.splice(urlpos, 1);
 		return {};
 	}
 
-	var cleanDest = await cleanLink(dest, curLink);
+	let clean_dest = clean_link(dest, current_page);
 
-	if (!cleanDest) return {};
+	if (!clean_dest) return {};
 
-	var origUrl = new URL(dest), cleanUrl = new URL(cleanDest);
+	let orig_url = new URL(dest), clean_url = new URL(clean_dest);
 
-	if (cleanUrl.href == origUrl.href)
+	if (clean_url.href == orig_url.href)
 		return {};
 
 
-	var containsParentUrl;
+	let contains_parent_url;
 	try
 	{
-		var curUrl = new URL(curLink);
-		containsParentUrl = (cleanUrl.host + cleanUrl.pathname) === (curUrl.host + curUrl.pathname);
+		let current_url = new URL(current_page);
+		contains_parent_url = (clean_url.host + clean_url.pathname) === (current_url.host + current_url.pathname);
 	} catch(e) {
-		containsParentUrl = false;
+		contains_parent_url = false;
 	}
 
 	for (let frame of details.frameAncestors)
-		if (!containsParentUrl)
+		if (!contains_parent_url)
 		{
-			var parentUrl = new URL(frame.url);
-			containsParentUrl = (cleanUrl.host + cleanUrl.pathname) === (parentUrl.host + parentUrl.pathname);
+			let parent_url = new URL(frame.url);
+			contains_parent_url = (clean_url.host + clean_url.pathname) === (parent_url.host + parent_url.pathname);
 		}
 
 
-	var cleaning_notif = { action: 'notify', url: cleanDest, orig: dest, tab_id: details.tabId };
+	let cleaning_notif = { action: 'notify', url: clean_dest, orig: dest, tab_id: details.tabId };
 	if (details.type != 'main_frame')
 		cleaning_notif.type = 'request';
 
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
-	if (containsParentUrl && details.type != 'main_frame')
+	if (contains_parent_url && details.type != 'main_frame')
 	{
-		handleMessage(Object.assign(cleaning_notif, {dropped: true}));
+		handle_message(Object.assign(cleaning_notif, {dropped: true}));
 		return {cancel: true};
 	}
 
 	// Allowed requests when destination is self, to protect against infinite loops (see 42106fd).
-	else if (cleanDest == curLink)
+	else if (clean_dest == current_page)
 		return {}
 
-	handleMessage(cleaning_notif);
-	return {redirectUrl: cleanDest};
+	handle_message(cleaning_notif);
+	return {redirectUrl: clean_dest};
 }
 
 
-function handleMessage(message, sender)
+function handle_message(message, sender)
 {
 	log('received message : ' + JSON.stringify(message))
 
 	switch (message.action)
 	{
 	case 'cleaned list':
-		return Promise.resolve(cleanedPerTab.getHistory(message.tab_id));
+		return Promise.resolve(cleaned_per_tab.get_history(message.tab_id));
 
 	case 'check tab enabled':
-		return Promise.resolve({enabled: disabledTabs.indexOf(message.tab_id) === -1});
+		return Promise.resolve({enabled: disabled_tabs.indexOf(message.tab_id) === -1});
 
 	case 'notify':
 		if (!('tab_id' in message))
@@ -167,23 +173,23 @@ function handleMessage(message, sender)
 		else if (message.tab_id == -1)
 			message.tab_id = browser.tabs.TAB_ID_NONE;
 
-		if (prefs.values.cltrack)
+		if (Prefs.values.cltrack)
 		{
-			var hist = cleanedPerTab.get(message.tab_id).history;
+			let hist = cleaned_per_tab.get(message.tab_id).history;
 			hist.push(Object.assign({}, message));
 			if (hist.length > 100)
 				hist.splice(0, hist.length - 100);
 		}
 
-		cleanedPerTab.get(message.tab_id).count += 1;
+		cleaned_per_tab.get(message.tab_id).count += 1;
 
-		browser.browserAction.setBadgeText({tabId: message.tab_id, text: '' + cleanedPerTab.getCount(message.tab_id)});
+		browser.browserAction.setBadgeText({tabId: message.tab_id, text: '' + cleaned_per_tab.get_count(message.tab_id)});
 
 		return Promise.resolve(null);;
 
 	case 'open bypass':
 		log('Adding to one-time whitelist ' + message.link);
-		temporaryWhitelist.push(message.link);
+		temporary_whitelist.push(message.link);
 
 	case 'open url':
 		if (message.target == new_window)
@@ -191,71 +197,70 @@ function handleMessage(message, sender)
 		else if (message.target == new_tab)
 		{
 			return get_browser_version.then(v =>
-				browser.tabs.create(Object.assign({ url: message.link, active: prefs.values.switchToTab },
+				browser.tabs.create(Object.assign({ url: message.link, active: Prefs.values.switch_to_tab },
 												  isNaN(v) || v < 57 ? {} : { openerTabId: sender.tab.id })))
 		}
 		else
 			return browser.tabs.update({ url: message.link });
 
 	case 'whitelist':
-		var nonHist = cleanedPerTab.get(browser.tabs.TAB_ID_NONE).history;
-		var tabHist = cleanedPerTab.get(message.tab_id).history;
-		if (message.item >= nonHist.length)
-			var entry = tabHist.splice(message.item - nonHist.length, 1)[0];
+		let non_tab_history = cleaned_per_tab.get(browser.tabs.TAB_ID_NONE).history, entry;
+		if (message.item >= non_tab_history.length)
+			entry = cleaned_per_tab.get(message.tab_id).history.splice(message.item - non_tab_history.length, 1)[0];
 		else
-			var entry = nonHist.splice(message.item, 1)[0];
+			entry = non_tab_history.splice(message.item, 1)[0];
 
-		var host = (new URL(entry.orig)).host;
-		if (prefs.values.skipdoms.indexOf(host) === -1)
+		let host = (new URL(entry.orig)).host;
+		if (Prefs.values.skipdoms.indexOf(host) === -1)
 		{
-			prefs.values.skipdoms.push(host);
-			return browser.storage.local.set({configuration: prefs.serialize()()})
+			Prefs.values.skipdoms.push(host);
+			return browser.storage.local.set({configuration: Prefs.serialize()()})
 		}
 		else
 			return Promise.resolve(null)
 
 	case 'clearlist':
-		cleanedPerTab.clear(message.tab_id);
+		cleaned_per_tab.clear(message.tab_id);
 		browser.browserAction.setBadgeText({tabId: message.tab_id, text: null});
 		return Promise.resolve(null);
 
 	case 'toggle':
-		let pos = disabledTabs.indexOf(message.tab_id);
+		let pos = disabled_tabs.indexOf(message.tab_id);
 		if (pos === -1)
 		{
-			disabledTabs.push(message.tab_id)
-			setIcon(icon_disabled, message.tab_id);
+			disabled_tabs.push(message.tab_id)
+			update_icon(icon_disabled, message.tab_id);
 		}
 		else
 		{
-			disabledTabs.splice(pos, 1)
-			setIcon(icon_default, message.tab_id);
+			disabled_tabs.splice(pos, 1)
+			update_icon(icon_default, message.tab_id);
 		}
 
 		return browser.tabs.sendMessage(message.tab_id, {action: 'toggle', enabled: pos === -1}).catch(() => {})
 
 	case 'options':
-		let oldPrefValues = Object.assign({}, prefs.values);
+		let old_pref_values = {...Prefs.values};
 
-		return prefs.load().then(() =>
+		return Prefs.reload().then(() =>
 		{
-			if (!prefs.values.cltrack) {
-				for (let key of cleanedPerTab)
-					if (typeof cleanedPerTab[key] !== 'function')
-						cleanedPerTab.clear(key);
+			if (!Prefs.values.cltrack) {
+				for (let key of cleaned_per_tab)
+					if (typeof cleaned_per_tab[key] !== 'function')
+						cleaned_per_tab.clear(key);
 			}
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
 			let changes = {}
 			for (let prop of ['cbc', 'progltr', 'httpall', 'textcl'])
-				changes[prop] = (prefs.values[prop] === true ? 1 : 0) - (oldPrefValues[prop] === true ? 1 : 0)
+				changes[prop] = (Prefs.values[prop] === true ? 1 : 0) - (old_pref_values[prop] === true ? 1 : 0)
 
 			if (changes.cbc > 0)
 				browser.contextMenus.create(
 				{
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
-					contexts: prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
+					contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
 				});
 			else if (changes.cbc < 0)
 				browser.contextMenus.remove('copy-clean-link')
@@ -263,68 +268,70 @@ function handleMessage(message, sender)
 				browser.contextMenus.update('copy-clean-link',
 				{
 					title: 'Copy clean link',
-					contexts: prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
+					contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
 				});
 
 			if (changes.progltr > 0)
-				browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, {urls: ['<all_urls>']},
+				browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, {urls: ['<all_urls>']},
 																 ['blocking', 'responseHeaders']);
 			else if (changes.progltr < 0)
-				browser.webRequest.onHeadersReceived.removeListener(cleanRedirectHeaders);
+				browser.webRequest.onHeadersReceived.removeListener(clean_redirect_headers);
 
 			browser.tabs.query({}).then(tabs => tabs.forEach(tab =>
 				browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})
 			));
 		})
 
+	case 'rules':
+		return Rules.reload()
+
 	default:
 		return Promise.reject('Unexpected message: ' + String(message));
 	}
 }
 
-browser.runtime.onMessage.addListener(handleMessage);
+browser.runtime.onMessage.addListener(handle_message);
 browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
 browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});
 
-prefs.load().then(() =>
+Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 {
-	browser.webRequest.onBeforeRequest.addListener(onRequest, { urls: ['<all_urls>'] }, ['blocking']);
+	browser.webRequest.onBeforeRequest.addListener(on_request, { urls: ['<all_urls>'] }, ['blocking']);
 
 	// Always add the listener, even if CleanLinks is disabled. Only add the menu item on enabled.
 	browser.contextMenus.onClicked.addListener((info, tab) =>
 	{
-		var link;
+		let link;
 		if ('linkUrl' in info && info.linkUrl)
 			link = info.linkUrl;
 		else if ('selectionText' in info && info.selectionText)
 			link = info.selectionText;
 
 		// Clean & copy
-		link = extractJavascriptLink(link, tab.url) || link;
-		cleanLink(link, tab.url).then(cleanUrl => navigator.clipboard.writeText(cleanUrl))
+		let clean_url = clean_link(extract_javascript_link(link, tab.url) || link, tab.url);
+		navigator.clipboard.writeText(clean_url);
 	});
 
-	if (prefs.values.progltr)
-		browser.webRequest.onHeadersReceived.addListener(cleanRedirectHeaders, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
+	if (Prefs.values.progltr)
+		browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
 
-	if (prefs.values.cbc)
+	if (Prefs.values.cbc)
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',
-			contexts: prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
+			contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
 		});
 
 	// Auto update badge text for pages when loading is complete
-	browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
-		if (cleanedPerTab.getCount(tab.id))
-			browser.browserAction.setBadgeText({tabId: id, text: '' + cleanedPerTab.getCount(tab.id)});
+	browser.tabs.onUpdated.addListener((id, change_info, tab) => {
+		if (cleaned_per_tab.get_count(tab.id))
+			browser.browserAction.setBadgeText({tabId: id, text: '' + cleaned_per_tab.get_count(tab.id)});
 	});
 
-	browser.tabs.onRemoved.addListener((id, removeInfo) => {
-		cleanedPerTab.clear(id);
-		let pos = disabledTabs.indexOf(id);
+	browser.tabs.onRemoved.addListener((id, remove_info) => {
+		cleaned_per_tab.clear(id);
+		let pos = disabled_tabs.indexOf(id);
 		if (pos !== -1)
-			disabledTabs.splice(pos, 1)
+			disabled_tabs.splice(pos, 1)
 	});
 });
-console.log('Done loading background.js')

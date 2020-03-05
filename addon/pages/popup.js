@@ -12,7 +12,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-var tab_id = -1;
 
 function set_selected(evt)
 {
@@ -67,9 +66,14 @@ function populate_popup()
 	document.querySelector('#homepage').setAttribute('href', homepage);
 	document.querySelector('#homepage').setAttribute('title', title + ' homepage');
 
-	browser.tabs.query({active: true, currentWindow: true}).then(tabList =>
+	if (!Prefs.values.cltrack) document.querySelector('#history').classList.add('disabled')
+	document.querySelector('button#whitelist').disabled = !Prefs.values.cltrack;
+	document.querySelector('button#clearlist').disabled = !Prefs.values.cltrack;
+
+	browser.tabs.query({active: true, currentWindow: true}).then(tab_list =>
 	{
-		tab_id = tabList[0].id;
+		let tab_id = tab_list[0].id;
+
 		browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
 		{
 			response.forEach(clean => add_option(clean.orig, clean.url,
@@ -81,15 +85,7 @@ function populate_popup()
 				input.onchange = () => filter_from_input(input)
 			});
 		});
-	});
 
-	if (!prefValues.cltrack) document.querySelector('#history').classList.add('disabled')
-	document.querySelector('button#whitelist').disabled = !prefValues.cltrack;
-	document.querySelector('button#clearlist').disabled = !prefValues.cltrack;
-
-	browser.tabs.query({active: true, currentWindow: true}).then(tabList =>
-	{
-		let tab_id = tabList[0].id;
 		browser.runtime.sendMessage({action: 'check tab enabled', tab_id: tab_id}).then(answer =>
 		{
 			document.querySelector('input#enabled').checked = answer.enabled;
@@ -145,5 +141,5 @@ function populate_popup()
 	});
 }
 
-apply_i18n()
-loadOptions().then(() => populate_popup());
+apply_i18n();
+Prefs.loaded.then(populate_popup);

@@ -15,10 +15,10 @@
 'use strict'
 
 /*
-function highlightLink(node, remove)
+function highlight_link(node, remove)
 {
 	// parse and apply ;-separated list of key:val style properties
-	('' + prefValues.hlstyle).split(';').forEach(function (r)
+	('' + Prefs.values.hlstyle).split(';').forEach(function (r)
 	{
 		let [prop, val] = r.split(':').map(s => s.trim());
 		node.style.setProperty(prop, remove ? '' : val, 'important');
@@ -26,9 +26,7 @@ function highlightLink(node, remove)
 }
 */
 
-let tab_enabled = true;
-
-function eventDoClick(url, node, evt)
+function event_do_click(url, node, evt)
 {
 	if (evt.button == 0 && evt.altKey)
 		return false; // alt+click, do nothing
@@ -37,7 +35,7 @@ function eventDoClick(url, node, evt)
 	let open_newtab = evt.ctrlKey || evt.button == 1 || evt.metaKey;
 	let open_newwin = evt.shiftKey;
 
-	if (/*prefValues.gotarget && */ evt.button == 0 && !(evt.shiftKey || evt.ctrlKey || evt.metaKey || evt.altKey))
+	if (/*Prefs.values.gotarget && */ evt.button == 0 && !(evt.shiftKey || evt.ctrlKey || evt.metaKey || evt.altKey))
 	{
 		let target = node.hasAttribute('target') && node.getAttribute('target') || '_self';
 		if ("_blank" == target)
@@ -92,9 +90,9 @@ function eventDoClick(url, node, evt)
 }
 
 
-function onClick(evt)
+function on_click(evt)
 {
-	var node = evt.target, textLink = '', url;
+	let node = evt.target, text_link = '', url;
 
 	do
 	{
@@ -102,7 +100,7 @@ function onClick(evt)
 		{
 			if (node.href.startsWith('javascript:'))
 			{
-				textLink = node.href
+				text_link = node.href
 				break;
 			}
 			else if (node.href !== '#')
@@ -112,51 +110,55 @@ function onClick(evt)
 		for (let evttype of ['onclick', 'onmouseup', 'onmousedown'])
 			if (node[evttype] !== null)
 			{
-				textLink = node[evttype].toString();
-				textLink = textLink.slice(textLink.indexOf('{') + 1, textLink.lastIndexOf('}'))
+				text_link = node[evttype].toString();
+				text_link = text_link.slice(text_link.indexOf('{') + 1, text_link.lastIndexOf('}'))
 				break;
 			}
 
-	} while (!textLink && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
+	} while (!text_link && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
 
-	if (!textLink)
+	if (!text_link)
 		return;
 
-	var cleanedLink = extractJavascriptLink(textLink, window.location);
+	var cleaned_link = extract_javascript_link(text_link, window.location);
 
-	if (!cleanedLink || cleanedLink === textLink)
+	if (!cleaned_link || cleaned_link === text_link)
 		return;
 
-	console.log('Cleaning ' + textLink + ' to ' + cleanedLink)
-	if (eventDoClick(cleanedLink, node, evt))
+	console.log('Cleaning ' + text_link + ' to ' + cleaned_link)
+	if (event_do_click(cleaned_link, node, evt))
 	{
 		// instead of blinking the URL bar, tell the background to show a notification.
-		browser.runtime.sendMessage({action: 'notify', url: cleanedLink, orig: textLink, type: 'clicked'});
+		browser.runtime.sendMessage({action: 'notify', url: cleaned_link, orig: text_link, type: 'clicked'});
 	}
 }
 
 
-loadOptions().then(() =>
+let tab_enabled = true;
+
+Prefs.loaded.then(() =>
 {
 	if (tab_enabled)
-		window.addEventListener('click', onClick, true);
+		window.addEventListener('click', on_click, true);
 })
 
 browser.runtime.onMessage.addListener(message =>
 {
 	if (message.action === 'reload options')
-		return loadOptions()
+		return Prefs.reload();
 	else if (message.action === 'toggle')
 	{
 		if (tab_enabled == message.enabled)
-			;
-		else if (message.enabled)
-			window.addEventListener('click', onClick, true);
+			return Promise.resolve({});
 		else
-			window.removeEventListener('click', onClick, true);
+			tab_enabled = message.enabled;
 
-		tab_enabled = message.enabled;
-		return Promise.resolve(null)
+		if (message.enabled)
+			window.addEventListener('click', on_click, true);
+		else
+			window.removeEventListener('click', on_click, true);
+
+		return Promise.resolve({});
 	}
 	else
 		return Promise.reject('Unexpected message: ' + String(message));

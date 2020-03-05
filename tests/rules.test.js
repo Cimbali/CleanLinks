@@ -7,41 +7,41 @@ let wayback = new URL('https://web.archive.org/web/20200304112831/http://www.goo
 
 describe('find_rules', function() {
 	it('should return correct "returnurl" whitelist for SO login', () =>
-		load_rules.then(all_rules =>
+		Rules.loaded.then(() =>
 		{
-			let result = find_rules(so_login, all_rules)
+			let result = Rules.find(so_login)
 			console.log(so_login.href + '\nfound: ' + JSON.stringify(result))
 			expect(result.whitelist).to.have.members(['returnurl'])
 		})
 	);
 	it('should return correct "q" whitelist for google search', () =>
-		load_rules.then(all_rules =>
+		Rules.loaded.then(() =>
 		{
-			let result = find_rules(google_search, all_rules)
+			let result = Rules.find(google_search)
 			console.log(google_search.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
 			expect(result.whitelist).to.have.members(['q'])
 		})
 	);
 	it('should return correct pathname rewrite for amazon product pages', () =>
-		load_rules.then(all_rules =>
+		Rules.loaded.then(() =>
 		{
-			let result = find_rules(amazon_url, all_rules)
+			let result = Rules.find(amazon_url)
 			console.log(amazon_url.href + '\nrewrites found: ' + JSON.stringify(result.rewrite))
 			expect(result.rewrite).to.deep.equal([{search: '/ref=[^/]*', replace: '', flags: ''}])
 		})
 	);
 	it('should return correct whitelist and removing for 9gag CDN pages', () =>
-		load_rules.then(all_rules =>
+		Rules.loaded.then(() =>
 		{
-			let result = find_rules(cdn9gag_url, all_rules)
+			let result = Rules.find(cdn9gag_url)
 			console.log(cdn9gag_url.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
 			expect(result.whitelist).to.have.members(['url'])
 		})
 	);
 	it('should return correct whitelist and removing for 9gag CDN pages', () =>
-		load_rules.then(all_rules =>
+		Rules.loaded.then(() =>
 		{
-			let result = find_rules(wayback, all_rules)
+			let result = Rules.find(wayback)
 			console.log(wayback.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
 			expect(result.whitelist_path).to.equal(true)
 		})

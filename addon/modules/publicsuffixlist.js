@@ -601,21 +601,18 @@ const fromSelfie = function(selfie, decoder) {
 
 // Load and return a promise
 
-const publicSuffixList = {
-	getDomain, getPublicSuffix, suffixInPSL,
+const PublicSuffixList = {
+	get_domain: getDomain,
+	get_public_suffix: getPublicSuffix,
+	suffix_in_psl: suffixInPSL,
 	loaded: new Promise(done =>
 	{
 		let populate = (response) =>
 		{
-			console.log('Populating PSL')
 			response.text().then(data =>
 			{
-				console.log('Started loading PSL')
 				parse(data, punycode.toASCII);
-				console.log('Done loading PSL')
-
 				browser.storage.local.set({PSL: toSelfie(Base64Encoder), PSLdate: Date.now()})
-
 				done();
 			})
 		}

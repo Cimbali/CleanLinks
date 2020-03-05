@@ -155,11 +155,11 @@
 	"message": "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you.",
 	"description": ""
 },
-"switchToTab_title": {
+"switch_to_tab_title": {
 	"message": "Switch to tabs opened by clicking links?",
 	"description": ""
 },
-"switchToTab_tooltip": {
+"switch_to_tab_tooltip": {
 	"message": "When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present.",
 	"description": ""
 },

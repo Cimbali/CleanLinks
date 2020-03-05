@@ -55,7 +55,7 @@ function recursive_find(rules, domain_bits, path)
 function find_rules(url, all_rules)
 {
 	// use public domain instead of TLD
-	let suffix = publicSuffixList.getPublicSuffix(url.hostname);
+	let suffix = PublicSuffixList.get_public_suffix(url.hostname);
 	let domain = url.hostname.substring(0, url.hostname.length - suffix.length - 1)
 	let domain_bits = [suffix].concat(...domain.split('.').reverse(), '').map(d => '.' + d);
 
@@ -214,13 +214,13 @@ const load_default_rules = (done) =>
 		{
 			let rules = JSON.parse(data);
 			browser.storage.sync.set({rules: rules})
-			publicSuffixList.loaded.then(() => done(rules));
+			PublicSuffixList.loaded.then(() => done(rules));
 		})
 	})
 }
 
 
-var load_rules = new Promise(done =>
+var load_rules = () => new Promise(done =>
 {
 	var cached = browser.storage.sync.get('rules')
 	if (cached === undefined)
@@ -229,7 +229,7 @@ var load_rules = new Promise(done =>
 		cached.then(data =>
 		{
 			if ('rules' in data && data.rules)
-				publicSuffixList.loaded.then(() => done(data.rules));
+				PublicSuffixList.loaded.then(() => done(data.rules));
 			else
 				load_default_rules(done);
 		})
@@ -237,32 +237,30 @@ var load_rules = new Promise(done =>
 
 
 let Rules = {
-	find: async url => {
-		let rules = await load_rules
-		return find_rules(url, rules)
+	all_rules: {},
+	find: url => {
+		return find_rules(url, this.all_rules)
 	},
-	serialize: async url => {
-		let rules = await load_rules
-		return serialize_rules(rules)
+	serialize: url => {
+		return serialize_rules(this.all_rules)
 	},
-	add: async (new_rule) => {
-		let rules = await load_rules
-		rules = push_rule(rules, new_rule)
-		save_rules(rules)
-		load_rules = Promise.resolve(rules)
+	add: (new_rule) => {
+		push_rule(this.all_rules, new_rule)
+		return save_rules(this.all_rules)
 	},
-	remove: async (old_rule) => {
-		let rules = await load_rules
-		pop_rule(rules, old_rule)
-		save_rules(rules)
-		load_rules = Promise.resolve(rules)
+	remove: (old_rule) => {
+		pop_rule(this.all_rules, old_rule)
+		return save_rules(this.all_rules)
 	},
-	update: async (old_rule, new_rule) => {
-		let rules = await load_rules
-		pop_rule(rules, old_rule)
-		push_rule(rules, new_rule)
-		save_rules(rules)
-		load_rules = Promise.resolve(rules)
+	update: (old_rule, new_rule) => {
+		pop_rule(this.all_rules, old_rule)
+		push_rule(this.all_rules, new_rule)
+		return save_rules(this.all_rules)
 	},
-	clear: clear_rules,
+	reload: () => load_rules().then(loaded => { this.all_rules = loaded; }),
+	clear: () => {
+		clear_rules()
+		return reload()
+	},
 }
+Rules.loaded = Rules.reload()

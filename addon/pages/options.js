@@ -22,9 +22,9 @@ const Queue = {
 };
 
 
-function update_page(prefs)
+function update_page(options)
 {
-	document.querySelector('input[name="hlstyle"]').disabled = !prefs.highlight;
+	document.querySelector('input[name="hlstyle"]').disabled = !options.highlight;
 }
 
 
@@ -43,30 +43,29 @@ function check_regexp(expr, error_span)
 
 function save_options()
 {
-	var prefs = Array.from(document.querySelectorAll('input, textarea')).reduce((prefs, field) =>
+	let options = {}
+	for (let field of Array.from(document.querySelectorAll('input, textarea')))
 	{
-		if (typeof prefValues[field.name] == 'boolean')
-			prefs[field.name] = field.checked;
-		else if (prefValues[field.name] instanceof RegExp)
+		if (typeof Prefs.values[field.name] == 'boolean')
+			options[field.name] = field.checked;
+		else if (Prefs.values[field.name] instanceof RegExp)
 		{
 			var error_span = document.querySelector('span#' + field.name + '_error');
 			if (check_regexp(field.value || '.^', document.getElementById('path_error')))
-				prefs[field.name] = field.value;
+				options[field.name] = field.value;
 			else
-				prefs[field.name] = prefValues[field.name].source;
+				options[field.name] = Prefs.values[field.name].source;
 		}
-		else if (field.name in prefs)
-			prefs[field.name] = field.value;
+		else if (field.name in Prefs)
+			options[field.name] = field.value;
+	}
 
-		return prefs
-	}, {})
+	update_page(options);
 
-	update_page(prefs);
-
-	browser.storage.sync.set({configuration: prefs}).then(() =>
+	browser.storage.sync.set({configuration: options}).then(() =>
 	{
 		browser.runtime.sendMessage({action: 'options'});
-		loadOptions();
+		Prefs.reload();
 	});
 }
 
@@ -86,7 +85,7 @@ var delayed_save = (function(callback)
 function reset_options()
 {
 	// clear options storage, reload everything
-	prefs.clear().then(() =>
+	Prefs.clear().then(() =>
 	{
 		browser.runtime.getBackgroundPage().then(page =>
 		{
@@ -99,7 +98,7 @@ function reset_options()
 
 function populate_options()
 {
-	var values = serializeOptions();
+	var values = Prefs.serialize();
 	for (var pref in values)
 	{
 		var input = document.querySelector('[name=' + pref + ']');
@@ -117,21 +116,21 @@ function populate_options()
 	}
 
 	document.querySelector('button[name="reset_options"]').onclick = reset_options;
-	update_page(prefValues);
+	update_page(values);
 }
 
 
 function remove_rule_item(list, element)
 {
 	let selection = document.getElementById('rule_selector');
-	let selectedOpt = selection[selection.selectedIndex];
+	let selected_opt = selection[selection.selectedIndex];
 
-	let rule = JSON.parse(selectedOpt.value);
+	let rule = JSON.parse(selected_opt.value);
 	let pos = rule[list].indexOf(element);
 	if (pos === -1)
 		return;
 	rule[list].splice(pos, 1)
-	selectedOpt.value = JSON.stringify(rule);
+	selected_opt.value = JSON.stringify(rule);
 }
 
 
@@ -155,17 +154,17 @@ function show_rule_item(list, element, elemtype)
 function add_rule_item(list, element, replace, flags)
 {
 	let selection = document.getElementById('rule_selector');
-	let selectedOpt = selection[selection.selectedIndex];
+	let selected_opt = selection[selection.selectedIndex];
 
 	if (list === 'rewrite')
 		element = {search: element, replace: replace, flags: flags}
 
-	let rule = JSON.parse(selectedOpt.value);
+	let rule = JSON.parse(selected_opt.value);
 	let pos = rule[list].indexOf(element);
 	if (pos === -1)
 	{
 		rule[list].push(element)
-		selectedOpt.value = JSON.stringify(rule);
+		selected_opt.value = JSON.stringify(rule);
 		show_rule_item(list, element, 'item')
 	}
 
@@ -238,14 +237,14 @@ function load_rule()
 function erase_rule()
 {
 	let select = document.getElementById('rule_selector');
-	let selectedOpt = select[select.selectedIndex];
+	let selected_opt = select[select.selectedIndex];
 	select[0].checked = true;
 	if (select.selectedIndex == 0) {
-		selectedOpt.value = '{}';
+		selected_opt.value = '{}';
 	} else {
-		Rules.remove(JSON.parse(selectedOpt.getAttribute('orig-value')))
+		Rules.remove(JSON.parse(selected_opt.getAttribute('orig-value')))
 		select.selectedIndex--;
-		selectedOpt.remove()
+		selected_opt.remove()
 	}
 	load_rule();
 }
@@ -254,9 +253,9 @@ function erase_rule()
 function save_rule()
 {
 	let select = document.getElementById('rule_selector');
-	let selectedOpt = select[select.selectedIndex];
+	let selected_opt = select[select.selectedIndex];
 
-	let rule = Object.assign(JSON.parse(selectedOpt.value), {
+	let rule = Object.assign(JSON.parse(selected_opt.value), {
 		domain: '.' + (document.querySelector('input[name="domain"]').value || '*'),
 		suffix: '.' + (document.querySelector('input[name="suffix"]').value || '*'),
 		path: document.querySelector('input[name="path"]').value || '/*',
@@ -274,15 +273,15 @@ function save_rule()
 	let replacing = null;
 	if (select.selectedIndex === 0) {
 		select[0].value = JSON.stringify(default_actions)
-		selectedOpt = select.appendChild(new Option(name_rule(rule), JSON.stringify(rule), false, true))
+		selected_opt = select.appendChild(new Option(name_rule(rule), JSON.stringify(rule), false, true))
 	} else {
-		replacing = JSON.parse(selectedOpt.getAttribute('orig-value'));
-		selectedOpt.replaceChild(document.createTextNode(name_rule(rule)), selectedOpt.firstChild);
+		replacing = JSON.parse(selected_opt.getAttribute('orig-value'));
+		selected_opt.replaceChild(document.createTextNode(name_rule(rule)), selected_opt.firstChild);
 	}
 
 	let rule_str = JSON.stringify(rule)
-	selectedOpt.setAttribute('value', rule_str);
-	selectedOpt.setAttribute('orig-value', rule_str);
+	selected_opt.setAttribute('value', rule_str);
+	selected_opt.setAttribute('orig-value', rule_str);
 
 	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
 	if (replacing === null) {
@@ -306,8 +305,9 @@ function reset_rules()
 	})
 }
 
-function populate_rules(serialized_rules)
+function populate_rules()
 {
+	let serialized_rules = Rules.serialize()
 	let select = document.getElementById('rule_selector')
 	for (let rule of serialized_rules)
 	{
@@ -377,5 +377,5 @@ function populate_rules(serialized_rules)
 
 
 apply_i18n();
-prefs.load().then(populate_options);
-Rules.serialize().then(populate_rules)
+Prefs.loaded.then(populate_options);
+Rules.loaded.then(populate_rules)

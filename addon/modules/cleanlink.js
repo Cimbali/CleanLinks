@@ -19,7 +19,7 @@ const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;@&=\/?%]|%(?![0-9a-fA-F]{2
 const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComponent('=')], ['&', encodeURIComponent('&')]];
 
 
-function skipLinkType(link)
+function skip_link_type(link)
 {
 	return link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:")
 }
@@ -74,7 +74,7 @@ function getLinkSearchStrings(link, skip)
 	return arr
 }
 
-function getBaseURL(base)
+function get_base_url(base)
 {
 	if (typeof base === 'string')
 	{
@@ -98,13 +98,13 @@ function getBaseURL(base)
 }
 
 
-function findRawEmbeddedLink(haystack, embeddedLink, matched_protocol)
+function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 {
 	let unencoded_match_start;
 	if (matched_protocol)
-		unencoded_match_start = embeddedLink.href.slice(0, embeddedLink.origin.length);
+		unencoded_match_start = embedded_link.href.slice(0, embedded_link.origin.length);
 	else
-		unencoded_match_start = embeddedLink.href.slice(embeddedLink.protocol.length + 2, embeddedLink.origin.length + 1);
+		unencoded_match_start = embedded_link.href.slice(embedded_link.protocol.length + 2, embedded_link.origin.length + 1);
 
 	let raw_pos = haystack.indexOf(unencoded_match_start)
 	if (raw_pos === -1)
@@ -114,7 +114,7 @@ function findRawEmbeddedLink(haystack, embeddedLink, matched_protocol)
 }
 
 
-function decodeEmbeddedURI(link, base, rules, originalString)
+function decode_embedded_uri(link, base, rules, original_string)
 {
 	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$') : null;
 
@@ -143,7 +143,7 @@ function decodeEmbeddedURI(link, base, rules, originalString)
 		}
 	}
 
-	let capture = undefined, matchedString, embeddedLink;
+	let capture = undefined, matchedString, embedded_link;
 	console.log(link.href)
 
 	// check every parsed (URL-decoded) substring in the URL
@@ -153,9 +153,9 @@ function decodeEmbeddedURI(link, base, rules, originalString)
 		if (capture)
 		{
 			// got the new link!
-			embeddedLink = new URL((capture.startsWith('www.') ? link.protocol + '//' : '') + capture);
-			log('decoded URI Component = ' + capture + ' → ' + embeddedLink.origin +
-				' + ' + embeddedLink.href.slice(embeddedLink.origin.length))
+			embedded_link = new URL((capture.startsWith('www.') ? link.protocol + '//' : '') + capture);
+			log('decoded URI Component = ' + capture + ' → ' + embedded_link.origin +
+				' + ' + embedded_link.href.slice(embedded_link.origin.length))
 			matchedString = str;
 			break;
 		}
@@ -165,37 +165,37 @@ function decodeEmbeddedURI(link, base, rules, originalString)
 		return link;
 
 	// check if the embedded URL appears unencoded or partially encoded in the containing URL
-	let raw_url = findRawEmbeddedLink(originalString.slice(link.origin.length), embeddedLink,
-									  capture.startsWith(embeddedLink.protocol))
+	let raw_url = find_raw_embedded_link(original_string.slice(link.origin.length), embedded_link,
+										 capture.startsWith(embedded_link.protocol))
 
 	// No unencoded occurrence of the embedded URL in the parent URL: encoding was done correctly. 99% of the cases here.
 	if (raw_url === null)
 	{
 		// Trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
 		// but only for properly encoded URLs, and in the (path + search params + hash) part.
-		let prefix_length = embeddedLink.origin.length;
-		if (!capture.startsWith(embeddedLink.protocol))
-			prefix_length -= embeddedLink.protocol.length;
+		let prefix_length = embedded_link.origin.length;
+		if (!capture.startsWith(embedded_link.protocol))
+			prefix_length -= embedded_link.protocol.length;
 
 		return new URL(capture.substring(prefix_length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'),
-						embeddedLink.origin);
+						embedded_link.origin);
 	}
 	else
 		console.log('raw url:', raw_url)
 
 	// The URL is incorrectly encoded: either fully or partially unencoded.
-	// embeddedLink:  contains the embedded URL assuming it is partially encoded, i.e. & and = encoded but : and / not
-	// matchedString: contains the string in which we matched embeddedLink
+	// embedded_link:  contains the embedded URL assuming it is partially encoded, i.e. & and = encoded but : and / not
+	// matchedString: contains the string in which we matched embedded_link
 	// raw_url:       contains the embedded URL assuming it is fully unencoded, i.e. until the end of the containing URL
 
-	// => if we find indications that the encoding is indeed partial, return embeddedLink
+	// => if we find indications that the encoding is indeed partial, return embedded_link
 	let semi_encoded = false;
 	for (let [dec, enc] of encoded_param_chars)
 		if (matchedString.includes(dec) && raw_url.includes(enc))
 			semi_encoded = true;
 
 	if (semi_encoded)
-		return embeddedLink;
+		return embedded_link;
 
 	// => Otherwise, use "raw_url" as the URL string. Use some heuristics on & and ? to remove garbage from the result.
 	log('using raw URL: ' + raw_url)
@@ -208,11 +208,11 @@ function decodeEmbeddedURI(link, base, rules, originalString)
 	else if (qmark_pos >= 0 && qmark_pos < qmark_end)
 		raw_url = raw_url.slice(0, qmark_end)
 
-	return new URL((raw_url.startsWith('www.') ? embeddedLink.protocol + '//' : '') + raw_url);
+	return new URL((raw_url.startsWith('www.') ? embedded_link.protocol + '//' : '') + raw_url);
 }
 
 
-function filterParamsAndPath(link, base, rules)
+function filter_params_and_path(link, base, rules)
 {
 	if ('rewrite' in rules && rules.rewrite.length)
 	{
@@ -240,49 +240,49 @@ function filterParamsAndPath(link, base, rules)
 }
 
 
-async function cleanLink(link, base)
+function clean_link(link, base)
 {
-	let origLink = link;
+	let orig_link = link;
 
-	if (!link || skipLinkType(link))
+	if (!link || skip_link_type(link))
 	{
 		log('not cleaning ' + link + ' : empty or ignored link type');
 		return link;
 	}
 
-	if (prefs.values.ignhttp && !(/^https?:$/.test(link.protocol)))
+	if (Prefs.values.ignhttp && !(/^https?:$/.test(link.protocol)))
 	{
 		log('not cleaning ' + link + ' : ignoring non-http(s) links');
 		return link;
 	}
 
-	base = getBaseURL(base);
+	base = get_base_url(base);
 	link = new URL(link)
 
-	let rules = await Rules.find(link)
+	let rules = Rules.find(link)
 	console.log('Rules found', rules)
 
 	// first remove parameters or rewrite
-	link = filterParamsAndPath(link, base, rules);
+	link = filter_params_and_path(link, base, rules);
 
 	for (let lmt = 4; lmt > 0; --lmt)
 	{
-		let embeddedLink = decodeEmbeddedURI(link, base, rules, origLink)
-		if (embeddedLink.href === link.href)
+		let embedded_link = decode_embedded_uri(link, base, rules, orig_link)
+		if (embedded_link.href === link.href)
 			break;
 
 		// remove parameters or rewrite again, if we redirected on an embedded URL
-		rules = await Rules.find(embeddedLink)
-		link = filterParamsAndPath(embeddedLink, base, rules);
+		rules = Rules.find(embedded_link)
+		link = filter_params_and_path(embedded_link, base, rules);
 	}
 
-	if (link.href == new URL(origLink).href)
+	if (link.href == new URL(orig_link).href)
 	{
-		log('cleaning ' + origLink + ' : unchanged')
-		return origLink;
+		log('cleaning ' + orig_link + ' : unchanged')
+		return orig_link;
 	}
 
-	log('cleaning ' + origLink + ' : ' + link.href)
+	log('cleaning ' + orig_link + ' : ' + link.href)
 
 	return link.href;
 }

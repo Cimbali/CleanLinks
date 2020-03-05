@@ -25,13 +25,14 @@ const homepage = browser.runtime.getManifest().homepage_url;
 const copyright = browser.runtime.getManifest().author;
 
 const icon_default = '';
-const icon_disabled = '-';
+const icon_disabled = '-off';
 
 const same_tab = 0;
 const new_tab = 1;
 const new_window = 2;
 
-var prefValues = {
+
+const pref_values = {
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
 	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
@@ -41,15 +42,16 @@ var prefValues = {
 	textcl    : false,                                         // search for & clean links in selected text
 	ignhttp   : false,                                         // ignore non-http(s?) links
 	cltrack   : true,                                          // whether we track the link cleaning
-	switchToTab : true,                                        // Should be a copy of the browser preference: switch to a new tab when we open a link?
+	switch_to_tab : true,                                      // Should be a copy of the browser preference: switch to a new tab when we open a link?
 	debug     : true
 }
 
 
 function log()
 {
-	if (prefValues.debug) console.log.apply(null, arguments)
+	if (pref_values.debug) console.log.apply(null, arguments)
 }
+
 
 function apply_i18n()
 {
@@ -60,82 +62,87 @@ function apply_i18n()
 		elem.setAttribute('title', _(elem.getAttribute('i18n_title')));
 }
 
-// Here only because it needs inclusion in both background and injected scripts
-function extractJavascriptLink(textLink, baseURL)
-{
-	var [all, quote, cleanedLink] = textLink.match(/^(?:javascript:)?.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
 
-	console.log('matched: ' + cleanedLink)
+// Here only because it needs inclusion in both background and injected scripts
+function extract_javascript_link(text_link, base_url)
+{
+	var [all, quote, cleaned_link] = text_link.match(/^(?:javascript:)?.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
+
+	console.log('matched: ' + cleaned_link)
 	try {
-		return new URL(cleanedLink, baseURL).href
+		return new URL(cleaned_link, base_url).href
 	} catch (e) {
 		return;
 	}
 }
 
-function serializeOptions()
+
+function serialize_options()
 {
-	return Object.keys(prefValues).reduce((serializedVals, param) =>
+	let serialized = {};
+	for (let [param, value] of Object.entries(pref_values))
 	{
-		if (prefValues[param] instanceof RegExp)
-			serializedVals[param] = prefValues[param].source;
-		else if (Array.isArray(prefValues[param]))
-			serializedVals[param] = prefValues[param].join(',');
+		if (value instanceof RegExp)
+			serialized[param] = value.source;
+		else if (Array.isArray(value))
+			serialized[param] = value.join(',');
 		else
-			serializedVals[param] = prefValues[param];
-
-		return serializedVals;
-	}, {});
-}
-
-
-function upgradeOptions(options)
-{
-	if ('httpomr' in options) {
-		options['httpall'] = options['httpomr'];
-		delete options['httpomr'];
+			serialized[param] = value;
 	}
+	return serialized;
 }
 
 
-function loadOptions()
+function upgrade_options(options)
+{
+	for (let [rename, newname] in Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab'}))
+		if (rename in options)
+		{
+			options[newname] = options[rename];
+			delete options[rename];
+		}
+}
+
+
+function load_options()
 {
 	// return the promise so it can be chained
 	return browser.storage.sync.get('configuration').then(data =>
 	{
 		if ('configuration' in data) {
-			upgradeOptions(data.configuration);
+			upgrade_options(data.configuration);
 
 			for (var param in data.configuration) {
-				if (typeof prefValues[param] == 'number')
-					prefValues[param] = parseInt(data.configuration[param]);
-				else if (typeof prefValues[param] == 'boolean')
+				if (typeof pref_values[param] === 'number')
+					pref_values[param] = parseInt(data.configuration[param]);
+				else if (typeof pref_values[param] === 'boolean')
 				{
-					prefValues[param] = data.configuration[param] === true
+					pref_values[param] = data.configuration[param] === true
 									|| data.configuration[param] === 'true'
 									|| data.configuration[param] === 'on';
 				}
-				else if (typeof prefValues[param] == 'string')
-					prefValues[param] = data.configuration[param] || '';
-				else if (prefValues[param] instanceof RegExp)
+				else if (typeof pref_values[param] === 'string')
+					pref_values[param] = data.configuration[param] || '';
+				else if (pref_values[param] instanceof RegExp)
 				{
 					try {
-						prefValues[param] = new RegExp(data.configuration[param] || '.^');
+						pref_values[param] = new RegExp(data.configuration[param] || '.^');
 					} catch (e) {
 						log('Error parsing regex ' + (data.configuration[param] || '.^') + ' : ' + e.message);
 					}
 				}
-				else if (Array.isArray(prefValues[param]))
-					prefValues[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
+				else if (Array.isArray(pref_values[param]))
+					pref_values[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
 			}
 		}
-		return prefValues;
+		return pref_values;
 	});
 }
 
-function clearOptions()
+function clear_options()
 {
 	return browser.storage.sync.remove('configuration');
 }
 
-const prefs = {values: prefValues, serialize: serializeOptions, load: loadOptions, clear: clearOptions}
+const Prefs = {values: pref_values, serialize: serialize_options, reload: load_options, clear: clear_options}
+Prefs.loaded = Prefs.reload()
