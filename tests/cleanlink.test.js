@@ -132,7 +132,7 @@ describe('extract_javascript_link', function() {
 	});
 	it('should clean the link to the complex javascript function argument', done =>
 	{
-		expect(extract_javascript_link("javascript:func(\"arg1\", 'arg2', 'http://somesite.com', 'target=\"_self\"')")).to.equal('http://somesite.com/');
+		expect(extract_javascript_link("javascript:func(\"arg1\", 'arg2', 'http://somesite.com/', 'target=\"_self\"')")).to.equal('http://somesite.com/');
 		done();
 	});
 });
@@ -143,7 +143,7 @@ describe('extract_javascript_link + clean_link', function() {
 		let rel_url = "javascript:displayWindowzdjecie('/_misc/zdj_wym.php?url_zdjecie=https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg',1100,778);";
 		let unjs_url = extract_javascript_link(rel_url, 'http://somedomain.com/a/page.html?foo=qux')
 		console.log('After cleaning JS link: ' + unjs_url)
-		return Rules.loaded.then(() => expect(clean_link(unjs_url)).to
+		return Rules.loaded.then(() => expect(clean_link(unjs_url, 'http://somedomain.com/a/page.html?foo=qux')).to
 			.equal('https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg')
 		)
 	});

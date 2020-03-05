@@ -82,7 +82,7 @@ function get_base_url(base)
 		{
 			base = new URL(base);
 			base.hash = '';
-			return base;
+			return base.href;
 		}
 		catch (e) {}
 	}
@@ -92,9 +92,10 @@ function get_base_url(base)
 	{
 		base = new URL(window.location);
 		base.hash = '';
+		return base.href
 	}
 
-	return base;
+	return undefined;
 }
 
 
@@ -114,7 +115,7 @@ function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 }
 
 
-function decode_embedded_uri(link, base, rules, original_string)
+function decode_embedded_uri(link, rules, original_string)
 {
 	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$') : null;
 
@@ -212,7 +213,7 @@ function decode_embedded_uri(link, base, rules, original_string)
 }
 
 
-function filter_params_and_path(link, base, rules)
+function filter_params_and_path(link, rules)
 {
 	if ('rewrite' in rules && rules.rewrite.length)
 	{
@@ -268,26 +269,26 @@ function clean_link(orig_link, base)
 	console.log('Rules found', rules)
 
 	// first remove parameters or rewrite
-	link = filter_params_and_path(link, base, rules);
+	link = filter_params_and_path(link, rules);
 
 	for (let lmt = 4; lmt > 0; --lmt)
 	{
-		let embedded_link = decode_embedded_uri(link, base, rules, orig_link)
+		let embedded_link = decode_embedded_uri(link, rules, orig_link)
 		if (embedded_link.href === link.href)
 			break;
 
 		// remove parameters or rewrite again, if we redirected on an embedded URL
 		rules = Rules.find(embedded_link)
-		link = filter_params_and_path(embedded_link, base, rules);
+		link = filter_params_and_path(embedded_link, rules);
 	}
 
-	if (link.href == new URL(orig_link).href)
+	if (link.href == new URL(orig_link, base).href)
 	{
 		log('cleaning ' + orig_link + ' : unchanged')
 		return orig_link;
 	}
 
-	log('cleaning ' + new URL(orig_link).href + ' : ' + link.href)
+	log('cleaning ' + new URL(orig_link, base).href + ' : ' + link.href)
 
 	return link.href;
 }
