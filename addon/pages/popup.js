@@ -26,29 +26,220 @@ function set_selected(evt)
 	document.querySelector('#openonce').disabled = !target;
 }
 
+// N/A, stroke \u0336, low line \u0335, slashed through \u0338, double low line \u0333, overline \u305
+const utf8_markers = {deleted: '\u0336', inserted: '\u0332', whitelist: '\u0338', embedded: '\u0333'};
+const css_classes = {deleted: 'del', inserted: 'ins', whitelist: 'keep', embedded: 'url'};
+
+
+function append_decorated(node, text, type)
+{
+	let child = document.createTextNode(text);
+	if (type)
+	{
+		let span = document.createElement('span');
+		span.appendChild(child);
+		span.classList.add(css_classes[type]);
+		child = span;
+
+		text = text.split('').join(utf8_markers[type]) + utf8_markers[type];
+	}
+
+	node.setAttribute('title', node.getAttribute('title') + text);
+	node.querySelector('span:last-child').appendChild(child);
+}
+
+
+// Find if the clean URL was embedded in the original URL
+function embed_url_pos(haystack, clean_url)
+{
+	let dest_base = clean_url.origin.slice(clean_url.protocol.length + 2);
+	let clean_encoded = [
+		clean_url.protocol.slice(0, -1) + '://' + dest_base,
+		clean_url.protocol.slice(0, -1) + encodeURIComponent('://') + dest_base,
+		encodeURIComponent(clean_url.origin),
+		encodeURIComponent(clean_url.origin).replace(/\./g, '%2E'),
+		dest_base,
+		encodeURIComponent(dest_base),
+		encodeURIComponent(dest_base).replace(/\./g, '%2E'),
+	]
+
+	for (let needle of clean_encoded)
+	{
+		let pos = haystack.indexOf(needle)
+		if (pos !== -1)
+			return [pos, pos + needle.length];
+	}
+
+	// TODO: base 64 encoded base
+}
+
 
 function add_option(orig, clean, classes)
 {
 	var history = document.querySelector('#history');
+	let option = document.createElement('p');
 
-	var option = document.createElement('p');
 	option.setAttribute('value', '' + history.querySelectorAll('p').length);
-	option.setAttribute('title', orig + '\n-> ' + clean);
-	classes.forEach(cl => option.classList.add(cl));
-
-	var span = document.createElement('span');
-	span.append(document.createTextNode(orig))
-	span.setAttribute('class', 'original');
-	option.appendChild(span);
-
-	span = document.createElement('span');
-	span.append(document.createTextNode(clean))
-	span.setAttribute('class', 'cleaned');
-	option.appendChild(span);
-
+	option.setAttribute('title', '');
+	option.classList.add(...classes);
 	option.onclick = set_selected
 
+	orig = new URL(orig)
+	clean = new URL(clean)
+
+	let origin_node = document.createElement('span');
+	origin_node.classList.add('original');
+	option.appendChild(origin_node);
+
+	let rules = Rules.find(orig);
+
+	append_decorated(option, orig.origin)
+
+	if (rules.whitelist_path)
+		append_decorated(option, orig.pathname, 'whitelist')
+
+	else if ('rewrite' in rules && rules.rewrite.length)
+	{
+		let matches = [], modified_path = orig.pathname;
+
+		for (let {search, replace, flags} of rules.rewrite)
+		{
+			modified_path = modified_path.replace(new RegExp(search, flags), replace);
+
+			let global = flags.indexOf('g') !== -1
+			let pattern = new RegExp(search, flags.replace('g', ''));
+
+			for (let pos = 0, match; (global || pos === 0) && (match = orig.pathname.substr(pos).match(pattern)) !== null;
+					pos += match.index + match[0].length)
+			{
+				// Manually compute the replacements
+				let replacement = replace.replace(new RegExp('\\$&', 'g'), match[0]);
+				for (let i = 1; i < match.length; i++)
+					replacement = replacement.replace(new RegExp('\\$' + i, 'g'), match[i]);
+
+				matches.push([pos + match.index, pos + match.index + match[0].length, replacement])
+			}
+		}
+
+		let [embed_start, embed_end] = embed_url_pos(modified_path, clean) || [], embed_range = undefined;
+		if (embed_start !== undefined && embed_end !== undefined)
+			embed_range = new Range()
+
+		matches.sort((a, b) => (a[0] - b[0]) || a[1] - b[1])
+
+		let pos = 0, modified_pos = 0;
+		for (let [start, end, replacement] of matches)
+		{
+			if (start >= pos)
+			{
+				append_decorated(option, orig.pathname.substring(pos, start));
+				let increment = start - pos;
+
+				if (embed_start !== undefined && embed_start >= modified_pos && embed_start <= modified_pos + increment)
+				{
+					embed_range.setStart(origin_node.lastChild, embed_start - modified_pos)
+					embed_start = undefined;
+				}
+				if (embed_end !== undefined && embed_end >= modified_pos && embed_end <= modified_pos + increment)
+				{
+					embed_range.setEnd(origin_node.lastChild, embed_end - modified_pos)
+					embed_end = undefined;
+				}
+
+				pos += increment;
+				modified_pos += increment;
+			}
+			if (end > pos)
+			{
+				append_decorated(option, orig.pathname.substring(pos, end), 'deleted')
+				pos = end;
+			}
+			if (replacement)
+			{
+				append_decorated(option, replacement, 'inserted')
+				modified_pos += replacement.length;
+			}
+
+			if (embed_start !== undefined && embed_start <= modified_pos)
+			{
+				embed_range.setStartAfter(origin_node.lastChild)
+				embed_start = undefined;
+			}
+			if (embed_end !== undefined && embed_end <= modified_pos)
+			{
+				embed_range.setEndAfter(origin_node.lastChild)
+				embed_end = undefined;
+			}
+		}
+
+		if (pos < orig.pathname.length)
+			append_decorated(option, orig.pathname.substring(pos))
+
+		let increment = orig.pathname.length - pos;
+		let clip = val => val < 0 ? 0 : (val >= increment ? increment - 1 : val)
+
+		if (embed_start !== undefined)
+			embed_range.setStart(origin_node.lastChild, clip(embed_start - modified_pos))
+		if (embed_end !== undefined)
+			embed_range.setEnd(origin_node.lastChild, clip(embed_end - modified_pos))
+
+		if (embed_range !== undefined)
+		{
+			let span = document.createElement('span');
+			span.classList.add(css_classes['embedded']);
+			embed_range.surroundContents(span);
+		}
+	}
+	else
+	{
+		let embed_pos = embed_url_pos(orig.pathname, clean);
+		if (embed_pos)
+		{
+			let [match_start, match_end] = embed_pos
+			append_decorated(option, orig.pathname.substring(0, match_start))
+			append_decorated(option, orig.pathname.substring(match_start, match_end), 'embedded')
+			append_decorated(option, orig.pathname.substring(match_end))
+		}
+		else
+			append_decorated(option, orig.pathname)
+	}
+
+	let sep = '?';
+	const keep = rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$') : /.^/;
+	const strip = rules.remove.length ? new RegExp('^(' + rules.remove.join('|') + ')$') : /.^/;
+
+	for (let [key, val] of orig.searchParams)
+	{
+		let decorate = undefined, embed_start = undefined, embed_end = undefined;
+		let keyval = sep + encodeURIComponent(key) + '=' + encodeURIComponent(val);
+		sep = '&';
+
+		if (key.match(keep))
+			decorate = 'whitelist'
+		else if (key.match(strip))
+			decorate = 'deleted';
+		else
+			[embed_start, embed_end] = embed_url_pos(keyval, clean) || [];
+
+		if (embed_start !== undefined && embed_end !== undefined)
+		{
+			append_decorated(option, keyval.substring(0, embed_start))
+			append_decorated(option, keyval.substring(embed_start, embed_end), 'embedded')
+			append_decorated(option, keyval.substring(embed_end))
+		}
+		else
+			append_decorated(option, keyval, decorate)
+	}
+
+	let clean_node = document.createElement('span');
+	clean_node.classList.add('cleaned');
+	option.appendChild(clean_node);
+
+	option.setAttribute('title', option.getAttribute('title') + '\n-> ' + clean.href);
+	clean_node.append(document.createTextNode(clean.href))
 	history.appendChild(option);
+
+	console.log(option.innerHTML)
 }
 
 
@@ -96,32 +287,32 @@ function populate_popup()
 			browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
 			document.querySelector('input#enabled').checked = !document.querySelector('input#enabled').checked;
 		}
+
+		document.querySelector('#whitelist').onclick = () =>
+		{
+			var selected = document.querySelector('#history p.selected');
+			var id = parseInt(selected.getAttribute('value'));
+			browser.runtime.sendMessage({action: 'whitelist', item: id, tab_id: tab_id});
+			// remove selected element, and renumber remaining ones (should be in sendMessage.then())
+			selected.remove();
+			document.querySelectorAll('#history p').forEach((opt, idx) => { opt.setAttribute('value', '' + idx) });
+		}
+
+		document.querySelector('#clearlist').onclick = () =>
+		{
+			browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
+			// remove cleared (all) elements (should be in sendMessage.then())
+			document.querySelectorAll('#history p').forEach(opt => { opt.remove() });
+		}
+
+		document.querySelector('#openonce').onclick = () =>
+		{
+			var selected = document.querySelector('#history .selected');
+			if (selected)
+				browser.runtime.sendMessage({action: 'open bypass', tab_id: tab_id, target: same_tab,
+											 link: selected.childNodes[0].innerText});
+		}
 	});
-
-	document.querySelector('#whitelist').onclick = () =>
-	{
-		var selected = document.querySelector('#history p.selected');
-		var id = parseInt(selected.getAttribute('value'));
-		browser.runtime.sendMessage({action: 'whitelist', item: id, tab_id: tab_id});
-		// remove selected element, and renumber remaining ones (should be in sendMessage.then())
-		selected.remove();
-		document.querySelectorAll('#history p').forEach((opt, idx) => { opt.setAttribute('value', '' + idx) });
-	}
-
-	document.querySelector('#clearlist').onclick = () =>
-	{
-		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
-		// remove cleared (all) elements (should be in sendMessage.then())
-		document.querySelectorAll('#history p').forEach(opt => { opt.remove() });
-	}
-
-	document.querySelector('#openonce').onclick = () =>
-	{
-		var selected = document.querySelector('#history .selected');
-		if (selected)
-			browser.runtime.sendMessage({action: 'open bypass', tab_id: tab_id, target: same_tab,
-										 link: selected.childNodes[0].innerText});
-	}
 
 	document.querySelector('#options').onclick = () =>
 	{

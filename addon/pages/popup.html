@@ -43,21 +43,37 @@
 			width: 384px;
 			border-bottom: black thin solid;
 		}
-		#history p span {
+		#history p > span {
 			display: block;
 			padding: 2px;
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			border-left: black thin solid;
 		}
-		#history p span.cleaned::before {
+		#history p > span.cleaned::before {
 			content: " → ";
 		}
-		#history p.selected span {
+		#history p.selected > span {
 			background: #BBF;
+			white-space: normal;
+			word-break: break-all;
 		}
 		#history p[value] {
 			cursor: pointer;
+		}
+		#history p .del {
+			text-decoration: line-through;
+			color: red;
+		}
+		#history p .ins {
+			text-decoration: underline;
+			color: green;
+		}
+		#history p .keep {
+		}
+		#history p .url {
+			text-decoration: underline overline;
+			color: #339;
 		}
 		#icon {
 			float: left;
@@ -195,6 +211,9 @@
 	</p>
 
 	<script src="/modules/common.js"></script>
+	<script src="/modules/punycode.js"></script>
+	<script src="/modules/publicsuffixlist.js"></script>
+	<script src="/modules/rules.js"></script>
 	<script src="/modules/cleanlink.js"></script>
 	<script src="popup.js"></script>
 </body>
