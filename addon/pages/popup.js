@@ -88,6 +88,7 @@ function add_option(orig, clean, classes)
 	clean = new URL(clean)
 
 	let origin_node = document.createElement('span');
+	origin_node.setAttribute('raw-url', orig.href);
 	origin_node.classList.add('original');
 	option.appendChild(origin_node);
 
@@ -232,14 +233,14 @@ function add_option(orig, clean, classes)
 	}
 
 	let clean_node = document.createElement('span');
+	clean_node.setAttribute('raw-url', clean.href);
 	clean_node.classList.add('cleaned');
 	option.appendChild(clean_node);
 
 	option.setAttribute('title', option.getAttribute('title') + '\n-> ' + clean.href);
 	clean_node.append(document.createTextNode(clean.href))
-	history.appendChild(option);
 
-	console.log(option.innerHTML)
+	history.appendChild(option);
 }
 
 
@@ -326,7 +327,8 @@ function populate_popup()
 
 		if (selected)
 		{
-			e.clipboardData.setData('text/plain', selected.childNodes[0].innerText + '\n' + selected.childNodes[1].innerText);
+			e.clipboardData.setData('text/plain', selected.childNodes[0].getAttribute('raw-url') + '\n'
+												+ selected.childNodes[1].getAttribute('raw-url'));
 			e.preventDefault();
 		}
 	});
