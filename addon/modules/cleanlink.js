@@ -15,7 +15,7 @@
 const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or "="}[a-z]+://{more stuff}
 const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
 const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i					// {base64-encoded http or www.}{more valid base64 chars}
-const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;@&=\/?%]|%(?![0-9a-fA-F]{2})).*$/i
+const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;@&=\/?%#]|%(?![0-9a-fA-F]{2})).*$/i
 const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComponent('=')], ['&', encodeURIComponent('&')]];
 
 
@@ -228,38 +228,41 @@ function filter_params_and_path(link, base, rules)
 		if ('whitelist' in rules && rules.whitelist.length)
 			keep = new RegExp('^(' + rules.whitelist.join('|') + ')$')
 
+		let changes = 0;
 		for (let [key, val] of link.searchParams.entries())
 			if ((!keep || !key.match(keep)) && key.match(strip))
+			{
 				params.delete(key)
+				changes++;
+			}
 
-		// Space encoding is sometimes inconsistent: URL() uses + while we might encounter %20 in the wild
-		let updated_path = params.toString();
-		if (link.search.slice(1).replace('%20', '+') !== updated_path)
-			link.search = updated_path.length ? ('?' + updated_path) : '';
+		// encoding is sometimes inconsistent:
+		// - URL() uses + for spaces while we might encounter %20 in the wild
+		// - some keys without values might get changed from &key=& to &key&
+		if (changes !== 0)
+			link.search = params.toString();
 	}
 
 	return link;
 }
 
 
-function clean_link(link, base)
+function clean_link(orig_link, base)
 {
-	let orig_link = link;
-
-	if (!link || skip_link_type(link))
+	if (!orig_link || skip_link_type(orig_link))
 	{
-		log('not cleaning ' + link + ' : empty or ignored link type');
-		return link;
+		log('not cleaning ' + orig_link + ' : empty or ignored orig_link type');
+		return orig_link;
 	}
 
-	if (Prefs.values.ignhttp && !(/^https?:$/.test(link.protocol)))
+	if (Prefs.values.ignhttp && !(/^https?:$/.test(orig_link.protocol)))
 	{
-		log('not cleaning ' + link + ' : ignoring non-http(s) links');
-		return link;
+		log('not cleaning ' + orig_link + ' : ignoring non-http(s) links');
+		return orig_link;
 	}
 
 	base = get_base_url(base);
-	link = new URL(link)
+	let link = new URL(orig_link, base)
 
 	let rules = Rules.find(link)
 	console.log('Rules found', rules)
@@ -284,7 +287,7 @@ function clean_link(link, base)
 		return orig_link;
 	}
 
-	log('cleaning ' + orig_link + ' : ' + link.href)
+	log('cleaning ' + new URL(orig_link).href + ' : ' + link.href)
 
 	return link.href;
 }
