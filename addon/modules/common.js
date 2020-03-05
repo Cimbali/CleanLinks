@@ -68,11 +68,18 @@ function extract_javascript_link(text_link, base_url)
 {
 	var [all, quote, cleaned_link] = text_link.match(/^(?:javascript:)?.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
 
-	console.log('matched: ' + cleaned_link)
-	try {
-		return new URL(cleaned_link, base_url).href
-	} catch (e) {
-		return;
+	if (!cleaned_link)
+		return null;
+
+	console.log('matched javascript link: ' + cleaned_link)
+	try
+	{
+		let url = new URL(cleaned_link, base_url)
+		return cleaned_link;
+	}
+	catch (e)
+	{
+		return null;
 	}
 }
 

@@ -92,8 +92,11 @@ function on_request(details)
 {
 	let dest = details.url, current_page = details.originUrl;
 
-	if (!Prefs.values.httpall && (details.frameId != 0 || typeof(details.documentUrl) !== 'undefined'))
+	if (!Prefs.values.httpall && (details.frameId !== 0 || typeof details.documentUrl !== 'undefined'))
+	{
+		log('Disabled CleanLinks for tab ' + details.tabId);
 		return {};
+	}
 
 	else if (disabled_tabs.indexOf(details.tabId) !== -1)
 	{
@@ -102,7 +105,8 @@ function on_request(details)
 	}
 
 	let urlpos = temporary_whitelist.indexOf(dest);
-	if (urlpos >= 0) {
+	if (urlpos >= 0)
+	{
 		log('One-time whitelist for ' + JSON.stringify(dest));
 		temporary_whitelist.splice(urlpos, 1);
 		return {};
@@ -110,15 +114,10 @@ function on_request(details)
 
 	let clean_dest = clean_link(dest, current_page);
 
-	if (!clean_dest) return {};
-
-	let orig_url = new URL(dest), clean_url = new URL(clean_dest);
-
-	if (clean_url.href == orig_url.href)
+	if (!clean_dest || clean_dest === dest)
 		return {};
 
-
-	let contains_parent_url;
+	let clean_url = new URL(clean_dest), contains_parent_url = false;
 	try
 	{
 		let current_url = new URL(current_page);
@@ -142,13 +141,14 @@ function on_request(details)
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (contains_parent_url && details.type != 'main_frame')
 	{
-		handle_message(Object.assign(cleaning_notif, {dropped: true}));
+		handle_message({dropped: true, ...cleaning_notif});
 		return {cancel: true};
 	}
 
 	// Allowed requests when destination is self, to protect against infinite loops (see 42106fd).
 	else if (clean_dest == current_page)
 		return {}
+
 
 	handle_message(cleaning_notif);
 	return {redirectUrl: clean_dest};
@@ -306,6 +306,11 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 			link = info.linkUrl;
 		else if ('selectionText' in info && info.selectionText)
 			link = info.selectionText;
+		else
+		{
+			console.error('No link from context menu')
+			return;
+		}
 
 		// Clean & copy
 		let clean_url = clean_link(extract_javascript_link(link, tab.url) || link, tab.url);
@@ -319,7 +324,7 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',
-			contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
+			contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link', 'selection']
 		});
 
 	// Auto update badge text for pages when loading is complete
