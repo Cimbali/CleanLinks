@@ -145,7 +145,6 @@ function decode_embedded_uri(link, rules, original_string)
 	}
 
 	let capture = undefined, matchedString, embedded_link;
-	console.log(link.href)
 
 	// check every parsed (URL-decoded) substring in the URL
 	for (let str of getLinkSearchStrings(link, skip))
@@ -266,6 +265,8 @@ function clean_link(orig_link, base)
 	let link = new URL(orig_link, base)
 
 	let rules = Rules.find(link)
+
+	console.log(link.href)
 	console.log('Rules found', rules)
 
 	// first remove parameters or rewrite

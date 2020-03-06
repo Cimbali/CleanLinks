@@ -234,6 +234,20 @@ function load_rule()
 }
 
 
+function filter_rules()
+{
+	let search = document.getElementById('rule_filter').value;
+	Array.from(document.querySelectorAll('#rule_selector option')).forEach((opt, idx) =>
+	{
+		if (idx !== 0)
+		{
+			console.log(opt.text, search, opt.text.match(search) ? 'match': 'NO')
+			opt.style.display = !search || opt.text.match(search) ? 'block' : 'none';
+		}
+	});
+}
+
+
 function erase_rule()
 {
 	let select = document.getElementById('rule_selector');
@@ -360,6 +374,8 @@ function populate_rules()
 	}
 
 	document.querySelector('input[name="whitelist_path"]').onchange = save_rule
+	document.getElementById('rule_filter').onchange = filter_rules
+	document.getElementById('rule_filter').onkeyup = delayed_save(filter_rules)
 
 	for (let input of document.querySelectorAll('#rule_editor input'))
 	{

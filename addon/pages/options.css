@@ -91,7 +91,7 @@ fieldset {
 	width: 100%;
 	margin: 0 0 2em;
 }
-fieldset fieldset, #rule_selector, #rule_legend {
+fieldset fieldset, #rule_selector {
 	width: calc(100% - 2em);
 	margin: 0 1em;
 }
@@ -103,17 +103,22 @@ fieldset.example legend {
 }
 #rule_legend {
 	margin: 1em 1em 0;
+	display: flex;
+	align-items: baseline;
+}
+#rule_legend * {
+	flex-grow: 0;
+}
+#rule_legend input {
+	flex-grow: 1;
+	width: auto;
+	margin: 0 1em;
 }
 #rule_selector {
 	height: 15em;
 }
 p.replace_editor {
 	margin: 0;
-}
-button#remove_rule {
-	position: absolute;
-	right: 2em;
-	margin-top: -2em;
 }
 textarea {
 	height:10em;

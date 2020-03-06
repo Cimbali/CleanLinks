@@ -39,8 +39,10 @@
 			</dl>
 		</fieldset>
 
-		<h4 id="rule_legend"><label for="rule_selector">Rule to edit:</label></h4>
-		<button id="remove_rule" disabled="disabled">❌ Delete rule</button>
+		<h4 id="rule_legend"><label for="rule_selector">Rule to edit:</label>
+			<input type="text" id="rule_filter" placeholder="filter rules" class="noautosave" />
+			<button id="remove_rule" disabled="disabled">❌ Delete rule</button>
+		</h4>
 		<p>
 			<select id="rule_selector" name="rule" size="2">
 				<option value="{}" selected="selected">-- New rule --</option>
