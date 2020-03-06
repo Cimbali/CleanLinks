@@ -297,9 +297,8 @@ function reset_rules()
 	// clear rules storage, reload everything
 	Rules.clear().then(() =>
 	{
-		browser.runtime.getBackgroundPage().then(page =>
+		browser.runtime.sendMessage({action: 'rules'}).then(page =>
 		{
-			page.location.reload();
 			window.location.reload();
 		})
 	})

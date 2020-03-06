@@ -64,6 +64,7 @@ body {
 	color: green;
 }
 #history p .keep {
+	background-color: grey;
 }
 #history p .url {
 	text-decoration: underline overline;

@@ -260,7 +260,7 @@ let Rules = {
 	reload: () => load_rules().then(loaded => { this.all_rules = loaded; }),
 	clear: () => {
 		clear_rules()
-		return reload()
+		return load_rules().then(loaded => { this.all_rules = loaded; });
 	},
 }
 Rules.loaded = Rules.reload()
