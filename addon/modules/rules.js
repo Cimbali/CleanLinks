@@ -241,7 +241,7 @@ let Rules = {
 	find: url => {
 		return find_rules(url, this.all_rules)
 	},
-	serialize: url => {
+	serialize: () => {
 		return serialize_rules(this.all_rules)
 	},
 	add: (new_rule) => {
@@ -257,10 +257,15 @@ let Rules = {
 		push_rule(this.all_rules, new_rule)
 		return save_rules(this.all_rules)
 	},
-	reload: () => load_rules().then(loaded => { this.all_rules = loaded; }),
-	clear: () => {
-		clear_rules()
-		return load_rules().then(loaded => { this.all_rules = loaded; });
+	reload: () => load_rules().then(loaded => this.all_rules = loaded),
+	replace: (new_data) => {
+		return clear_rules().then(() => {
+			this.all_rules = new_data;
+			return save_rules(this.all_rules);
+		});
+	},
+	reset: () => {
+		return clear_rules().then(() => load_rules().then(loaded => this.all_rules = loaded));
 	},
 }
 Rules.loaded = Rules.reload()

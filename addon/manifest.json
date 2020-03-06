@@ -20,6 +20,7 @@
 		"<all_urls>",
 		"activeTab",
 		"storage",
+		"downloads",
 		"https://publicsuffix.org/list/public_suffix_list.dat"
 	],
 

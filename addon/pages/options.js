@@ -85,7 +85,7 @@ var delayed_save = (function(callback)
 function reset_options()
 {
 	// clear options storage, reload everything
-	Prefs.clear().then(() =>
+	Prefs.reset().then(() =>
 	{
 		browser.runtime.getBackgroundPage().then(page =>
 		{
@@ -306,10 +306,28 @@ function save_rule()
 }
 
 
+function import_rules()
+{
+	let get_json = this.files[0].text();
+	return get_json.then(data => Rules.replace(JSON.parse(data))).catch(err => console.error('Error importing rules', err))
+			.then(() => window.location.reload());
+}
+
+
+function export_rules()
+{
+	return Rules.loaded.then(rules =>
+	{
+		let blob = new Blob([JSON.stringify(rules)], {type : 'data:application/json;charset=utf-8'})
+		browser.downloads.download({filename: 'clean_links_rules.json', url: URL.createObjectURL(blob)});
+	})
+}
+
+
 function reset_rules()
 {
 	// clear rules storage, reload everything
-	Rules.clear().then(() =>
+	Rules.reset().then(() =>
 	{
 		browser.runtime.sendMessage({action: 'rules'}).then(page =>
 		{
@@ -388,6 +406,9 @@ function populate_rules()
 
 	document.getElementById('remove_rule').onclick = erase_rule
 	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
+	document.querySelector('button[name="export_rules"]').onclick = export_rules
+	document.querySelector('button[name="import_rules"]').onclick = () => document.getElementById('import_rules').click()
+	document.getElementById("import_rules").onchange = import_rules
 }
 
 

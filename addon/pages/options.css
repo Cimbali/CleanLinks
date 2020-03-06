@@ -164,7 +164,11 @@ dd {
 	justify-content: center;
 }
 #reset_buttons button {
-	margin: 0 2em;
+	margin: 0 .5em;
+	white-space: nowrap;
+}
+#import_rules {
+	display: none;
 }
 
 .help {
