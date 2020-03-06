@@ -172,6 +172,34 @@ function add_rule_item(list, element, replace, flags)
 }
 
 
+function validate_item(list)
+{
+	let input_name = list !== 'rewrite' ? list + '_edit' : 'search_edit';
+	let input = document.querySelector('input[name="' + input_name + '"]');
+
+	if (input.value && check_regexp(input.value, document.getElementById(input_name + '_error')))
+	{
+		let args = [input.value];
+		input.value = '';
+
+		if (list === 'rewrite')
+		{
+			let replace = document.querySelector('input[name="replace_edit"]');
+			let flags_g = document.querySelector('input[name="rewrite_repeat"]');
+			let flags_i = document.querySelector('input[name="rewrite_icase"]');
+
+			args.push(replace.value, (flags_g.checked ? 'g' : '') + (flags_i.checked ? 'i' : ''));
+
+			replace.value = '';
+			flags_g.checked = flags_i.checked = true;
+		}
+
+		add_rule_item(list, ...args);
+		save_rule()
+	}
+}
+
+
 function name_rule(rule)
 {
 	let domain = rule.domain, path = rule.path;
@@ -192,11 +220,9 @@ function name_rule(rule)
 
 function load_rule()
 {
-	for (let list of document.querySelectorAll('span.itemlist, span.inheritlist')) {
-		while (list.lastChild) {
-			list.removeChild(list.lastChild)
-		}
-	}
+	for (let list of document.querySelectorAll('span.itemlist, span.inheritlist'))
+		while (list.lastChild)
+			list.removeChild(list.lastChild);
 
 	if (document.getElementById('rule_selector').selectedIndex === 0)
 	{
@@ -240,10 +266,7 @@ function filter_rules()
 	Array.from(document.querySelectorAll('#rule_selector option')).forEach((opt, idx) =>
 	{
 		if (idx !== 0)
-		{
-			console.log(opt.text, search, opt.text.match(search) ? 'match': 'NO')
 			opt.style.display = !search || opt.text.match(search) ? 'block' : 'none';
-		}
 	});
 }
 
@@ -253,9 +276,10 @@ function erase_rule()
 	let select = document.getElementById('rule_selector');
 	let selected_opt = select[select.selectedIndex];
 	select[0].checked = true;
-	if (select.selectedIndex == 0) {
+	if (select.selectedIndex == 0)
 		selected_opt.value = '{}';
-	} else {
+	else
+	{
 		Rules.remove(JSON.parse(selected_opt.getAttribute('orig-value')))
 		select.selectedIndex--;
 		selected_opt.remove()
@@ -273,7 +297,7 @@ function save_rule()
 		domain: '.' + (document.querySelector('input[name="domain"]').value || '*'),
 		suffix: '.' + (document.querySelector('input[name="suffix"]').value || '*'),
 		path: document.querySelector('input[name="path"]').value || '/*',
-		whitelist_path: document.querySelector('input[name="whitelist_path"]').checked
+		whitelist_path: document.querySelector('input[name="whitelist_path"]').checked,
 	});
 
 
@@ -336,79 +360,66 @@ function reset_rules()
 	})
 }
 
+
 function populate_rules()
 {
-	let serialized_rules = Rules.serialize()
 	let select = document.getElementById('rule_selector')
-	for (let rule of serialized_rules)
+	for (let rule of Rules.serialize())
 	{
 		let opt = select.appendChild(new Option(name_rule(rule), JSON.stringify({...default_actions, ...rule})))
 		opt.setAttribute('orig-value', opt.getAttribute('value'))
 	}
 	select[0].value = JSON.stringify(default_actions)
-
 	select.onchange = load_rule
 
-	for (const list of ['remove', 'whitelist'])
+	for (const list of ['remove', 'whitelist', 'rewrite'])
 	{
-		let button = document.getElementById(list + '_add');
-		let input = document.querySelector('input[name="' + list + '_edit"]');
-		button.onclick = () =>
+		let editor = document.querySelector('#' + list + '_editor');
+		let input_name = list !== 'rewrite' ? list + '_edit' : 'search_edit';
+		let input = document.querySelector('input[name="' + input_name + '"]');
+
+		document.getElementById(list + '_add').onclick = () =>
 		{
-			if (input.value && check_regexp(input.value, document.getElementById(list + '_edit_error')))
-			{
-				add_rule_item(list, input.value);
-				input.value = '';
-				save_rule()
-			}
+			for (let item of document.querySelectorAll('.editor'))
+				item.style.display = item.id === list + '_editor' ? 'block' : 'none';
+			input.select();
 		}
 
-		let check_val = () => check_regexp(input.value, document.getElementById(list + '_edit_error'));
+		editor.querySelector('.ok').onclick = () =>
+		{
+			validate_item(list);
+			editor.style.display = 'none';
+		}
+		editor.querySelector('.cancel').onclick = () =>
+		{
+			editor.style.display = 'none';
+		}
+
+		let check_val = () => check_regexp(input.value, document.getElementById(input_name + '_error'));
 		input.onchange = check_val;
 		input.onkeyup = delayed_save(check_val);
-	}
-
-	{
-		let button = document.getElementById('rewrite_add');
-		let input_s = document.querySelector('input[name="search_edit"]');
-		let input_r = document.querySelector('input[name="replace_edit"]');
-		let flags_g = document.querySelector('input[name="rewrite_repeat"]');
-		let flags_i = document.querySelector('input[name="rewrite_icase"]');
-		button.onclick = () =>
-		{
-			if (input_s.value && check_regexp(input_s.value, document.getElementById('search_edit_error')))
-			{
-				let flags = (flags_g.checked ? 'g' : '') + (flags_g.checked ? 'i' : '');
-				add_rule_item('rewrite', input_s.value, input_r.value, flags);
-				input_s.value = input_r.value = '';
-				flags_g.checked = flags_i.checked = true;
-				save_rule()
-			}
-		}
-
-		let check_val = () => check_regexp(input_s.value, document.getElementById('search_edit_error'));
-		input_s.onchange = check_val;
-		input_s.onkeyup = delayed_save(check_val);
 	}
 
 	document.querySelector('input[name="whitelist_path"]').onchange = save_rule
 	document.getElementById('rule_filter').onchange = filter_rules
 	document.getElementById('rule_filter').onkeyup = delayed_save(filter_rules)
-
-	for (let input of document.querySelectorAll('#rule_editor input'))
-	{
-		if (input.getAttribute('name') === 'ignhttp' || input.classList.contains('noautosave'))
-			continue;
-
-		if (input.onchange !== null) input.onchange = save_rule
-		if (input.onkeyup !== null) input.onkeyup = delayed_save(save_rule)
-	}
-
 	document.getElementById('remove_rule').onclick = erase_rule
 	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
 	document.querySelector('button[name="export_rules"]').onclick = export_rules
 	document.querySelector('button[name="import_rules"]').onclick = () => document.getElementById('import_rules').click()
 	document.getElementById("import_rules").onchange = import_rules
+
+	document.addEventListener('keyup', e =>
+	{
+		if (e.key === 'Escape')
+			for (let item of document.querySelectorAll('.editor'))
+				if (item.style.display !== 'none')
+				{
+					e.stopPropagation();
+					e.preventDefault();
+					item.style.display = 'none';
+				}
+	});
 }
 
 

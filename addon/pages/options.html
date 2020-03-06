@@ -91,46 +91,67 @@
 			</legend>
 			<p></p>
 
-			<label><span>Remove query parameters:</span>
-				<span class="parsing_error" id="remove_edit_error"></span>
-				<br /><input type="text" name="remove_edit" value="" />
-				<button id="remove_add" class="add_to_list" title="Add to the list">+</button>
-				<span id="remove_itemlist" class="itemlist"></span>
-				<span id="remove_inheritlist" class="inheritlist"></span>
-			</label>
+			<p class="editor" id="rewrite_editor">
+				<span class="parsing_error" id="search_edit_error"></span>
+				<label>
+					<span>Remove from path:</span>
+					<input type="text" name="search_edit" id="search_edit" value="" />
+				</label>
+				<label>
+					<span>Replace with:</span>
+					<input type="text" name="replace_edit" name="replace_edit" value="" />
+				</label>
 
-			<label><span>Whitelist query parameters (prevent removing and allow embedded URL):</span>
-				<span class="parsing_error" id="whitelist_edit_error"></span>
-				<br /><input type="text" name="whitelist_edit" value="" />
-				<button id="whitelist_add" class="add_to_list" title="Add to the list">+</button>
-				<span id="whitelist_itemlist" class="itemlist"></span>
-				<span id="whitelist_inheritlist" class="inheritlist"></span>
-			</label>
+				<label><span>Replace all occurrences</span>
+					<input type="checkbox" name="rewrite_repeat" checked="checked" />
+				</label>
+
+				<label><span>Ignore case</span>
+					<input type="checkbox" name="rewrite_icase" checked="checked" />
+				</label>
+
+				<button class="ok">Add</button><button class="cancel">Cancel</button>
+			</p>
+
+			<p class="editor" id="remove_editor">
+				<label>
+					<span>Add to removed query parameters:</span>
+					<span class="parsing_error" id="remove_edit_error"></span>
+					<br /><input type="text" name="remove_edit" value="" />
+				</label>
+
+				<button class="ok">Add</button><button class="cancel">Cancel</button>
+			</p>
+
+			<p class="editor" id="whitelist_editor">
+				<label>
+					<span>Add to whitelisted query parameters:</span>
+					<span class="parsing_error" id="whitelist_edit_error"></span>
+					<br /><input type="text" name="whitelist_edit" value="" />
+				</label>
+
+				<button class="ok">Add</button><button class="cancel">Cancel</button>
+			</p>
+
+
+			<label for="remove_add">Remove query parameters:</label>
+			<span id="remove_itemlist" class="itemlist"></span>
+			<span id="remove_inheritlist" class="inheritlist"></span>
+			<button id="remove_add" class="add_to_list" title="Add to the list">+</button>
+
+			<label for="whitelist_add">Whitelist query parameters (prevent removing and allow embedded URL):</label>
+			<span id="whitelist_itemlist" class="itemlist"></span>
+			<span id="whitelist_inheritlist" class="inheritlist"></span>
+			<button id="whitelist_add" class="add_to_list" title="Add to the list">+</button>
+
 			<label><span>Allow URL embedded inside path</span>
 				<input type="checkbox" name="whitelist_path" value="" />
 			</label>
 
-			<p class="replace_editor">
-			<label for="search_edit">Remove from path:</label>
-				<label for="replace_edit">Replace with:</label>
-				<br /><input type="text" name="search_edit" id="search_edit" value="" />
-				→ <input type="text" name="replace_edit" name="replace_edit" value="" />
-				<button id="rewrite_add" class="add_to_list" title="Add to the list">+</button>
-				<span class="parsing_error" id="search_edit_error"></span>
-			</p>
-
-			<label><span>Replace all occurrences</span>
-				<input type="checkbox" name="rewrite_repeat" checked="checked" />
-			</label>
-
-			<label><span>Ignore case</span>
-				<input type="checkbox" name="rewrite_icase" checked="checked" />
-			</label>
-
-			<p class="replace_editor">
-				<span id="rewrite_itemlist" class="itemlist"></span>
-				<span id="rewrite_inheritlist" class="inheritlist"></span>
-			</p>
+			<label for="rewrite_add">Remove or replace in path:</label>
+			<span id="rewrite_itemlist" class="itemlist"></span>
+			<span id="rewrite_inheritlist" class="inheritlist"></span>
+			<button id="rewrite_add" class="add_to_list" title="Add to the list">+</button>
 
 		</fieldset>
 	</fieldset>

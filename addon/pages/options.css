@@ -7,11 +7,29 @@ label {
 }
 
 fieldset > label > span:first-child,
-p.replace_editor > label > span:first-child {
+p.editor > label > span:first-child {
 	display:inline-block;
 	min-width: 20em;
 }
-
+.editor {
+	background: #F8F8F8;
+	border: black 2px solid;
+	display: none;
+	position: absolute;
+	width: 80%;
+	left: 10%;
+	right: 10%;
+	text-align: center;
+	padding: 1em 2em;
+	border-radius: 1em;
+}
+p.editor > label > span:first-child {
+	margin-bottom: .5em;
+}
+.editor button.ok,
+.editor button.cancel {
+	margin: 0 1em;
+}
 label[for="show_URL_legend"] {
 	display: inline-block;
 	position: relative;
@@ -23,17 +41,15 @@ label[for="show_URL_legend"] {
 	box-shadow: 2px 4px #aaa;
 	border-radius: 5px;
 }
-
 span.parsing_error {
 	color: red;
 	font-weight:bold;
 }
 span.itemlist, span.inheritlist {
-	display: block;
-	margin: 0;
-	padding: 0;
+	display: inline;
 }
-span.itemlist > span, span.inheritlist > span {
+span.itemlist > span,
+span.inheritlist > span {
 	display: inline-block;
 	border: black thin solid;
 	padding: 5px;
@@ -61,13 +77,6 @@ input[type=number] {
 }
 input[type=text], textarea {
 	width: 100%;
-}
-input[type=text][name$=_edit] {
-	width: 87%;
-}
-input[type=text][name$=_edit] + button {
-	margin-left: 2%;
-	width: 10%;
 }
 #domain_edit, label[for=domain_edit] {
 	display: inline-block;
@@ -116,9 +125,6 @@ fieldset.example legend {
 }
 #rule_selector {
 	height: 15em;
-}
-p.replace_editor {
-	margin: 0;
 }
 textarea {
 	height:10em;
