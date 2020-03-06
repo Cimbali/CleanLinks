@@ -52,12 +52,20 @@ function recursive_find(rules, domain_bits, path)
 }
 
 
-function find_rules(url, all_rules)
+function split_suffix(url)
 {
 	// use public domain instead of TLD
-	let suffix = PublicSuffixList.get_public_suffix(url.hostname);
-	let domain = url.hostname.substring(0, url.hostname.length - suffix.length - 1)
-	let domain_bits = [suffix].concat(...domain.split('.').reverse(), '').map(d => '.' + d);
+	let suffix = '.' + PublicSuffixList.get_public_suffix(url.hostname);
+	let domain = url.hostname.substring(0, url.hostname.length - suffix.length)
+
+	return [suffix, domain];
+}
+
+
+function find_rules(url, all_rules)
+{
+	let [suffix, domain] = split_suffix(url);
+	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '');
 
 	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
 	for (let [key, action] of Object.entries(default_actions))
@@ -92,14 +100,14 @@ function unserialize_rule(serialized_rule)
 			actions[key] = serialized_rule[key];
 
 	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
-	let pos = [serialized_rule.suffix], subdom = serialized_rule.domain.startsWith('..');
+	let pos = [serialized_rule.suffix], subdom = serialized_rule.domain.startsWith('.');
 
-	pos.push(...serialized_rule.domain.substring(subdom ? 2 : 1).split('.').reverse().map(d => '.' + d))
+	pos.push(...serialized_rule.domain.split('.').reverse().map(d => '.' + d))
 
 	if (subdom)
 		pos.push('.')
 
-	if (serialized_rule.path !== '/*')
+	if ('path' in serialized_rule && serialized_rule.path !== '/*')
 		pos.push(serialized_rule.path)
 
 	return {keys: pos, actions: actions}
@@ -118,6 +126,7 @@ function serialize_rules(rules, serialized_rule)
 		let obj = {...serialized_rule, ...rules.actions};
 		if (!('suffix' in obj)) obj.suffix = '.*'
 		if (!('domain' in obj)) obj.domain = '.*'
+		else obj.domain = obj.domain.substr(1) // remove leading .
 		if (!('path' in obj)) obj.path = '/*'
 		list.push(obj)
 
@@ -220,20 +229,40 @@ const load_default_rules = (done) =>
 }
 
 
-var load_rules = () => new Promise(done =>
+function make_domain_importer(promise)
 {
-	var cached = browser.storage.sync.get('rules')
-	if (cached === undefined)
-		load_default_rules(done)
-	else
-		cached.then(data =>
+	return domains_list => promise.then(rules =>
+	{
+		let actions = {whitelist: ['.*'], whitelist_path: true};
+
+		for (let fqdn of domains_list)
 		{
-			if ('rules' in data && data.rules)
-				PublicSuffixList.loaded.then(() => done(data.rules));
-			else
-				load_default_rules(done);
-		})
-});
+			let [suffix, domain] = split_suffix(new URL('https://' + fqdn + '/'));
+			Rules.add({suffix: suffix, domain: domain, ...actions})
+		}
+
+		return save_rules(rules);
+	});
+}
+
+
+function load_rules()
+{
+	return new Promise(done =>
+	{
+		let cached = browser.storage.sync.get('rules')
+		if (cached === undefined)
+			load_default_rules(done)
+		else
+			cached.then(data =>
+			{
+				if ('rules' in data && data.rules)
+					PublicSuffixList.loaded.then(() => done(data.rules));
+				else
+					load_default_rules(done);
+			})
+	});
+}
 
 
 let Rules = {
@@ -269,3 +298,5 @@ let Rules = {
 	},
 }
 Rules.loaded = Rules.reload()
+
+import_domain_whitelist = make_domain_importer(Rules.loaded)

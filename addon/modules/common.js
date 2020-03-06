@@ -100,6 +100,8 @@ function serialize_options()
 }
 
 
+let import_domain_whitelist = undefined;
+
 function upgrade_options(options)
 {
 	for (let [rename, newname] in Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab'}))
@@ -108,6 +110,23 @@ function upgrade_options(options)
 			options[newname] = options[rename];
 			delete options[rename];
 		}
+
+	if ('skipdoms' in options && import_domain_whitelist !== undefined)
+	{
+		// These are already handled in the default rules
+		for (let handled of ['accounts.google.com', 'signin.ebay.com'])
+		{
+			let find = options.skipdoms.indexOf(handled)
+			if (find !== -1)
+				options.skipdoms.splice(find, 1)
+		}
+
+		let actions = {whitelist: ['.*'], whitelist_path: true};
+		import_domain_whitelist(options.skipdoms.slice()).then(() =>
+		{
+			delete options.skipdoms;
+		});
+	}
 }
 
 
@@ -132,9 +151,12 @@ function load_options()
 					pref_values[param] = data.configuration[param] || '';
 				else if (pref_values[param] instanceof RegExp)
 				{
-					try {
+					try
+					{
 						pref_values[param] = new RegExp(data.configuration[param] || '.^');
-					} catch (e) {
+					}
+					catch (e)
+					{
 						log('Error parsing regex ' + (data.configuration[param] || '.^') + ' : ' + e.message);
 					}
 				}

@@ -62,6 +62,13 @@
       }
     },
     ".ebay": {
+      ".signin": {
+        "actions": {
+          "whitelist": [
+            "ru"
+          ]
+        }
+      },
       "actions": {
         "remove": [
           "_trkparms",
@@ -100,6 +107,17 @@
           "actions": {
             "whitelist": [
               "continue"
+            ]
+          }
+        }
+      },
+      ".translate": {
+        "/translate.*": {
+          "actions": {
+            "whitelist": [
+              "rurl",
+              "q",
+              "u"
             ]
           }
         }
@@ -363,6 +381,18 @@
           "email_token",
           "email_source"
         ]
+      }
+    },
+    ".googleusercontent": {
+      ".translate": {
+        "/translate.*": {
+          "actions": {
+            "whitelist": [
+              "rurl",
+              "u"
+            ]
+          }
+        }
       }
     },
     ".healio": {
@@ -674,6 +704,19 @@
           "nb",
           "u"
         ]
+      }
+    }
+  },
+  ".nl": {
+    ".ns": {
+      ".nstrein": {
+        ".www": {
+          "actions": {
+            "whitelist": [
+              "loginurl"
+            ]
+          }
+        }
       }
     }
   },
