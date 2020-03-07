@@ -19,11 +19,13 @@ function set_selected(evt)
 	if (selected) selected.classList.remove('selected');
 
 	var target = evt.target;
-	while (target && target.tagName != 'P')
+	while (target && target.tagName !== 'P')
 		target = target.parentNode;
 
 	if (target) target.classList.add('selected');
 	document.querySelector('#openonce').disabled = !target;
+	document.querySelector('#whitelist').disabled = !target;
+	document.querySelector('#open_editor').disabled = !target;
 }
 
 // N/A, stroke \u0336, low line \u0335, slashed through \u0338, double low line \u0333, overline \u305
@@ -258,9 +260,13 @@ function populate_popup()
 	document.querySelector('#homepage').setAttribute('href', homepage);
 	document.querySelector('#homepage').setAttribute('title', title + ' homepage');
 
-	if (!Prefs.values.cltrack) document.querySelector('#history').classList.add('disabled')
-	document.querySelector('button#whitelist').disabled = !Prefs.values.cltrack;
-	document.querySelector('button#clearlist').disabled = !Prefs.values.cltrack;
+	if (!Prefs.values.cltrack)
+	{
+		document.querySelector('#history').classList.add('disabled')
+		document.querySelector('button#whitelist').disabled = true;
+		document.querySelector('button#clearlist').disabled = true;
+		return;
+	}
 
 	browser.tabs.query({active: true, currentWindow: true}).then(tab_list =>
 	{
@@ -276,6 +282,8 @@ function populate_popup()
 				filter_from_input(input);
 				input.onchange = () => filter_from_input(input)
 			});
+
+			document.querySelector('button#clearlist').disabled = response.length === 0;
 		});
 
 		browser.runtime.sendMessage({action: 'check tab enabled', tab_id: tab_id}).then(answer =>
@@ -314,6 +322,19 @@ function populate_popup()
 											 link: selected.childNodes[0].innerText});
 		}
 	});
+
+	document.querySelector('#open_editor').onclick = () =>
+	{
+		var selected = document.querySelector('#history .selected');
+		if (!selected)
+			return;
+
+		browser.runtime.sendMessage({action: 'set prepopulate', link: selected.firstChild.getAttribute('raw-url')}).then(() =>
+		{
+			browser.runtime.openOptionsPage();
+			window.close();
+		});
+	}
 
 	document.querySelector('#options').onclick = () =>
 	{

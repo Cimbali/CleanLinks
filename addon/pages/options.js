@@ -30,11 +30,14 @@ function update_page(options)
 
 function check_regexp(expr, error_span)
 {
-	try {
+	try
+	{
 		var r = new RegExp(expr);
 		error_span.innerText = '';
 		return true;
-	} catch (e) {
+	}
+	catch (e)
+	{
 		error_span.innerText = 'Error parsing RegExp: ' + e.message;
 		return false;
 	}

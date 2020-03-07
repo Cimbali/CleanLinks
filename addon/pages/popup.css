@@ -95,7 +95,7 @@ body {
 #options  {
 	background-image: url("/icons/settings.svg");
 }
-#whitelist, #clearlist {
+#bottom button {
 	display: block;
 	margin: 5px 0 5px 10px;
 }

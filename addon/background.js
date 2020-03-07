@@ -50,6 +50,8 @@ const disabled_tabs = []
 // Links that are whitelisted just once (rudimentary)
 const temporary_whitelist = []
 
+let prepopulate_link = undefined;
+
 function clean_redirect_headers(details)
 {
 	if (30 != parseInt(details.statusCode / 10) || 304 == details.statusCode)
@@ -306,6 +308,19 @@ function handle_message(message, sender)
 
 	case 'rules':
 		return Rules.reload()
+
+	case 'set prepopulate':
+		return Promise.resolve(prepopulate_link = message.link);
+
+	case 'get prepopulate':
+		if (prepopulate_link)
+		{
+			let link = prepopulate_link;
+			prepopulate_link = undefined;
+			return Promise.resolve({link: link});
+		}
+		else
+			return Promise.reject({})
 
 	default:
 		return Promise.reject('Unexpected message: ' + String(message));
