@@ -179,8 +179,13 @@ function validate_item(list)
 {
 	let input_name = list !== 'rewrite' ? list + '_edit' : 'search_edit';
 	let input = document.querySelector('input[name="' + input_name + '"]');
+	let error_span = document.getElementById(input_name + '_error');
 
-	if (input.value && check_regexp(input.value, document.getElementById(input_name + '_error')))
+	if (!input.value)
+	{
+		error_span.innerText = 'Empty expression!';
+	}
+	else if (check_regexp(input.value, error_span))
 	{
 		let args = [input.value];
 		input.value = '';
@@ -199,6 +204,7 @@ function validate_item(list)
 
 		add_rule_item(list, ...args);
 		save_rule()
+		document.getElementById(list + '_editor').style.display = 'none';
 	}
 }
 
@@ -326,9 +332,9 @@ function save_rule()
 
 	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
 	if (replacing === null) {
-		Queue.add(async () => await Rules.add(rule));
+		Queue.add(() => Rules.add(rule));
 	} else {
-		Queue.add(async () => await Rules.update(replacing, rule));
+		Queue.add(() => Rules.update(replacing, rule));
 	}
 }
 
@@ -388,10 +394,20 @@ function populate_rules()
 			input.select();
 		}
 
+		input.addEventListener('keyup', e =>
+		{
+			if (e.key === 'Enter')
+			{
+				console.log('Enter')
+				e.stopPropagation();
+				e.preventDefault();
+				validate_item(list);
+			}
+		});
+
 		editor.querySelector('.ok').onclick = () =>
 		{
 			validate_item(list);
-			editor.style.display = 'none';
 		}
 		editor.querySelector('.cancel').onclick = () =>
 		{
