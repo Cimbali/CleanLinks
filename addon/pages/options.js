@@ -215,7 +215,7 @@ function name_rule(rule)
 
 	if (domain.startsWith('.'))
 		domain = domain.substring(1)
-	else if (domain !== '*')
+	else if (domain !== '*.*')
 		domain = '*.' + domain
 
 	if (!(path.startsWith('/')))
@@ -223,7 +223,7 @@ function name_rule(rule)
 	if (path === '/*')
 		path = ''
 
-	return domain + rule.suffix + path;
+	return domain + path;
 }
 
 
@@ -236,7 +236,6 @@ function load_rule()
 	if (document.getElementById('rule_selector').selectedIndex === 0)
 	{
 		document.querySelector('input[name="domain"]').value = '';
-		document.querySelector('input[name="suffix"]').value = '';
 		document.querySelector('input[name="path"]').value = '';
 		document.querySelector('input[name="subdomains"]').checked = true;
 		document.querySelector('input[name="whitelist_path"]').checked = false;
@@ -249,7 +248,6 @@ function load_rule()
 	const subdomains = !rule.domain.startsWith('.')
 	document.querySelector('input[name="domain"]').value = rule.domain.substring(subdomains ? 0 : 1)
 	document.querySelector('input[name="subdomains"]').checked = subdomains;
-	document.querySelector('input[name="suffix"]').value = rule.suffix.substring(1)
 	document.querySelector('input[name="path"]').value = rule.path === '/*' ? '' : rule.path;
 	document.querySelector('input[name="whitelist_path"]').checked = rule.whitelist_path
 
@@ -302,8 +300,7 @@ function save_rule()
 	let selected_opt = select[select.selectedIndex];
 
 	let rule = Object.assign(JSON.parse(selected_opt.value), {
-		domain: '.' + (document.querySelector('input[name="domain"]').value || '*'),
-		suffix: '.' + (document.querySelector('input[name="suffix"]').value || '*'),
+		domain: '.' + (document.querySelector('input[name="domain"]').value || '*.*'),
 		path: document.querySelector('input[name="path"]').value || '/*',
 		whitelist_path: document.querySelector('input[name="whitelist_path"]').checked,
 	});
@@ -372,10 +369,8 @@ function reset_rules()
 function prepopulate_rule(link)
 {
 	let url = new URL(link)
-	let [suffix, domain] = split_suffix(url);
 	document.getElementById('rule_selector').selectedIndex = 0;
-	document.querySelector('input[name="domain"]').value = domain;
-	document.querySelector('input[name="suffix"]').value = suffix;
+	document.querySelector('input[name="domain"]').value = url.hostname;
 	document.querySelector('input[name="path"]').value = url.pathname;
 }
 

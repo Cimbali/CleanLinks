@@ -316,7 +316,7 @@ function populate_popup()
 			let selected = document.querySelector('#history p.selected');
 			let actions = JSON.parse(selected.getAttribute('actions'));
 			let url = new URL(selected.querySelector('.original').getAttribute('raw-url'));
-			let [suffix, domain] = split_suffix(url);
+			let [suffix, domain] = split_suffix(url.hostname);
 
 			Rules.add({suffix, domain, path: '^' + url.pathname + '$', ...actions}).then(() =>
 				browser.runtime.sendMessage({action: 'rules'})

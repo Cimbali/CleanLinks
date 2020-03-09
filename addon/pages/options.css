@@ -78,11 +78,6 @@ input[type=number] {
 input[type=text], textarea {
 	width: 100%;
 }
-#domain_edit, label[for=domain_edit] {
-	display: inline-block;
-	width: calc(70% - 2ch);
-	margin-right: .5ch;
-}
 p.replace_editor > label {
 	display: inline-block;
 	width: calc(50% - 2ch - 2.5em);

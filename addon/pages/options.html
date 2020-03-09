@@ -65,15 +65,15 @@
 				</span>
 			</legend>
 
-			<p><label for="domain_edit">Domain</label><label for="suffix_edit">Suffix</label><br />
-				<input type="text" name="domain" id="domain_edit" value="" />.<input type="text" name="suffix" id="suffix_edit" value="" />
-			</p>
+			<label><span>Domain</span><br />
+				<input type="text" name="domain" id="domain_edit" value="" placeholder="subdomain.domain.suffix" />
+			</label>
 			<label><span>Match subdomains</span>
 				<input type="checkbox" name="subdomains" checked="checked" />
 			</label>
 			<label><span>Path</span>
 				<span class="parsing_error" id="path_error"></span>
-				<br /><input type="text" name="path" value="" />
+				<br /><input type="text" name="path" value="" placeholder="/path/in/link" />
 			</label>
 		</fieldset>
 

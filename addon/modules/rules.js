@@ -52,11 +52,14 @@ function recursive_find(rules, domain_bits, path)
 }
 
 
-function split_suffix(url)
+function split_suffix(hostname)
 {
+	if (hostname === '' || hostname === '*')
+		return ['.*', '*']
+
 	// use public domain instead of TLD
-	let suffix = '.' + PublicSuffixList.get_public_suffix(url.hostname);
-	let domain = url.hostname.substring(0, url.hostname.length - suffix.length)
+	let suffix = hostname.endsWith('.*') ? '.*' : ('.' + PublicSuffixList.get_public_suffix(hostname));
+	let domain = hostname.substring(0, hostname.length - suffix.length)
 
 	return [suffix, domain];
 }
@@ -64,7 +67,7 @@ function split_suffix(url)
 
 function find_rules(url, all_rules)
 {
-	let [suffix, domain] = split_suffix(url);
+	let [suffix, domain] = split_suffix(url.hostname);
 	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '');
 
 	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
@@ -100,9 +103,8 @@ function unserialize_rule(serialized_rule)
 			actions[key] = serialized_rule[key];
 
 	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
-	let pos = [serialized_rule.suffix], subdom = serialized_rule.domain.startsWith('.');
-
-	pos.push(...serialized_rule.domain.split('.').reverse().map(d => '.' + d))
+	let [suffix, domain] = split_suffix(serialized_rule.domain), subdom = serialized_rule.domain.startsWith('.');
+	let pos = [suffix].concat(domain.split('.').reverse().map(d => '.' + d));
 
 	if (subdom)
 		pos.push('.')
@@ -117,16 +119,19 @@ function unserialize_rule(serialized_rule)
 function serialize_rules(rules, serialized_rule)
 {
 	if (serialized_rule === undefined)
-		serialized_rule = {inherited: {...default_actions}}
+		serialized_rule = {domain: [], inherited: {...default_actions}}
 
 	let list = []
 
 	if ('actions' in rules)
 	{
 		let obj = {...serialized_rule, ...rules.actions};
-		if (!('suffix' in obj)) obj.suffix = '.*'
-		if (!('domain' in obj)) obj.domain = '.*'
-		else obj.domain = obj.domain.substr(1) // remove leading .
+		if (serialized_rule.domain.length === 0)
+			obj.domain = '*.*';
+		else if (serialized_rule.domain.length === 1)
+			obj.domain = '*' + serialized_rule.domain[0];
+		else
+			obj.domain = serialized_rule.domain.join('').substr(1) // remove leding .
 		if (!('path' in obj)) obj.path = '/*'
 		list.push(obj)
 
@@ -143,10 +148,8 @@ function serialize_rules(rules, serialized_rule)
 
 	for (let [key, value] of Object.entries(rules))
 	{
-		if (key[0] === '.' && serialized_rule.suffix === undefined)
-			list.push(...serialize_rules(value, {...serialized_rule, suffix: key}))
-		else if (key[0] === '.')
-			list.push(...serialize_rules(value, {...serialized_rule, domain: key + ('domain' in serialized_rule ? serialized_rule.domain : '')}))
+		if (key[0] === '.')
+			list.push(...serialize_rules(value, {...serialized_rule, domain: [key].concat(serialized_rule.domain)}))
 		else if (key[0] === '/')
 			list.push(...serialize_rules(value, {...serialized_rule, path: key}))
 		else if (key !== 'actions')
@@ -236,10 +239,7 @@ function make_domain_importer(promise)
 		let actions = {whitelist: ['.*'], whitelist_path: true};
 
 		for (let fqdn of domains_list)
-		{
-			let [suffix, domain] = split_suffix(new URL('https://' + fqdn + '/'));
-			Rules.add({suffix: suffix, domain: domain, ...actions})
-		}
+			Rules.add({domain: fqdn, ...actions})
 
 		return save_rules(rules);
 	});
