@@ -213,7 +213,8 @@ function handle_message(message, sender)
 		log('Adding to one-time whitelist ' + message.link);
 		temporary_whitelist.push(message.link);
 
-		return Promise.resolve(null);;
+		// then continue to open URL
+		message.target = same_tab;
 
 	case 'open url':
 		if (message.target == new_window)
@@ -226,22 +227,6 @@ function handle_message(message, sender)
 		}
 		else
 			return browser.tabs.update(tab_id, { url: message.link });
-
-	case 'whitelist':
-		let non_tab_history = cleaned_per_tab.get(browser.tabs.TAB_ID_NONE).history, entry;
-		if (message.item >= non_tab_history.length)
-			entry = cleaned_per_tab.get(tab_id).history.splice(message.item - non_tab_history.length, 1)[0];
-		else
-			entry = non_tab_history.splice(message.item, 1)[0];
-
-		let host = (new URL(entry.orig)).host;
-		if (Prefs.values.skipdoms.indexOf(host) === -1)
-		{
-			Prefs.values.skipdoms.push(host);
-			return browser.storage.local.set({configuration: Prefs.serialize()()})
-		}
-		else
-			return Promise.resolve(null)
 
 	case 'clearlist':
 		cleaned_per_tab.clear(tab_id);
@@ -320,7 +305,7 @@ function handle_message(message, sender)
 			return Promise.resolve({link: link});
 		}
 		else
-			return Promise.reject({})
+			return Promise.resolve({})
 
 	default:
 		return Promise.reject('Unexpected message: ' + String(message));

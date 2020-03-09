@@ -181,7 +181,7 @@ function decode_embedded_uri(link, rules, original_string)
 						embedded_link.origin);
 	}
 	else
-		console.log('raw url:', raw_url)
+		log('raw url:', raw_url)
 
 	// The URL is incorrectly encoded: either fully or partially unencoded.
 	// embedded_link:  contains the embedded URL assuming it is partially encoded, i.e. & and = encoded but : and / not
@@ -265,9 +265,6 @@ function clean_link(orig_link, base)
 	let link = new URL(orig_link, base)
 
 	let rules = Rules.find(link)
-
-	console.log(link.href)
-	console.log('Rules found', rules)
 
 	// first remove parameters or rewrite
 	link = filter_params_and_path(link, rules);

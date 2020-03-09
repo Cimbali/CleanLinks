@@ -71,7 +71,7 @@ function extract_javascript_link(text_link, base_url)
 	if (!cleaned_link)
 		return null;
 
-	console.log('matched javascript link: ' + cleaned_link)
+	log('matched javascript link: ' + cleaned_link)
 	try
 	{
 		let url = new URL(cleaned_link, base_url)

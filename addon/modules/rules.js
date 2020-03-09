@@ -150,7 +150,7 @@ function serialize_rules(rules, serialized_rule)
 		else if (key[0] === '/')
 			list.push(...serialize_rules(value, {...serialized_rule, path: key}))
 		else if (key !== 'actions')
-			console.error('Unexpected key while serializing rules', key)
+			console.error('Unexpected key while serializing rules:', key, '=>', value)
 	}
 
 	return list

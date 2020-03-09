@@ -22,9 +22,11 @@ function set_selected(evt)
 	while (target && target.tagName !== 'P')
 		target = target.parentNode;
 
-	if (target) target.classList.add('selected');
+	if (target)
+		target.classList.add('selected');
+
 	document.querySelector('#openonce').disabled = !target;
-	document.querySelector('#whitelist').disabled = !target;
+	document.querySelector('#whitelist').disabled = !target || !target.hasAttribute('actions');
 	document.querySelector('#open_editor').disabled = !target;
 }
 
@@ -81,7 +83,6 @@ function add_option(orig, clean, classes)
 	var history = document.querySelector('#history');
 	let option = document.createElement('p');
 
-	option.setAttribute('value', '' + history.querySelectorAll('p').length);
 	option.setAttribute('title', '');
 	option.classList.add(...classes);
 	option.onclick = set_selected
@@ -95,6 +96,7 @@ function add_option(orig, clean, classes)
 	option.appendChild(origin_node);
 
 	let rules = Rules.find(orig);
+	let actions_to_whitelist = {};
 
 	append_decorated(option, orig.origin)
 
@@ -191,6 +193,7 @@ function add_option(orig, clean, classes)
 			let span = document.createElement('span');
 			span.classList.add(css_classes['embedded']);
 			embed_range.surroundContents(span);
+			actions_to_whitelist.whitelist_path = true;
 		}
 	}
 	else
@@ -202,6 +205,7 @@ function add_option(orig, clean, classes)
 			append_decorated(option, orig.pathname.substring(0, match_start))
 			append_decorated(option, orig.pathname.substring(match_start, match_end), 'embedded')
 			append_decorated(option, orig.pathname.substring(match_end))
+			actions_to_whitelist.whitelist_path = true;
 		}
 		else
 			append_decorated(option, orig.pathname)
@@ -229,6 +233,10 @@ function add_option(orig, clean, classes)
 			append_decorated(option, keyval.substring(0, embed_start))
 			append_decorated(option, keyval.substring(embed_start, embed_end), 'embedded')
 			append_decorated(option, keyval.substring(embed_end))
+
+			if (!('whitelist' in actions_to_whitelist))
+				actions_to_whitelist.whitelist = []
+			actions_to_whitelist.whitelist.push(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
 		}
 		else
 			append_decorated(option, keyval, decorate)
@@ -241,6 +249,12 @@ function add_option(orig, clean, classes)
 
 	option.setAttribute('title', option.getAttribute('title') + '\n-> ' + clean.href);
 	clean_node.append(document.createTextNode(clean.href))
+
+	if (Object.entries(actions_to_whitelist).length !== 0)
+	{
+		option.setAttribute('actions', JSON.stringify(actions_to_whitelist));
+		console.log(actions_to_whitelist)
+	}
 
 	history.appendChild(option);
 }
@@ -299,12 +313,14 @@ function populate_popup()
 
 		document.querySelector('#whitelist').onclick = () =>
 		{
-			var selected = document.querySelector('#history p.selected');
-			var id = parseInt(selected.getAttribute('value'));
-			browser.runtime.sendMessage({action: 'whitelist', item: id, tab_id: tab_id});
-			// remove selected element, and renumber remaining ones (should be in sendMessage.then())
-			selected.remove();
-			document.querySelectorAll('#history p').forEach((opt, idx) => { opt.setAttribute('value', '' + idx) });
+			let selected = document.querySelector('#history p.selected');
+			let actions = JSON.parse(selected.getAttribute('actions'));
+			let url = new URL(selected.querySelector('.original').getAttribute('raw-url'));
+			let [suffix, domain] = split_suffix(url);
+
+			Rules.add({suffix, domain, path: '^' + url.pathname + '$', ...actions}).then(() =>
+				browser.runtime.sendMessage({action: 'rules'})
+			)
 		}
 
 		document.querySelector('#clearlist').onclick = () =>
@@ -319,7 +335,7 @@ function populate_popup()
 			var selected = document.querySelector('#history .selected');
 			if (selected)
 				browser.runtime.sendMessage({action: 'open bypass', tab_id: tab_id, target: same_tab,
-											 link: selected.childNodes[0].innerText});
+											 link: selected.querySelector('.original').getAttribute('raw-url')});
 		}
 	});
 

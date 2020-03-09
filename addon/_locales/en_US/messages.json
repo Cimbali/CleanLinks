@@ -40,7 +40,7 @@
 	"description": ""
 },
 "bootstrap_whitelist_button": {
-	"message": "Whitelist Selection",
+	"message": "Whitelist Embedded URL",
 	"description": ""
 },
 "bootstrap_clearlist_button": {

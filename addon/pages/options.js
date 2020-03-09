@@ -246,7 +246,6 @@ function load_rule()
 	}
 
 	let rule = JSON.parse(document.getElementById('rule_selector').value);
-	console.log(document.getElementById('rule_selector').value)
 	const subdomains = !rule.domain.startsWith('.')
 	document.querySelector('input[name="domain"]').value = rule.domain.substring(subdomains ? 0 : 1)
 	document.querySelector('input[name="subdomains"]').checked = subdomains;
@@ -370,6 +369,17 @@ function reset_rules()
 }
 
 
+function prepopulate_rule(link)
+{
+	let url = new URL(link)
+	let [suffix, domain] = split_suffix(url);
+	document.getElementById('rule_selector').selectedIndex = 0;
+	document.querySelector('input[name="domain"]').value = domain;
+	document.querySelector('input[name="suffix"]').value = suffix;
+	document.querySelector('input[name="path"]').value = url.pathname;
+}
+
+
 function populate_rules()
 {
 	let select = document.getElementById('rule_selector')
@@ -398,7 +408,6 @@ function populate_rules()
 		{
 			if (e.key === 'Enter')
 			{
-				console.log('Enter')
 				e.stopPropagation();
 				e.preventDefault();
 				validate_item(list);
@@ -438,6 +447,21 @@ function populate_rules()
 					e.preventDefault();
 					item.style.display = 'none';
 				}
+	});
+
+	browser.runtime.sendMessage({action: 'get prepopulate'}).then(answer =>
+	{
+		if ('link' in answer)
+			prepopulate_rule(answer.link)
+	})
+
+	browser.runtime.onMessage.addListener(message =>
+	{
+		if (message.action === 'set prepopulate')
+		{
+			prepopulate_rule(message.link);
+			return browser.runtime.sendMessage({action: 'get prepopulate'})
+		}
 	});
 }
 

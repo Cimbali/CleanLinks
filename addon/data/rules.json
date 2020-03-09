@@ -111,6 +111,15 @@
           }
         }
       },
+      ".consent": {
+        "/status": {
+          "actions": {
+            "whitelist": [
+              "continue"
+            ]
+          }
+        }
+      },
       ".translate": {
         "/translate.*": {
           "actions": {

@@ -623,8 +623,6 @@ const PublicSuffixList = {
 			const local_url = browser.runtime.getURL('/data/public_suffix_list.dat')
 			fetch(new Request(world_url)).then(populate).catch(err =>
 			{
-				console.error(err)
-				console.log('Trying: ' + local_url)
 				fetch(new Request(local_url)).then(populate)
 			});
 		}
@@ -638,7 +636,6 @@ const PublicSuffixList = {
 				if ('PSL' in data)
 				{
 					fromSelfie(data.PSL, Base64Encoder)
-					console.log('Done unserializing PSL')
 					done();
 				}
 				else
