@@ -342,6 +342,32 @@ function populate_popup()
 		window.close();
 	}
 
+	document.addEventListener('keyup', e =>
+	{
+		var selected = document.querySelector('#history .selected');
+		if (e.key === 'ArrowUp')
+		{
+			if (selected === null)
+				document.querySelector('#history').lastChild.click()
+			else if (selected.previousSibling)
+				selected.previousSibling.click()
+			document.querySelector('#history .selected').scrollIntoView(true)
+		}
+		else if (e.key === 'ArrowDown')
+		{
+			if (selected === null)
+				document.querySelector('#history').firstChild.click()
+			else if (selected.nextSibling)
+				selected.nextSibling.click()
+			document.querySelector('#history .selected').scrollIntoView(false)
+		}
+		else
+			return;
+
+		e.stopPropagation();
+		e.preventDefault();
+	});
+
 	document.addEventListener('copy', e =>
 	{
 		var selected = document.querySelector('#history .selected');
