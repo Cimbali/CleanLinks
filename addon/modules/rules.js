@@ -29,7 +29,7 @@ function recursive_find(rules, domain_bits, path)
 		let bit = domain_bits[0]
 
 		// wildcard domain match
-		if (bit !== '.' && '.*' in rules)
+		if (bit !== '.' && '.*' in rules)
 			matches.push(...recursive_find(rules['.*'], domain_bits.slice(1), path))
 
 		// normal (exact) domain match
@@ -45,7 +45,7 @@ function recursive_find(rules, domain_bits, path)
 		matches.push(...recursive_find(rules['/*'], []))
 
 	// normal (regexp) path match
-	let path_matches = Object.keys(rules).filter(key => key.startsWith('/') && key !== '/*')
+	let path_matches = Object.keys(rules).filter(key => key.startsWith('/') && key !== '/*')
 										 .filter(key => path.match(new RegExp(key)))
 
 	return path_matches.reduce((list, matching_key) => list.concat(recursive_find(rules[matching_key], [])), matches)
@@ -74,7 +74,7 @@ function merge_rule_actions(actions, add)
 		else if (Array.isArray(action))
 			actions[key].push(...action)
 		else if (typeof action === 'boolean')
-			actions[key] = actions[key] || action
+			actions[key] = actions[key] || action
 	}
 
 	return actions;
@@ -101,13 +101,13 @@ function unserialize_rule(serialized_rule)
 	let actions = {}
 	for (let [key, default_val] of Object.entries(default_actions))
 		if (serialized_rule.hasOwnProperty(key) && (
-			(Array.isArray(default_val) && serialized_rule[key].length !== 0) ||
-			(typeof default_val === 'boolean' && default_val !== serialized_rule[key])
+			(Array.isArray(default_val) && serialized_rule[key].length !== 0) ||
+			(typeof default_val === 'boolean' && default_val !== serialized_rule[key])
 		))
 			actions[key] = serialized_rule[key];
 
 	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
-	let [suffix, domain] = split_suffix(serialized_rule.domain), subdom = serialized_rule.domain.startsWith('.');
+	let [suffix, domain] = split_suffix(serialized_rule.domain), subdom = serialized_rule.domain.startsWith('.');
 	let pos = [suffix].concat(domain.split('.').reverse().map(d => '.' + d));
 
 	if (subdom)
@@ -214,13 +214,13 @@ function pop_rule(all_rules, serialized_rule)
 
 function push_rule(all_rules, serialized_rule)
 {
-	let {keys, actions} = unserialize_rule(serialized_rule)
+	let [keys, actions] = unserialize_rule(serialized_rule)
 
 	let node = all_rules;
 	for (let key of keys)
 	{
 		if (!(key in node))
-			node[key] = {}
+			node[key] = {}
 
 		node = node[key]
 	}

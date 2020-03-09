@@ -168,7 +168,7 @@ function decode_embedded_uri(link, rules, original_string)
 	let raw_url = find_raw_embedded_link(original_string.slice(link.origin.length), embedded_link,
 										 capture.startsWith(embedded_link.protocol))
 
-	// No unencoded occurrence of the embedded URL in the parent URL: encoding was done correctly. 99% of the cases here.
+	// No unencoded occurrence of the embedded URL in the parent URL: encoding was done correctly. 99% of the cases here.
 	if (raw_url === null)
 	{
 		// Trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
@@ -197,7 +197,7 @@ function decode_embedded_uri(link, rules, original_string)
 	if (semi_encoded)
 		return embedded_link;
 
-	// => Otherwise, use "raw_url" as the URL string. Use some heuristics on & and ? to remove garbage from the result.
+	// => Otherwise, use "raw_url" as the URL string. Use some heuristics on & and ? to remove garbage from the result.
 	log('using raw URL: ' + raw_url)
 	var qmark_pos = raw_url.indexOf('?')
 	var qmark_end = raw_url.lastIndexOf('?')
@@ -220,7 +220,7 @@ function filter_params_and_path(link, rules)
 			link.pathname = link.pathname.replace(new RegExp(search, flags), replace)
 	}
 
-	if ('remove' in rules && rules.remove.length && link.search.length > 1)
+	if ('remove' in rules && rules.remove.length && link.search.length > 1)
 	{
 		let params = new URLSearchParams(link.search.slice(1));
 		let strip = new RegExp('^(' + rules.remove.join('|') + ')$');

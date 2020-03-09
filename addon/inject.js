@@ -122,7 +122,7 @@ function on_click(evt)
 
 	var cleaned_link = extract_javascript_link(text_link, window.location);
 
-	if (!cleaned_link || cleaned_link === text_link)
+	if (!cleaned_link || cleaned_link === text_link)
 		return;
 
 	log('Cleaning ' + text_link + ' to ' + cleaned_link)
