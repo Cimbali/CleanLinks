@@ -65,28 +65,32 @@ function split_suffix(hostname)
 }
 
 
+function merge_rule_actions(actions, add)
+{
+	for (let [key, action] of Object.entries(add))
+	{
+		if (!(key in actions))
+			actions[key] = Array.isArray(action) ? [...action] : action;
+		else if (Array.isArray(action))
+			actions[key].push(...action)
+		else if (typeof action === 'boolean')
+			actions[key] = actions[key] || action
+	}
+
+	return actions;
+}
+
+
 function find_rules(url, all_rules)
 {
 	let [suffix, domain] = split_suffix(url.hostname);
 	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '');
 
 	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
-	for (let [key, action] of Object.entries(default_actions))
-	{
-		if (Array.isArray(action))
-			aggregated[key] = [...action]
-		else if (typeof action === 'boolean')
-			aggregated[key] = action
-	}
 
+	merge_rule_actions(aggregated, default_actions)
 	for (let actions of action_list)
-		for (let [key, action] of Object.entries(actions))
-		{
-			if (Array.isArray(action))
-				aggregated[key].push(...action)
-			else if (typeof action === 'boolean')
-				aggregated[key] = aggregated[key] || action
-		}
+		merge_rule_actions(aggregated, actions)
 
 	return aggregated;
 }
@@ -112,14 +116,14 @@ function unserialize_rule(serialized_rule)
 	if ('path' in serialized_rule && serialized_rule.path !== '/*')
 		pos.push(serialized_rule.path)
 
-	return {keys: pos, actions: actions}
+	return [pos, actions];
 }
 
 
 function serialize_rules(rules, serialized_rule)
 {
 	if (serialized_rule === undefined)
-		serialized_rule = {domain: [], inherited: {...default_actions}}
+		serialized_rule = {domain: [], inherited: {...default_actions}, parents: []}
 
 	let list = []
 
@@ -144,6 +148,7 @@ function serialize_rules(rules, serialized_rule)
 			else if (typeof value === 'boolean')
 				serialized_rule.inherited[key] = serialized_rule.inherited[key] || value
 		}
+		serialized_rule.parents = [obj].concat(serialized_rule.parents)
 	}
 
 	for (let [key, value] of Object.entries(rules))
@@ -162,7 +167,7 @@ function serialize_rules(rules, serialized_rule)
 
 function pop_rule(all_rules, serialized_rule)
 {
-	let {keys, actions} = unserialize_rule(serialized_rule)
+	let [keys, expected_actions] = unserialize_rule(serialized_rule)
 
 	let node = all_rules, stack = [];
 	for (let key of keys)
@@ -176,7 +181,22 @@ function pop_rule(all_rules, serialized_rule)
 		}
 	}
 
-	delete node.actions
+	let found_actions = {...node.actions}
+
+	for (let [action, value] in Object.entries(expected_actions))
+	{
+		if (!(action in found_actions))
+			continue;
+		else if (Array.isArray(value))
+			found_actions[action] = found_actions[action].filter(x => !value.contains(x));
+		else if (typeof value === 'boolean')
+		{
+			if (value === found_actions[action])
+				delete found_actions[action];
+		}
+	}
+
+	delete node.actions;
 
 	while (stack.length !== 0)
 	{
@@ -187,6 +207,8 @@ function pop_rule(all_rules, serialized_rule)
 		else
 			break
 	}
+
+	return found_actions;
 }
 
 
@@ -203,7 +225,10 @@ function push_rule(all_rules, serialized_rule)
 		node = node[key]
 	}
 
-	node.actions = actions
+	if (!('actions' in node))
+		node.actions = {...actions}
+	else
+		node.actions = merge_rule_actions(node.actions, actions)
 }
 
 
@@ -282,7 +307,8 @@ let Rules = {
 		return save_rules(this.all_rules)
 	},
 	update: (old_rule, new_rule) => {
-		pop_rule(this.all_rules, old_rule)
+		let found = pop_rule(this.all_rules, old_rule)
+		merge_rule_actions(new_rule, found)
 		push_rule(this.all_rules, new_rule)
 		return save_rules(this.all_rules)
 	},

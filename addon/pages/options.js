@@ -382,6 +382,7 @@ function populate_rules()
 	{
 		let opt = select.appendChild(new Option(name_rule(rule), JSON.stringify({...default_actions, ...rule})))
 		opt.setAttribute('orig-value', opt.getAttribute('value'))
+		opt.setAttribute('parents', rule.parents.map(name_rule).join(', '));
 	}
 	select[0].value = JSON.stringify(default_actions)
 	select.onchange = load_rule
