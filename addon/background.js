@@ -47,6 +47,10 @@ const get_browser_version = (async () => await browser.runtime.getBrowserInfo())
 
 const disabled_tabs = []
 
+disabled_tabs.is_enabled = tab => disabled_tabs.indexOf(tab) === -1
+disabled_tabs.is_disabled = tab => disabled_tabs.indexOf(tab) !== -1
+disabled_tabs.remove = tab => disabled_tabs.splice(disabled_tabs.indexOf(tab), 1)
+
 // Links that are whitelisted just once (rudimentary)
 const temporary_whitelist = []
 
@@ -61,7 +65,7 @@ function clean_redirect_headers(details)
 	if (!loc || !loc.value)
 		return {};
 
-	if (disabled_tabs.indexOf(details.tabId) !== -1)
+	if (disabled_tabs.is_disabled(details.tabId))
 		return {}
 
 	let dest = new URL(loc.value, details.url).href, clean_dest = clean_link(dest, details.url);
@@ -100,7 +104,7 @@ function on_request(details)
 		return {};
 	}
 
-	else if (disabled_tabs.indexOf(details.tabId) !== -1)
+	else if (disabled_tabs.is_disabled(details.tabId))
 	{
 		log('Disabled CleanLinks for tab ' + details.tabId);
 		return {}
@@ -191,7 +195,7 @@ function handle_message(message, sender)
 		return Promise.resolve(cleaned_per_tab.get_history(tab_id));
 
 	case 'check tab enabled':
-		return Promise.resolve({enabled: disabled_tabs.indexOf(tab_id) === -1});
+		return Promise.resolve({enabled: disabled_tabs.is_enabled(tab_id)});
 
 	case 'notify':
 		if (Prefs.values.cltrack)
@@ -233,19 +237,18 @@ function handle_message(message, sender)
 		return Promise.resolve(null);
 
 	case 'toggle':
-		let pos = disabled_tabs.indexOf(tab_id);
-		if (pos === -1)
+		if (disabled_tabs.is_enabled(tab_id))
 		{
 			disabled_tabs.push(tab_id)
 			update_icon(icon_disabled, tab_id);
 		}
 		else
 		{
-			disabled_tabs.splice(pos, 1)
+			disabled_tabs.remove(tab_id)
 			update_icon(icon_default, tab_id);
 		}
 
-		return browser.tabs.sendMessage(tab_id, {action: 'toggle', enabled: pos === -1}).catch(() => {})
+		return browser.tabs.sendMessage(tab_id, {action: 'toggle', enabled: disabled_tabs.is_enabled(tab_id)}).catch(() => {})
 
 	case 'options':
 		let old_pref_values = {...Prefs.values};
@@ -351,6 +354,7 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 	// Auto update badge text for pages when loading is complete
 	browser.tabs.onUpdated.addListener((id, change_info, tab) =>
 	{
+		update_icon(disabled_tabs.is_disabled(id) ? icon_disabled : icon_default, id);
 		if (cleaned_per_tab.get_count(tab.id))
 			browser.browserAction.setBadgeText({tabId: id, text: '' + cleaned_per_tab.get_count(tab.id)});
 	});
@@ -358,8 +362,7 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 	browser.tabs.onRemoved.addListener((id, remove_info) =>
 	{
 		cleaned_per_tab.clear(id);
-		let pos = disabled_tabs.indexOf(id);
-		if (pos !== -1)
-			disabled_tabs.splice(pos, 1)
+		if (disabled_tabs.is_disabled(id))
+			disabled_tabs.remove(id);
 	});
 });
