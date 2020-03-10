@@ -202,10 +202,9 @@ function add_option(orig, clean, classes)
 	}
 	else
 	{
-		let embed_pos = embed_url_pos(orig.pathname, clean);
-		if (embed_pos)
+		let [match_start, match_end] = embed_url_pos(orig.pathname, clean);
+		if (match_start !== undefined && match_end !== undefined)
 		{
-			let [match_start, match_end] = embed_pos
 			append_decorated(option, orig.pathname.substring(0, match_start))
 			append_decorated(option, orig.pathname.substring(match_start, match_end), 'embedded')
 			append_decorated(option, orig.pathname.substring(match_end))
@@ -261,11 +260,12 @@ function add_option(orig, clean, classes)
 }
 
 
-function filter_from_input(input)
+function filter_from_input(evt)
 {
-	var opts = Array.from(document.querySelectorAll('#history p.' + input.name));
-	var displ = input.checked ? 'block' : 'none';
-	opts.forEach(opt => opt.style.display = displ);
+	let display_value = evt.target.checked ? 'block' : 'none';
+
+	for (let opt of document.getElementById('history').getElementsByClassName(evt.target.name))
+		opt.style.display = display_value;
 }
 
 
@@ -289,14 +289,22 @@ function populate_popup()
 
 		browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
 		{
-			response.forEach(clean => add_option(clean.orig, clean.url,
-												'dropped' in clean ? ['dropped', clean.type] : [clean.type]));
-
-			Array.from(document.querySelectorAll('#filters input')).forEach(input =>
+			for (let clean of response)
 			{
-				filter_from_input(input);
-				input.onchange = () => filter_from_input(input)
-			});
+				let classes = [clean.type];
+				if ('dropped' in clean)
+					classes.push('dropped')
+				else if (clean.type === 'promoted')
+					classes.push('clicked')
+
+				add_option(clean.orig, clean.url, classes);
+			}
+
+			for (input of document.querySelectorAll('#filters input'))
+			{
+				input.onchange = filter_from_input
+				input.dispatchEvent(new Event('change'))
+			}
 
 			document.querySelector('button#clearlist').disabled = response.length === 0;
 		});

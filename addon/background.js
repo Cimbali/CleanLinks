@@ -137,15 +137,14 @@ function on_request(details)
 
 
 	let cleaning_notif = { action: 'notify', url: clean_dest, orig: dest, tab_id: details.tabId };
-	if (details.type !== 'main_frame')
-	{
-		// Google opens some-tab redirects in an iframe in the current document, so simple redirection is not enough.
-		// We need to cancel this request and direct the current tab to the cleaned destination URL.
-		if (dest.match(/^https:\/\/www.google.[a-z.]+\/url\?/))
-			cleaning_notif.type = 'promoted';
-		else
-			cleaning_notif.type = 'request';
-	}
+	if (details.type === 'main_frame')
+		cleaning_notif.type = 'clicked';
+	// Google opens some-tab redirects in an iframe in the current document, so simple redirection is not enough.
+	// We need to cancel this request and direct the current tab to the cleaned destination URL.
+	else if (dest.match(/^https:\/\/www.google.[a-z.]+\/url\?/))
+		cleaning_notif.type = 'promoted';
+	else
+		cleaning_notif.type = 'request';
 
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (contains_parent_url && details.type != 'main_frame')
