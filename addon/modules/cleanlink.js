@@ -204,9 +204,9 @@ function decode_embedded_uri(link, rules, original_string)
 
 	// => Otherwise, use "raw_url" as the URL string. Use some heuristics on & and ? to remove garbage from the result.
 	log('using raw URL: ' + raw_url)
-	var qmark_pos = raw_url.indexOf('?')
-	var qmark_end = raw_url.lastIndexOf('?')
-	var amp_pos = raw_url.indexOf('&')
+	let qmark_pos = raw_url.indexOf('?')
+	let qmark_end = raw_url.lastIndexOf('?')
+	let amp_pos = raw_url.indexOf('&')
 
 	if (amp_pos >= 0 && qmark_pos < 0)
 		raw_url = raw_url.slice(0, amp_pos)

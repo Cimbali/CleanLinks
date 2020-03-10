@@ -16,9 +16,7 @@
 
 const Queue = {
 	chain: Promise.resolve(),
-	add: function(async_callable) {
-		this.chain = this.chain.then(async_callable)
-	}
+	add: callable => { this.chain = this.chain.then(callable); }
 };
 
 
@@ -38,7 +36,7 @@ function check_regexp(expr, error_span)
 	}
 	catch (e)
 	{
-		error_span.innerText = 'Error parsing RegExp: ' + e.message;
+		error_span.innerText = _('browser_regex_err') + ' ' + e.message;
 		return false;
 	}
 }
@@ -183,7 +181,7 @@ function validate_item(list)
 
 	if (!input.value)
 	{
-		error_span.innerText = 'Empty expression!';
+		error_span.innerText = _('browser_regex_missing');
 	}
 	else if (check_regexp(input.value, error_span))
 	{
@@ -299,7 +297,8 @@ function save_rule()
 	let select = document.getElementById('rule_selector');
 	let selected_opt = select[select.selectedIndex];
 
-	let rule = Object.assign(JSON.parse(selected_opt.value), {
+	let rule = Object.assign(JSON.parse(selected_opt.value),
+	{
 		domain: '.' + (document.querySelector('input[name="domain"]').value || '*.*'),
 		path: document.querySelector('input[name="path"]').value || '/*',
 		whitelist_path: document.querySelector('input[name="whitelist_path"]').checked,
@@ -314,10 +313,13 @@ function save_rule()
 
 	// Perform the update operation immediately in the DOM
 	let replacing = null;
-	if (select.selectedIndex === 0) {
+	if (select.selectedIndex === 0)
+	{
 		select[0].value = JSON.stringify(default_actions)
 		selected_opt = select.appendChild(new Option(name_rule(rule), JSON.stringify(rule), false, true))
-	} else {
+	}
+	else
+	{
 		replacing = JSON.parse(selected_opt.getAttribute('orig-value'));
 		selected_opt.replaceChild(document.createTextNode(name_rule(rule)), selected_opt.firstChild);
 	}
@@ -327,11 +329,10 @@ function save_rule()
 	selected_opt.setAttribute('orig-value', rule_str);
 
 	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
-	if (replacing === null) {
+	if (replacing === null)
 		Queue.add(() => Rules.add(rule));
-	} else {
+	else
 		Queue.add(() => Rules.update(replacing, rule));
-	}
 }
 
 
