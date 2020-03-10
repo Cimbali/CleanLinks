@@ -38,7 +38,7 @@ function check_regexp(expr, error_span)
 	}
 	catch (e)
 	{
-		error_span.innerText = _('browser_regex_err') + ' ' + e.message;
+		error_span.innerText = _('Error Processing Regular expression:') + ' ' + e.message;
 		return false;
 	}
 }
@@ -199,7 +199,7 @@ function validate_item(list)
 
 	if (!input.value)
 	{
-		error_span.innerText = _('browser_regex_missing');
+		error_span.innerText = _('Empty expression!');
 	}
 	else if (check_regexp(input.value, error_span))
 	{
@@ -348,7 +348,7 @@ function rule_changed()
 	let same_node = orig_rule && (orig_rule.domain || '*.*') === rule.domain && (orig_rule.path || '') === rule.path;
 
 	if (!same_node && Rules.exists(rule))
-		document.getElementById('rule_error').innerText = _('rule_collision', name_rule(rule));
+		document.getElementById('rule_error').innerText = _('Rule $RULE_NAME$ already exists', name_rule(rule));
 	else
 		document.getElementById('rule_error').innerText = '';
 

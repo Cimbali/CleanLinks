@@ -14,7 +14,7 @@
 
 'use strict'
 
-const _ = browser.i18n.getMessage
+const _ = (...args) => browser.i18n.getMessage(...args) || args[0]
 const attr_cleaned_count = 'data-cleanedlinks';
 const attr_cleaned_link = 'data-cleanedlink';
 

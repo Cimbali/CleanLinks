@@ -1,102 +1,77 @@
 {
-"addon_description": {
-	"message": "將加密/內嵌鏈接還原為直接鏈接。",
-	"description": ""
-},
-"browser_cleanedlinks": {
-	"message": "已處理鏈接數：",
-	"description": ""
-},
-"browser_regex_err": {
-	"message": "處理規則時遇到錯誤：",
-	"description": ""
-},
-"popup_enabled_tab": {
-	"message": "已啟用",
-	"description": ""
-},
-"popup_disabled_tab": {
-	"message": "已禁用",
-	"description": ""
-},
-"popup_whitelist_button": {
-	"message": "添加到白名單",
-	"description": ""
-},
-"popup_whitelist_description": {
-	"message": "此列表顯示了本次瀏覽器會話中已處理的鏈接和它們的原始鏈接，您可以方便地將某個域名添加到白名單中。請注意白名單會對整個域名生效，因此有時您可能需要找到鏈接的模式並將它們添加到“忽略鏈接規則”選項中。",
-	"description": ""
-},
-"highlight_title": {
-	"message": "高亮已處理鏈接",
-	"description": ""
-},
-"hlstyle_emptytext": {
-	"message": "例如：background:rgba(252,252,0,0.7); color: #000",
-	"description": ""
-},
-"hlstyle_title": {
-	"message": "高亮樣式",
-	"description": ""
-},
-"hlstyle_content": {
-	"message": "本樣式將被應用到經過處理的鏈接標籤上",
-	"description": ""
-},
-"cbc_title": {
-	"message": "接管複製鏈接地址菜單",
-	"description": ""
-},
-"cbc_tooltip": {
-	"message": "使用自定義的 cmd_copyLink 控制器接管 複製鏈接地址 右鍵菜單，將經過處理的鏈接複製到剪貼板。 ",
-	"description": ""
-},
-"progltr_title": {
-	"message": "使用跳轉監聽器",
-	"description": ""
-},
-"progltr_tooltip": {
-	"message": "使用 HTTP 監聽器捕捉 3xx 跳轉。例如將短鏈接還原成長鏈接。",
-	"description": ""
-},
-"gotarget_title": {
-	"message": "遵守 target 屬性",
-	"description": ""
-},
-"gotarget_tooltip": {
-	"message": "是否檢查並遵守鏈接的 target 屬性。",
-	"description": ""
-},
-"reset_tooltip": {
-	"message": "還原所有設定到默認值",
-	"description": ""
-},
-"reset_options": {
-	"message": "重置設定",
-	"description": ""
-},
-"ignhttp_title": {
-	"message": "忽略非 HTTP(s) 協議鏈接",
-	"description": ""
-},
-"ignhttp_tooltip": {
-	"message": "此選項將使本附加元件忽略所有非 HTTP/HTTPS 協議的鏈接。",
-	"description": ""
-},
-"textcl_title": {
-	"message": "轉換文本鏈接",
-	"description": ""
-},
-"textcl_tooltip": {
-	"message": "將文本狀態的鏈接轉換成可直接點擊的鏈接。需要事件委託模式。",
-	"description": ""
-},
-"cltrack_title": {
-	"message": "追踪鏈接",
-	"description": ""
-},
-"cltrack_tooltip": {
-	"message": "將會記錄所有經過處理的鏈接，可以在工具欄按鈕上右鍵以快速將域名添加到白名單。",
-	"description": ""
-}
+  "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
+    "message": "將文本狀態的鏈接轉換成可直接點擊的鏈接。需要事件委託模式。"
+  },
+  "Apply this CSS Style to cleaned links.": {
+    "message": "本樣式將被應用到經過處理的鏈接標籤上"
+  },
+  "Catch Text Links": {
+    "message": "轉換文本鏈接"
+  },
+  "Cleaned Links:": {
+    "message": "已處理鏈接數："
+  },
+  "Copy clean links from the context menu": {
+    "message": "接管複製鏈接地址菜單"
+  },
+  "Disabled": {
+    "message": "已禁用"
+  },
+  "E.g. background:rgba(252,252,0,0.7); color: #000": {
+    "message": "例如：background:rgba(252,252,0,0.7); color: #000"
+  },
+  "Enabled": {
+    "message": "已啟用"
+  },
+  "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.": {
+    "message": "將會記錄所有經過處理的鏈接，可以在工具欄按鈕上右鍵以快速將域名添加到白名單。"
+  },
+  "Error Processing Regular expression:": {
+    "message": "處理規則時遇到錯誤："
+  },
+  "Follow Target Attribute?": {
+    "message": "遵守 target 屬性"
+  },
+  "Highlight Cleaned Links?": {
+    "message": "高亮已處理鏈接"
+  },
+  "Highlight Style": {
+    "message": "高亮樣式"
+  },
+  "Ignore non-http/s links": {
+    "message": "忽略非 HTTP(s) 協議鏈接"
+  },
+  "Link Tracking": {
+    "message": "追踪鏈接"
+  },
+  "Reset Options": {
+    "message": "重置設定"
+  },
+  "Reset options to their default values.": {
+    "message": "還原所有設定到默認值"
+  },
+  "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
+    "message": "使用 HTTP 監聽器捕捉 3xx 跳轉。例如將短鏈接還原成長鏈接。"
+  },
+  "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+    "message": "使用自定義的 cmd_copyLink 控制器接管 複製鏈接地址 右鍵菜單，將經過處理的鏈接複製到剪貼板。 "
+  },
+  "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {
+    "message": "此列表顯示了本次瀏覽器會話中已處理的鏈接和它們的原始鏈接，您可以方便地將某個域名添加到白名單中。請注意白名單會對整個域名生效，因此有時您可能需要找到鏈接的模式並將它們添加到“忽略鏈接規則”選項中。"
+  },
+  "This options causes non-http/s links to be ignored when checking for nested urls on them.": {
+    "message": "此選項將使本附加元件忽略所有非 HTTP/HTTPS 協議的鏈接。"
+  },
+  "Use Redirect Watcher?": {
+    "message": "使用跳轉監聽器"
+  },
+  "Whether the target attribute on links should be checked and respected.": {
+    "message": "是否檢查並遵守鏈接的 target 屬性。"
+  },
+  "Whitelist Embedded URL": {
+    "message": "添加到白名單"
+  },
+  "addon_description": {
+    "message": "將加密/內嵌鏈接還原為直接鏈接。"
+  }
 }

@@ -1,102 +1,77 @@
 {
-"addon_description": {
-	"message": "Convierte enlaces enmascarados/anidados en auténticos enlaces limpios",
-	"description": ""
-},
-"browser_cleanedlinks": {
-	"message": "Enlaces limpiados:",
-	"description": ""
-},
-"browser_regex_err": {
-	"message": "Error procesando el patrón regex:",
-	"description": ""
-},
-"popup_enabled_tab": {
-	"message": "Activado",
-	"description": ""
-},
-"popup_disabled_tab": {
-	"message": "Desactivado",
-	"description": ""
-},
-"popup_whitelist_button": {
-	"message": "Ignorar Dominios",
-	"description": ""
-},
-"popup_whitelist_description": {
-	"message": "Esta lista contiene los enlaces limpiados y sus originales, para facilitar su adición a la opción de ignorados.",
-	"description": ""
-},
-"highlight_title": {
-	"message": "Subrayar enlaces limpiados?",
-	"description": ""
-},
-"hlstyle_emptytext": {
-	"message": "E.g. background:rgba(252,252,0,0.7); color: #000",
-	"description": ""
-},
-"hlstyle_title": {
-	"message": "Estilo de subrayado",
-	"description": ""
-},
-"hlstyle_content": {
-	"message": "Aplica este estilo de subrayado a los enlaces limpiados.",
-	"description": ""
-},
-"cbc_title": {
-	"message": "CopyLink Controller?",
-	"description": ""
-},
-"cbc_tooltip": {
-	"message": "Instala un controlador de comando cmd_copyLink para limpiar los enlaces copiados al portapapeles usando el menú contextual.",
-	"description": ""
-},
-"progltr_title": {
-	"message": "Usar observador de redirección?",
-	"description": ""
-},
-"progltr_tooltip": {
-	"message": "Instala un observador de protocolo HTTP para identificar redirecciones. Esto habilitara la posibilidad de limpiar URLs ocultas tras enlaces cortos ofrecidos por servicios tales como goo.gl.",
-	"description": ""
-},
-"gotarget_title": {
-	"message": "Usar el atributo Target?",
-	"description": ""
-},
-"gotarget_tooltip": {
-	"message": "Los enlaces pueden contener un atributo Target el cual indica donde deben abrirse.",
-	"description": ""
-},
-"reset_tooltip": {
-	"message": "Reinicia las opciones a sus valores por defecto.",
-	"description": ""
-},
-"reset_options": {
-	"message": "Reiniciar Opciones",
-	"description": ""
-},
-"ignhttp_title": {
-	"message": "Ignorar enlaces que no sean http/s",
-	"description": ""
-},
-"ignhttp_tooltip": {
-	"message": "Esta opción provoca que se ignoren enlaces que no sean http/s a la hora de comprobar urls anidadas en ellos",
-	"description": ""
-},
-"textcl_title": {
-	"message": "Interceptar enlaces en texto",
-	"description": ""
-},
-"textcl_tooltip": {
-	"message": "Permite clickar en enlaces no clickables por defecto para abrirlos como si fueran enlaces normales - Requiere usar el modo de Evento Delegado.",
-	"description": ""
-},
-"cltrack_title": {
-	"message": "Seguimiento de enlaces",
-	"description": ""
-},
-"cltrack_tooltip": {
-	"message": "Esta opción le permitirá añadir dominios fácilmente a la lista de ignorados usando RMB en el botón de la barra de navegación.",
-	"description": ""
-}
+  "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
+    "message": "Permite clickar en enlaces no clickables por defecto para abrirlos como si fueran enlaces normales - Requiere usar el modo de Evento Delegado."
+  },
+  "Apply this CSS Style to cleaned links.": {
+    "message": "Aplica este estilo de subrayado a los enlaces limpiados."
+  },
+  "Catch Text Links": {
+    "message": "Interceptar enlaces en texto"
+  },
+  "Cleaned Links:": {
+    "message": "Enlaces limpiados:"
+  },
+  "Copy clean links from the context menu": {
+    "message": "CopyLink Controller?"
+  },
+  "Disabled": {
+    "message": "Desactivado"
+  },
+  "E.g. background:rgba(252,252,0,0.7); color: #000": {
+    "message": "E.g. background:rgba(252,252,0,0.7); color: #000"
+  },
+  "Enabled": {
+    "message": "Activado"
+  },
+  "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.": {
+    "message": "Esta opción le permitirá añadir dominios fácilmente a la lista de ignorados usando RMB en el botón de la barra de navegación."
+  },
+  "Error Processing Regular expression:": {
+    "message": "Error procesando el patrón regex:"
+  },
+  "Follow Target Attribute?": {
+    "message": "Usar el atributo Target?"
+  },
+  "Highlight Cleaned Links?": {
+    "message": "Subrayar enlaces limpiados?"
+  },
+  "Highlight Style": {
+    "message": "Estilo de subrayado"
+  },
+  "Ignore non-http/s links": {
+    "message": "Ignorar enlaces que no sean http/s"
+  },
+  "Link Tracking": {
+    "message": "Seguimiento de enlaces"
+  },
+  "Reset Options": {
+    "message": "Reiniciar Opciones"
+  },
+  "Reset options to their default values.": {
+    "message": "Reinicia las opciones a sus valores por defecto."
+  },
+  "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
+    "message": "Instala un observador de protocolo HTTP para identificar redirecciones. Esto habilitara la posibilidad de limpiar URLs ocultas tras enlaces cortos ofrecidos por servicios tales como goo.gl."
+  },
+  "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+    "message": "Instala un controlador de comando cmd_copyLink para limpiar los enlaces copiados al portapapeles usando el menú contextual."
+  },
+  "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {
+    "message": "Esta lista contiene los enlaces limpiados y sus originales, para facilitar su adición a la opción de ignorados."
+  },
+  "This options causes non-http/s links to be ignored when checking for nested urls on them.": {
+    "message": "Esta opción provoca que se ignoren enlaces que no sean http/s a la hora de comprobar urls anidadas en ellos"
+  },
+  "Use Redirect Watcher?": {
+    "message": "Usar observador de redirección?"
+  },
+  "Whether the target attribute on links should be checked and respected.": {
+    "message": "Los enlaces pueden contener un atributo Target el cual indica donde deben abrirse."
+  },
+  "Whitelist Embedded URL": {
+    "message": "Ignorar Dominios"
+  },
+  "addon_description": {
+    "message": "Convierte enlaces enmascarados/anidados en auténticos enlaces limpios"
+  }
 }

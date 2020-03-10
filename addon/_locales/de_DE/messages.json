@@ -1,102 +1,77 @@
 {
-"addon_description": {
-	"message": "Ersetzt verschachtelte/verschleierte Links zu authentischen sauberen Links",
-	"description": ""
-},
-"browser_cleanedlinks": {
-	"message": "Gesäuberte Links:",
-	"description": ""
-},
-"browser_regex_err": {
-	"message": "Fehler beim abarbeiten der Reguläre Ausdrücke:",
-	"description": ""
-},
-"popup_enabled_tab": {
-	"message": "aktiviert",
-	"description": ""
-},
-"popup_disabled_tab": {
-	"message": "deaktiviert",
-	"description": ""
-},
-"popup_whitelist_button": {
-	"message": "Zu Ausnahmen hinzufügen",
-	"description": ""
-},
-"popup_whitelist_description": {
-	"message": "Dies ist eine aktuelle Sitzungsliste für die gereinigten Links und der Originale von denen sie kamen, für eine einfache Aufnahme in die Ausnahmeliste. Bitte beachten Sie, manchmal ist es besser teile der URL in den regulären Ausdruck hinzuzufügen.",
-	"description": ""
-},
-"highlight_title": {
-	"message": "Gesäuberte Links hervorheben?",
-	"description": ""
-},
-"hlstyle_emptytext": {
-	"message": "z.B. background:rgba(252,252,0,0.7); color: #000",
-	"description": ""
-},
-"hlstyle_title": {
-	"message": "Highlight Style",
-	"description": ""
-},
-"hlstyle_content": {
-	"message": "Wende diesen CSS Style auf gesäuberte Links an.",
-	"description": ""
-},
-"cbc_title": {
-	"message": "CopyLink Controller?",
-	"description": ""
-},
-"cbc_tooltip": {
-	"message": "Dies installiert einen cmd_copyLink Controller um bei Menüaufrufen zum Link kopieren den Link zu säubern bevor er in die Zwischenablage kopiert wird.",
-	"description": ""
-},
-"progltr_title": {
-	"message": "Umleitungswächter nutzen?",
-	"description": ""
-},
-"progltr_tooltip": {
-	"message": "Aktiviere einen HTTP Wächter um 3xx Umleitungen zu erkennen. Dies sollte zum Beispiel erlauben Links zu säubern die hinter gekürzten URLs stehen.",
-	"description": ""
-},
-"gotarget_title": {
-	"message": "Folge Target Attribut?",
-	"description": ""
-},
-"gotarget_tooltip": {
-	"message": "Soll das target Attribut von Links geprüft und beachtet werden.",
-	"description": ""
-},
-"reset_tooltip": {
-	"message": "Auf Standardeinstellungen zurücksetzen.",
-	"description": ""
-},
-"reset_options": {
-	"message": "Einstellungen zurücksetzen",
-	"description": ""
-},
-"cltrack_title": {
-	"message": "Links Verfolgen",
-	"description": ""
-},
-"cltrack_tooltip": {
-	"message": "Das Aktivieren dieser Option erlaubt die Nachverfolgung von gesäuberten Links um ihre Domains leichter mit einem Rechtsklick auf den Toolbar Button in die Ausnahmeliste aufnehmen zu können.",
-	"description": ""
-},
-"ignhttp_title": {
-	"message": "Nicht-http/s Links ignorieren",
-	"description": ""
-},
-"ignhttp_tooltip": {
-	"message": "Diese Option aktiviert, dass nicht-http/s Links bei der Prüfung nach verschachtelten Links ignoriert werden.",
-	"description": ""
-},
-"textcl_title": {
-	"message": "Erfasse Text Links",
-	"description": ""
-},
-"textcl_tooltip": {
-	"message": "Erlaubt klicken auf nicht verlinkte Text Links um die wie normale Links zu öffnen - Benötigt den Event Delegations Modus.",
-	"description": ""
-}
+  "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
+    "message": "Erlaubt klicken auf nicht verlinkte Text Links um die wie normale Links zu öffnen - Benötigt den Event Delegations Modus."
+  },
+  "Apply this CSS Style to cleaned links.": {
+    "message": "Wende diesen CSS Style auf gesäuberte Links an."
+  },
+  "Catch Text Links": {
+    "message": "Erfasse Text Links"
+  },
+  "Cleaned Links:": {
+    "message": "Gesäuberte Links:"
+  },
+  "Copy clean links from the context menu": {
+    "message": "CopyLink Controller?"
+  },
+  "Disabled": {
+    "message": "deaktiviert"
+  },
+  "E.g. background:rgba(252,252,0,0.7); color: #000": {
+    "message": "z.B. background:rgba(252,252,0,0.7); color: #000"
+  },
+  "Enabled": {
+    "message": "aktiviert"
+  },
+  "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.": {
+    "message": "Das Aktivieren dieser Option erlaubt die Nachverfolgung von gesäuberten Links um ihre Domains leichter mit einem Rechtsklick auf den Toolbar Button in die Ausnahmeliste aufnehmen zu können."
+  },
+  "Error Processing Regular expression:": {
+    "message": "Fehler beim abarbeiten der Reguläre Ausdrücke:"
+  },
+  "Follow Target Attribute?": {
+    "message": "Folge Target Attribut?"
+  },
+  "Highlight Cleaned Links?": {
+    "message": "Gesäuberte Links hervorheben?"
+  },
+  "Highlight Style": {
+    "message": "Highlight Style"
+  },
+  "Ignore non-http/s links": {
+    "message": "Nicht-http/s Links ignorieren"
+  },
+  "Link Tracking": {
+    "message": "Links Verfolgen"
+  },
+  "Reset Options": {
+    "message": "Einstellungen zurücksetzen"
+  },
+  "Reset options to their default values.": {
+    "message": "Auf Standardeinstellungen zurücksetzen."
+  },
+  "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
+    "message": "Aktiviere einen HTTP Wächter um 3xx Umleitungen zu erkennen. Dies sollte zum Beispiel erlauben Links zu säubern die hinter gekürzten URLs stehen."
+  },
+  "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+    "message": "Dies installiert einen cmd_copyLink Controller um bei Menüaufrufen zum Link kopieren den Link zu säubern bevor er in die Zwischenablage kopiert wird."
+  },
+  "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {
+    "message": "Dies ist eine aktuelle Sitzungsliste für die gereinigten Links und der Originale von denen sie kamen, für eine einfache Aufnahme in die Ausnahmeliste. Bitte beachten Sie, manchmal ist es besser teile der URL in den regulären Ausdruck hinzuzufügen."
+  },
+  "This options causes non-http/s links to be ignored when checking for nested urls on them.": {
+    "message": "Diese Option aktiviert, dass nicht-http/s Links bei der Prüfung nach verschachtelten Links ignoriert werden."
+  },
+  "Use Redirect Watcher?": {
+    "message": "Umleitungswächter nutzen?"
+  },
+  "Whether the target attribute on links should be checked and respected.": {
+    "message": "Soll das target Attribut von Links geprüft und beachtet werden."
+  },
+  "Whitelist Embedded URL": {
+    "message": "Zu Ausnahmen hinzufügen"
+  },
+  "addon_description": {
+    "message": "Ersetzt verschachtelte/verschleierte Links zu authentischen sauberen Links"
+  }
 }

@@ -1,192 +1,145 @@
 {
-"addon_description": {
-	"message": "Converts obfuscated/nested links to genuine clean links",
-	"description": ""
-},
-"browser_cleanedlinks": {
-	"message": "Cleaned Links:",
-	"description": ""
-},
-"browser_regex_err": {
-	"message": "Error Processing Regular expression:",
-	"description": ""
-},
-"browser_regex_missing": {
-	"message": "Empty expression!",
-	"description": ""
-},
-"popup_openonce_button": {
-	"message": "Open Un-cleaned Link",
-	"description": ""
-},
-"popup_whitelist_button": {
-	"message": "Whitelist Embedded URL",
-	"description": ""
-},
-"popup_clearlist_button": {
-	"message": "Clear List",
-	"description": ""
-},
-"popup_whitelist_description": {
-	"message": "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.",
-	"description": ""
-},
-"popup_toggle_tooltip": {
-	"message": "Toggle to enable or disable the extension.",
-	"description": ""
-},
-"popup_enabled_tab": {
-	"message": "Enabled",
-	"description": ""
-},
-"popup_disabled_tab": {
-	"message": "Disabled",
-	"description": ""
-},
-"highlight_title": {
-	"message": "Highlight Cleaned Links?",
-	"description": ""
-},
-"show_clean_count_title": {
-	"message": "Show Cleaned Links Count?",
-	"description": ""
-},
-"hlstyle_emptytext": {
-	"message": "E.g. background:rgba(252,252,0,0.7); color: #000",
-	"description": ""
-},
-"hlstyle_title": {
-	"message": "Highlight Style",
-	"description": ""
-},
-"hlstyle_content": {
-	"message": "Apply this CSS Style to cleaned links.",
-	"description": ""
-},
-"context_menu_title": {
-	"message": "Copy clean links from the context menu",
-	"description": ""
-},
-"context_menu_tooltip": {
-	"message": "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.",
-	"description": ""
-},
-"progltr_title": {
-	"message": "Use Redirect Watcher?",
-	"description": ""
-},
-"progltr_tooltip": {
-	"message": "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.",
-	"description": ""
-},
-"gotarget_title": {
-	"message": "Follow Target Attribute?",
-	"description": ""
-},
-"gotarget_tooltip": {
-	"message": "Whether the target attribute on links should be checked and respected.",
-	"description": ""
-},
-"reset_options_tooltip": {
-	"message": "Reset options to their default values.",
-	"description": ""
-},
-"reset_options_label": {
-	"message": "Reset Options",
-	"description": ""
-},
-"reset_rules_tooltip": {
-	"message": "Reset rules to their default values.",
-	"description": ""
-},
-"reset_rules_label": {
-	"message": "Reset Rules",
-	"description": ""
-},
-"ignhttp_title": {
-	"message": "Ignore non-http/s links",
-	"description": ""
-},
-"ignhttp_tooltip": {
-	"message": "This options causes non-http/s links to be ignored when checking for nested urls on them.",
-	"description": ""
-},
-"textcl_title": {
-	"message": "Catch Text Links",
-	"description": ""
-},
-"textcl_tooltip": {
-	"message": "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.",
-	"description": ""
-},
-"cltrack_title": {
-	"message": "Link Tracking",
-	"description": ""
-},
-"cltrack_tooltip": {
-	"message": "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.",
-	"description": ""
-},
-"httpall_title": {
-	"message": "Clean all outgoing HTTP requests, instead of only top frame",
-	"description": ""
-},
-"httpall_tooltip": {
-	"message": "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you.",
-	"description": ""
-},
-"switch_to_tab_title": {
-	"message": "Switch to tabs opened by clicking links?",
-	"description": ""
-},
-"switch_to_tab_tooltip": {
-	"message": "When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present.",
-	"description": ""
-},
-"URL_protocol": {
-	"message": "Protocol",
-	"description": ""
-},
-"URL_domain": {
-	"message": "Domain name",
-	"description": ""
-},
-"URL_suffix": {
-	"message": "Public suffix",
-	"description": ""
-},
-"URL_tld": {
-	"message": "(usually same as top-level domain)",
-	"description": ""
-},
-"URL_subdomain": {
-	"message": "Subdomain",
-	"description": ""
-},
-"URL_fqdn": {
-	"message": "Fully-Qualified Domain Name (FQDN)",
-	"description": ""
-},
-"URL_path": {
-	"message": "Path",
-	"description": ""
-},
-"URL_query": {
-	"message": "Query",
-	"description": ""
-},
-"URL_parameter": {
-	"message": "Parameter",
-	"description": ""
-},
-"rule_collision": {
-	"message": "Rule $RULE_NAME$ already exists",
-	"description": "",
-	"placeholders": {
-      "rule_name" : {
-        "content" : "$1",
-        "example" : "*.*"
+  "(usually same as top-level domain)": {
+    "message": "(usually same as top-level domain)"
+  },
+  "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you.": {
+    "message": "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you."
+  },
+  "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
+    "message": "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode."
+  },
+  "Apply this CSS Style to cleaned links.": {
+    "message": "Apply this CSS Style to cleaned links."
+  },
+  "Catch Text Links": {
+    "message": "Catch Text Links"
+  },
+  "Clean all outgoing HTTP requests, instead of only top frame": {
+    "message": "Clean all outgoing HTTP requests, instead of only top frame"
+  },
+  "Cleaned Links:": {
+    "message": "Cleaned Links:"
+  },
+  "Clear List": {
+    "message": "Clear List"
+  },
+  "Copy clean links from the context menu": {
+    "message": "Copy clean links from the context menu"
+  },
+  "Disabled": {
+    "message": "Disabled"
+  },
+  "Domain name": {
+    "message": "Domain name"
+  },
+  "E.g. background:rgba(252,252,0,0.7); color: #000": {
+    "message": "E.g. background:rgba(252,252,0,0.7); color: #000"
+  },
+  "Empty expression!": {
+    "message": "Empty expression!"
+  },
+  "Enabled": {
+    "message": "Enabled"
+  },
+  "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.": {
+    "message": "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button."
+  },
+  "Error Processing Regular expression:": {
+    "message": "Error Processing Regular expression:"
+  },
+  "Follow Target Attribute?": {
+    "message": "Follow Target Attribute?"
+  },
+  "Fully-Qualified Domain Name (FQDN)": {
+    "message": "Fully-Qualified Domain Name (FQDN)"
+  },
+  "Highlight Cleaned Links?": {
+    "message": "Highlight Cleaned Links?"
+  },
+  "Highlight Style": {
+    "message": "Highlight Style"
+  },
+  "Ignore non-http/s links": {
+    "message": "Ignore non-http/s links"
+  },
+  "Link Tracking": {
+    "message": "Link Tracking"
+  },
+  "Open Un-cleaned Link": {
+    "message": "Open Un-cleaned Link"
+  },
+  "Parameter": {
+    "message": "Parameter"
+  },
+  "Path": {
+    "message": "Path"
+  },
+  "Protocol": {
+    "message": "Protocol"
+  },
+  "Public suffix": {
+    "message": "Public suffix"
+  },
+  "Query": {
+    "message": "Query"
+  },
+  "Reset Options": {
+    "message": "Reset Options"
+  },
+  "Reset Rules": {
+    "message": "Reset Rules"
+  },
+  "Reset options to their default values.": {
+    "message": "Reset options to their default values."
+  },
+  "Reset rules to their default values.": {
+    "message": "Reset rules to their default values."
+  },
+  "Rule $RULE_NAME$ already exists": {
+    "message": "Rule $RULE_NAME$ already exists",
+    "placeholders": {
+      "rule_name": {
+        "content": "$1"
       }
-	}
-}
+    }
+  },
+  "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
+    "message": "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs."
+  },
+  "Show Cleaned Links Count?": {
+    "message": "Show Cleaned Links Count?"
+  },
+  "Subdomain": {
+    "message": "Subdomain"
+  },
+  "Switch to tabs opened by clicking links?": {
+    "message": "Switch to tabs opened by clicking links?"
+  },
+  "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+    "message": "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard."
+  },
+  "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {
+    "message": "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain."
+  },
+  "This options causes non-http/s links to be ignored when checking for nested urls on them.": {
+    "message": "This options causes non-http/s links to be ignored when checking for nested urls on them."
+  },
+  "Toggle to enable or disable the extension.": {
+    "message": "Toggle to enable or disable the extension."
+  },
+  "Use Redirect Watcher?": {
+    "message": "Use Redirect Watcher?"
+  },
+  "When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present.": {
+    "message": "When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present."
+  },
+  "Whether the target attribute on links should be checked and respected.": {
+    "message": "Whether the target attribute on links should be checked and respected."
+  },
+  "Whitelist Embedded URL": {
+    "message": "Whitelist Embedded URL"
+  },
+  "addon_description": {
+    "message": "Converts obfuscated/nested links to genuine clean links"
+  }
 }

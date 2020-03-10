@@ -16,25 +16,25 @@
 			</a>
 		</div>
 		<div>
-			<button id="toggle" i18n_title="popup_toggle_tooltip"></button>
-			<button id="options" i18n_title="popup_options_tooltip" title="Options page"></button>
+			<button id="toggle" i18n_title="Toggle to enable or disable the extension."></button>
+			<button id="options" i18n_title="Open CleanLinks Options page" title="Options page"></button>
 			<h3 id="title"> &mdash;
-				<span i18n_text="popup_enabled_tab" class="when_enabled"></span>
-				<span i18n_text="popup_disabled_tab" class="when_disabled"></span>
+				<span i18n_text="Enabled" class="when_enabled"></span>
+				<span i18n_text="Disabled" class="when_disabled"></span>
 			</h3>
 		</div>
 	</div>
 
 	<p class="filters" id="filter_categories">
-		<label i18n_text="popup_clicked_links_filter"><input type="checkbox" name="clicked" checked="checked" />Clicked links</label>
-		<label i18n_text="popup_http_requests_filter"><input type="checkbox" name="request" checked="checked" />HTTP requests</label>
-		<label i18n_text="popup_header_redir_filter"><input type="checkbox" name="header" checked="checked" />Header redirects</label>
+		<label><input type="checkbox" name="clicked" checked="checked" /><span i18n_text="Clicked links"></span></label>
+		<label><input type="checkbox" name="request" checked="checked" /><span i18n_text="HTTP requests"></span></label>
+		<label><input type="checkbox" name="header" checked="checked" /><span i18n_text="Header redirects"></span></label>
 	</p>
 
 	<p class="filters" id="filter_actions">
-		<label i18n_text="popup_embed"><input type="checkbox" name="embed" checked="checked" />Embedded URL</label>
-		<label i18n_text="popup_remove"><input type="checkbox" name="remove" checked="checked" />Params stripped</label>
-		<label i18n_text="popup_rewrite"><input type="checkbox" name="rewrite" checked="checked" />Path rewritten</label>
+		<label><input type="checkbox" name="embed" checked="checked" /><span i18n_text="Embedded URL"></span></label>
+		<label><input type="checkbox" name="remove" checked="checked" /><span i18n_text="Params stripped"></span></label>
+		<label><input type="checkbox" name="rewrite" checked="checked" /><span i18n_text="Path rewritten"></span></label>
 	</p>
 
 	<div id="history"></div>
@@ -42,13 +42,13 @@
 	<p id="bottom">
 		<span class="help">
 			<span class="tooltip">?</span>
-			<span i18n_text="popup_whitelist_description" class="tooltiptext"></span>
+			<span i18n_text="This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain." class="tooltiptext"></span>
 		</span>
 		<span class="spacer"></span>
-		<button id="openonce" i18n_text="popup_openonce_button" disabled="disabled"></button>
-		<button id="clearlist" i18n_text="popup_clearlist_button" disabled="disabled"></button>
-		<button id="whitelist" i18n_text="popup_whitelist_button" disabled="disabled"></button>
-		<button id="open_editor" i18n_text="popup_open_editor_button" disabled="disabled">Edit rule</button>
+		<button id="openonce" i18n_text="Open Un-cleaned Link" disabled="disabled"></button>
+		<button id="clearlist" i18n_text="Clear List" disabled="disabled"></button>
+		<button id="whitelist" i18n_text="Whitelist Embedded URL" disabled="disabled"></button>
+		<button id="open_editor" i18n_text="Edit rule" disabled="disabled"></button>
 	</p>
 
 	<script src="/modules/common.js"></script>

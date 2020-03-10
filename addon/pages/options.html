@@ -8,51 +8,52 @@
 
 <body>
 	<fieldset id="rule_editor">
-	<legend>Link cleaning rules</legend>
+		<legend i18n_text="Link cleaning rules"></legend>
 
-		<label i18n_title="ignhttp_tooltip"><span i18n_text="ignhttp_title"></span>
+		<label i18n_title="This options causes non-http/s links to be ignored when checking for nested urls on them."><span i18n_text="Ignore non-http/s links"></span>
 			<input type="checkbox" name="ignhttp" value="" />
 		</label>
 
 		<fieldset class="example">
 			<input type="checkbox" id="show_URL_legend" class="toggle noautosave" />
 
-			<legend>URL example <label for="show_URL_legend">
-					<span class="enabled">Hide</span><span class="disabled">Show</span> legend
+			<legend i18n_title="URL example"> <label for="show_URL_legend">
+					<span class="enabled" i18n_text="Hide legend"></span>
+					<span class="disabled" i18n_text="Show legend"></span>
 			</label></legend>
 			<p class="URL">
-				<span class="protocol" i18n_title="URL_protocol">https</span>://<span class="subdomain" i18n_title="URL_subdomain">addons.</span><span class="domain" i18n_title="URL_domain">mozilla.<span class="suffix" i18n_title="URL_suffix">org</span></span><span class="path" i18n_title="URL_path">/en-GB/firefox/addon/clean-links-webext/reviews/</span><span class="query" i18n_title="URL_query">?<span class="parameter" i18n_title="URL_parameter">score</span>=5</span>
+				<span class="protocol" i18n_title="Protocol">https</span>://<span class="subdomain" i18n_title="Subdomain">addons.</span><span class="domain" i18n_title="Domain name">mozilla.<span class="suffix" i18n_title="Public suffix">org</span></span><span class="path" i18n_title="Path">/en-GB/firefox/addon/clean-links-webext/reviews/</span><span class="query" i18n_title="Query">?<span class="parameter" i18n_title="Parameter">score</span>=5</span>
 			</p>
 
 			<dl class="enabled">
-				<dt class="protocol">https</dt> <dd i18n_text="URL_protocol"></dd>
+				<dt class="protocol">https</dt> <dd i18n_text="Protocol"></dd>
 				<dt class="suffix">org</dt> <dd>
-					<a i18n_text="URL_suffix" href="https://publicsuffix.org/"></a>
-					<span i18n_text="URL_tld"></span>
+					<a i18n_text="Public suffix" href="https://publicsuffix.org/"></a>
+					<span i18n_text="(usually same as top-level domain)"></span>
 				</dd>
-				<dt class="domain">mozilla.org</dt> <dd i18n_text="URL_domain"></dd>
-				<dt class="subdomain">addons.</dt> <dd i18n_text="URL_subdomain"></dd>
-				<dt class="fqdn">addons.mozilla.org</dt> <dd i18n_text="URL_fqdn"></dd>
-				<dt class="path">/en-GB/firefox/addon/clean-links-webext/reviews/</dt> <dd i18n_text="URL_path"></dd>
-				<dt class="query">?score=5</dt> <dd i18n_text="URL_query"></dd>
-				<dt class="parameter">score</dt> <dd i18n_text="URL_parameter"></dd>
+				<dt class="domain">mozilla.org</dt> <dd i18n_text="Domain name"></dd>
+				<dt class="subdomain">addons.</dt> <dd i18n_text="Subdomain"></dd>
+				<dt class="fqdn">addons.mozilla.org</dt> <dd i18n_text="Fully-Qualified Domain Name (FQDN)"></dd>
+				<dt class="path">/en-GB/firefox/addon/clean-links-webext/reviews/</dt> <dd i18n_text="Path"></dd>
+				<dt class="query">?score=5</dt> <dd i18n_text="Query"></dd>
+				<dt class="parameter">score</dt> <dd i18n_text="Parameter"></dd>
 			</dl>
 		</fieldset>
 
-		<h4 id="rule_legend"><label for="rule_selector">Rule to edit:</label>
+		<h4 id="rule_legend"><label for="rule_selector" i18n_text="">Rule to edit:</label>
 			<input type="text" id="rule_filter" placeholder="filter rules" class="noautosave" />
 		</h4>
 
 		<select id="rule_selector" name="rule" size="2"></select>
 
 		<p id="rule_buttons">
-			<button id="add_rule">&#x2795;&nbsp;<span>Add rule</span></button>
-			<button id="save_rule" disabled="disabled">💾&nbsp;<span>Save rule</span></button>
-			<button id="remove_rule" disabled="disabled">&#x274c;&nbsp;<span>Delete rule</span></button>
+			<button id="add_rule">&#x2795;&nbsp;<span i18n_text="Add rule"></span></button>
+			<button id="save_rule" disabled="disabled">💾&nbsp;<span i18n_text="Save rule"></span></button>
+			<button id="remove_rule" disabled="disabled">&#x274c;&nbsp;<span i18n_text="Delete rule"></span></button>
 		</p>
 
 		<fieldset>
-			<legend>URLs matched
+			<legend><span i18n_text="URLs matched"></span>
 				<span class="help">
 					<span class="tooltip">?</span>
 					<span class="tooltiptext">
@@ -68,20 +69,20 @@
 			</legend>
 
 			<span class="parsing_error" id="rule_error"></span>
-			<label><span>Domain</span><br />
+			<label><span i18n_text="Domain"></span><br />
 				<input type="text" name="domain" id="domain_edit" value="" placeholder="subdomain.domain.suffix" />
 			</label>
-			<label><span>Match subdomains</span>
+			<label><span i18n_text="Match subdomains"></span>
 				<input type="checkbox" name="subdomains" checked="checked" />
 			</label>
 			<span class="parsing_error" id="path_error"></span>
-			<label><span>Path</span>
+			<label><span i18n_text="Path"></span>
 				<input type="text" name="path" value="" placeholder="/path/in/link" />
 			</label>
 		</fieldset>
 
 		<fieldset>
-			<legend>Cleaning actions
+			<legend><span i18n_text="Cleaning actions"></span>
 				<span class="help">
 					<span class="tooltip">?</span>
 					<span class="tooltiptext">
@@ -97,112 +98,112 @@
 			<p class="editor" id="rewrite_editor">
 				<span class="parsing_error" id="search_edit_error"></span>
 				<label>
-					<span>Remove from path:</span>
+					<span i18n_text="">Remove from path:</span>
 					<input type="text" name="search_edit" id="search_edit" value="" />
 				</label>
 				<label>
-					<span>Replace with:</span>
+					<span i18n_text="">Replace with:</span>
 					<input type="text" name="replace_edit" name="replace_edit" value="" />
 				</label>
 
-				<label><span>Replace all occurrences</span>
+				<label><span i18n_text="">Replace all occurrences</span>
 					<input type="checkbox" name="rewrite_repeat" checked="checked" />
 				</label>
 
-				<label><span>Ignore case</span>
+				<label><span i18n_text="">Ignore case</span>
 					<input type="checkbox" name="rewrite_icase" checked="checked" />
 				</label>
 
-				<button class="ok">Add</button><button class="cancel">Cancel</button>
+				<button class="ok" i18n_text="">Add</button><button class="cancel" i18n_text="">Cancel</button>
 			</p>
 
 			<p class="editor" id="remove_editor">
 				<span class="parsing_error" id="remove_edit_error"></span>
 				<label>
-					<span>Add to removed query parameters:</span>
+					<span i18n_text="Add to removed query parameters:"></span>
 					<br /><input type="text" name="remove_edit" value="" />
 				</label>
 
-				<button class="ok">Add</button><button class="cancel">Cancel</button>
+				<button class="ok" i18n_text="Add"></button><button class="cancel" i18n_text="Cancel"></button>
 			</p>
 
 			<p class="editor" id="whitelist_editor">
 				<span class="parsing_error" id="whitelist_edit_error"></span>
 				<label>
-					<span>Add to whitelisted query parameters:</span>
+					<span i18n_text="Add to whitelisted query parameters:"></span>
 					<br /><input type="text" name="whitelist_edit" value="" />
 				</label>
 
-				<button class="ok">Add</button><button class="cancel">Cancel</button>
+				<button class="ok" i18n_text="Add"></button><button class="cancel" i18n_text="Cancel"></button>
 			</p>
 
 
-			<label for="remove_add">Remove query parameters:</label>
+			<label for="remove_add" i18n_text="Remove query parameters:"></label>
 			<span id="remove_itemlist" class="itemlist"></span>
 			<span id="remove_inheritlist" class="inheritlist"></span>
-			<button id="remove_add" class="add_to_list" title="Add to the list">+</button>
+			<button id="remove_add" class="add_to_list" i18n_title="Add to the list">+</button>
 
-			<label for="whitelist_add">Whitelist query parameters (prevent removing and allow embedded URL):</label>
+			<label for="whitelist_add" i18n_text="Whitelist query parameters (prevent removing and allow embedded URL):"></label>
 			<span id="whitelist_itemlist" class="itemlist"></span>
 			<span id="whitelist_inheritlist" class="inheritlist"></span>
-			<button id="whitelist_add" class="add_to_list" title="Add to the list">+</button>
+			<button id="whitelist_add" class="add_to_list" i18n_title="Add to the list">+</button>
 
-			<label><span>Allow URL embedded inside path</span>
+			<label><span i18n_text="Allow URL embedded inside path"></span>
 				<input type="checkbox" name="whitelist_path" value="" />
 			</label>
 
-			<label for="rewrite_add">Remove or replace in path:</label>
+			<label for="rewrite_add" i18n_text="Remove or replace in path:"></label>
 			<span id="rewrite_itemlist" class="itemlist"></span>
 			<span id="rewrite_inheritlist" class="inheritlist"></span>
-			<button id="rewrite_add" class="add_to_list" title="Add to the list">+</button>
+			<button id="rewrite_add" class="add_to_list" i18n_title="Add to the list">+</button>
 
 		</fieldset>
 	</fieldset>
 
 	<fieldset>
-		<legend>Features</legend>
-		<label i18n_title="switch_to_tab_tooltip"><span i18n_text="switch_to_tab_title"></span>
+		<legend i18n_text="Features"></legend>
+		<label i18n_title="When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present."><span i18n_text="Switch to tabs opened by clicking links?"></span>
 			<input type="checkbox" name="switch_to_tab" value="" />
 		</label>
-		<label i18n_title="context_menu_tooltip"><span i18n_text="context_menu_title"></span>
+		<label i18n_title="This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard."><span i18n_text="Copy clean links from the context menu"></span>
 			<input type="checkbox" name="context_menu" value="" />
 		</label>
-		<label i18n_title="progltr_tooltip"><span i18n_text="progltr_title"></span>
+		<label i18n_title="Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs."><span i18n_text="Use Redirect Watcher?"></span>
 			<input type="checkbox" name="progltr" value="" />
 		</label>
-		<label i18n_title="httpall_tooltip"><span i18n_text="httpall_title"></span>
+		<label i18n_title="All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you."><span i18n_text="Clean all outgoing HTTP requests, instead of only top frame"></span>
 			<input type="checkbox" name="httpall" value="" />
 		</label>
-		<label i18n_title="gotarget_tooltip"><span i18n_text="gotarget_title"></span>
+		<label i18n_title="Whether the target attribute on links should be checked and respected."><span i18n_text="Follow Target Attribute?"></span>
 			<input type="checkbox" name="gotarget" value="" />
 		</label>
-		<label i18n_title="textcl_tooltip"><span i18n_text="textcl_title"></span>
+		<label i18n_title="Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode."><span i18n_text="Catch Text Links"></span>
 			<input type="checkbox" name="textcl" value="" />
 		</label>
-		<label i18n_title="cltrack_tooltip"><span i18n_text="cltrack_title"></span>
+		<label i18n_title="Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button."><span i18n_text="Link Tracking"></span>
 			<input type="checkbox" name="cltrack" value="" />
 		</label>
 	</fieldset>
 
 	<fieldset>
-		<legend>Display</legend>
-		<label><span i18n_text="highlight_title"></span>
+		<legend i18n_text="Display"></legend>
+		<label><span i18n_text="Highlight Cleaned Links?"></span>
 			<input type="checkbox" name="highlight" value="" />
 		</label>
-		<label i18n_title="hlstyle_content"><span i18n_text="hlstyle_title"></span>
-			<br /><input type="text" name="hlstyle" i18n_title="hlstyle_emptytext" />
+		<label i18n_title="Apply this CSS Style to cleaned links."><span i18n_text="Highlight Style"></span>
+			<br /><input type="text" name="hlstyle" i18n_title="E.g. background:rgba(252,252,0,0.7); color: #000" />
 		</label>
-		<label><span i18n_text="show_clean_count_title"></span>
+		<label><span i18n_text="Show Cleaned Links Count?"></span>
 			<input type="checkbox" name="show_clean_count" value="" />
 		</label>
 	</fieldset>
 
 	<fieldset id="reset_buttons">
-		<legend>Rules</legend>
-		<p><button name="export_rules">Export rules</button></p>
-		<p><button name="import_rules">Import rules</button><input type="file" accept="application/json" id="import_rules" /></p>
-		<p><button name="reset_rules" i18n_text="reset_rules_label" i18n_title="reset_rules_tooltip"></button></p>
-		<p><button name="reset_options" i18n_text="reset_options_label" i18n_title="reset_options_tooltip"></button></p>
+		<legend i18n_text="Rules"></legend>
+		<p><button name="export_rules" i18n_text="Export rules"></button></p>
+		<p><button name="import_rules" i18n_text="Import rules"></button><input type="file" accept="application/json" id="import_rules" /></p>
+		<p><button name="reset_rules" i18n_text="Reset Rules" i18n_title="Reset rules to their default values."></button></p>
+		<p><button name="reset_options" i18n_text="Reset Options" i18n_title="Reset options to their default values."></button></p>
 	</fieldset>
 
 	<script src="/modules/common.js"></script>
