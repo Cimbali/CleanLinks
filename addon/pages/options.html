@@ -41,12 +41,14 @@
 
 		<h4 id="rule_legend"><label for="rule_selector">Rule to edit:</label>
 			<input type="text" id="rule_filter" placeholder="filter rules" class="noautosave" />
-			<button id="remove_rule" disabled="disabled">❌ Delete rule</button>
 		</h4>
-		<p>
-			<select id="rule_selector" name="rule" size="2">
-				<option value="{}" selected="selected">-- New rule --</option>
-			</select>
+
+		<select id="rule_selector" name="rule" size="2"></select>
+
+		<p id="rule_buttons">
+			<button id="add_rule">➕ Add rule</button>
+			<button id="save_rule" disabled="disabled">💾 Save rule</button>
+			<button id="remove_rule" disabled="disabled">❌ Delete rule</button>
 		</p>
 
 		<fieldset>
@@ -65,6 +67,7 @@
 				</span>
 			</legend>
 
+			<span class="parsing_error" id="rule_error"></span>
 			<label><span>Domain</span><br />
 				<input type="text" name="domain" id="domain_edit" value="" placeholder="subdomain.domain.suffix" />
 			</label>

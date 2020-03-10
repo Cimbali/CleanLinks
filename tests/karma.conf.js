@@ -24,7 +24,6 @@ module.exports = config => Object.assign(config,
 		"modules/publicsuffixlist.js",
 		"modules/rules.js",
 		"modules/cleanlink.js",
-		"inject.js",
 
 		{type: 'css', included: false, served: true, nocache: true, pattern: "data/*"},
 

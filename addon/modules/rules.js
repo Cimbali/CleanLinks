@@ -40,12 +40,8 @@ function recursive_find(rules, domain_bits, path)
 	if (path === undefined)
 		return matches
 
-	// wildcard path match
-	if (path !== '/' && '/*' in rules)
-		matches.push(...recursive_find(rules['/*'], []))
-
 	// normal (regexp) path match
-	let path_matches = Object.keys(rules).filter(key => key.startsWith('/') && key !== '/*')
+	let path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
 										 .filter(key => path.match(new RegExp(key)))
 
 	return path_matches.reduce((list, matching_key) => list.concat(recursive_find(rules[matching_key], [])), matches)
@@ -107,13 +103,13 @@ function unserialize_rule(serialized_rule)
 			actions[key] = serialized_rule[key];
 
 	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
-	let [suffix, domain] = split_suffix(serialized_rule.domain), subdom = serialized_rule.domain.startsWith('.');
+	let [suffix, domain] = split_suffix(serialized_rule.domain);
 	let pos = [suffix].concat(domain.split('.').reverse().map(d => '.' + d));
 
-	if (subdom)
-		pos.push('.')
+	while (pos.length && pos[pos.length - 1] === '.*')
+		pos.pop();
 
-	if ('path' in serialized_rule && serialized_rule.path !== '/*')
+	if ('path' in serialized_rule && serialized_rule.path)
 		pos.push(serialized_rule.path)
 
 	return [pos, actions];
@@ -136,7 +132,7 @@ function serialize_rules(rules, serialized_rule)
 			obj.domain = '*' + serialized_rule.domain[0];
 		else
 			obj.domain = serialized_rule.domain.join('').substr(1) // remove leding .
-		if (!('path' in obj)) obj.path = '/*'
+		if (!('path' in obj)) obj.path = ''
 		list.push(obj)
 
 		// Add the actions to the set of inherited actions to pass on to the children
@@ -232,6 +228,24 @@ function push_rule(all_rules, serialized_rule)
 }
 
 
+function rule_exists(all_rules, serialized_rule)
+{
+	let [keys, actions] = unserialize_rule(serialized_rule)
+	console.log(keys)
+
+	let node = all_rules;
+	for (let key of keys)
+	{
+		if (!(key in node))
+			return false;
+
+		node = node[key]
+	}
+
+	return 'actions' in node;
+}
+
+
 function clear_rules()
 {
 	return browser.storage.sync.remove('rules');
@@ -295,18 +309,26 @@ let Rules = {
 	find: url => {
 		return find_rules(url, this.all_rules)
 	},
-	serialize: () => {
+	serialize: () =>
+	{
 		return serialize_rules(this.all_rules)
 	},
-	add: (new_rule) => {
+	add: new_rule =>
+	{
 		push_rule(this.all_rules, new_rule)
 		return save_rules(this.all_rules)
 	},
-	remove: (old_rule) => {
+	remove: old_rule =>
+	{
 		pop_rule(this.all_rules, old_rule)
 		return save_rules(this.all_rules)
 	},
-	update: (old_rule, new_rule) => {
+	exists: rule =>
+	{
+		return rule_exists(this.all_rules, rule);
+	},
+	update: (old_rule, new_rule) =>
+	{
 		let found = pop_rule(this.all_rules, old_rule)
 		merge_rule_actions(new_rule, found)
 		push_rule(this.all_rules, new_rule)

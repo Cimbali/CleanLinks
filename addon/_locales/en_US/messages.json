@@ -178,5 +178,15 @@
 "URL_parameter": {
 	"message": "Parameter",
 	"description": ""
+},
+"rule_collision": {
+	"message": "Rule $RULE_NAME$ already exists",
+	"description": "",
+	"placeholders": {
+      "rule_name" : {
+        "content" : "$1",
+        "example" : "*.*"
+      }
+	}
 }
 }

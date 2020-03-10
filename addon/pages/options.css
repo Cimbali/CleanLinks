@@ -106,12 +106,16 @@ fieldset.example legend {
 	margin: 0 0 -1em 0;
 }
 #rule_legend {
-	margin: 1em 1em 0;
+	margin: 1em 0 1em 1em;
+}
+#rule_buttons, #rule_legend {
 	display: flex;
 	align-items: baseline;
 }
-#rule_legend * {
-	flex-grow: 0;
+#rule_buttons button {
+	flex-grow: 1;
+	text-align: center;
+	margin: 0 1em;
 }
 #rule_legend input {
 	flex-grow: 1;
