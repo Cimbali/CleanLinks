@@ -33,7 +33,7 @@ const cleaned_per_tab = {
 	get: tab_id =>
 	{
 		if  (!(tab_id in cleaned_per_tab))
-			cleaned_per_tab[tab_id] = {count: 0, history: []};
+			cleaned_per_tab[tab_id] = {count: 0, history: [], pending_highlight: null};
 		return cleaned_per_tab[tab_id];
 	},
 	clear: tab_id => { delete cleaned_per_tab[tab_id]; },
@@ -194,6 +194,11 @@ function handle_message(message, sender)
 	case 'cleaned list':
 		return Promise.resolve(cleaned_per_tab.get_history(tab_id));
 
+	case 'highlight':
+		if (Prefs.values.highlight)
+			cleaned_per_tab.get(tab_id).pending_highlight = message.link;
+		return new Promise.resolve({});
+
 	case 'check tab enabled':
 		return Promise.resolve({enabled: disabled_tabs.is_enabled(tab_id)});
 
@@ -208,9 +213,24 @@ function handle_message(message, sender)
 
 		cleaned_per_tab.get(tab_id).count += 1;
 
-		browser.browserAction.setBadgeText({tabId: tab_id, text: '' + cleaned_per_tab.get_count(tab_id)});
+		if (Prefs.values.show_clean_count)
+			browser.browserAction.setBadgeText({tabId: tab_id, text: '' + cleaned_per_tab.get_count(tab_id)});
 
-		return Promise.resolve(null);;
+		if (Prefs.values.highlight)
+		{
+			let orig_tab = tab_id;
+			if (cleaned_per_tab.get(orig_tab).pending_highlight !== message.orig)
+				[orig_tab, ] = Object.entries(cleaned_per_tab).find(pair => typeof pair[1] !== 'function' && pair[1].pending_highlight === message.orig) || [];
+
+			if (orig_tab !== undefined)
+			{
+				console.log('Highlighting in ' + parseInt(orig_tab))
+				cleaned_per_tab.get(orig_tab).pending_highlight = null;
+				return browser.tabs.sendMessage(parseInt(orig_tab), {action: 'highlight'}).catch(() => {})
+			}
+		}
+
+		return Promise.resolve({});
 
 	case 'open bypass':
 		log('Adding to one-time whitelist ' + message.link);
@@ -263,7 +283,7 @@ function handle_message(message, sender)
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
 			let changes = {}
-			for (let prop of ['cbc', 'progltr', 'httpall', 'textcl'])
+			for (let prop of ['cbc', 'progltr', 'httpall', 'textcl', 'show_clean_count'])
 				changes[prop] = (Prefs.values[prop] === true ? 1 : 0) - (old_pref_values[prop] === true ? 1 : 0)
 
 			if (changes.cbc > 0)
@@ -271,7 +291,7 @@ function handle_message(message, sender)
 				{
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
-					contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
+					contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
 				});
 			else if (changes.cbc < 0)
 				browser.contextMenus.remove('copy-clean-link')
@@ -279,7 +299,7 @@ function handle_message(message, sender)
 				browser.contextMenus.update('copy-clean-link',
 				{
 					title: 'Copy clean link',
-					contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link']
+					contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
 				});
 
 			if (changes.progltr > 0)
@@ -288,9 +308,18 @@ function handle_message(message, sender)
 			else if (changes.progltr < 0)
 				browser.webRequest.onHeadersReceived.removeListener(clean_redirect_headers);
 
-			browser.tabs.query({}).then(tabs => tabs.forEach(tab =>
-				browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})
-			));
+			browser.tabs.query({}).then(tabs =>
+			{
+				for (let tab of tabs)
+				{
+					browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})
+
+					if (changes.show_cleaned_count < 0)
+						browser.browserAction.setBadgeText({tabId: tab.id, text: null});
+					else if (changes.show_cleaned_count > 0)
+						browser.browserAction.setBadgeText({tabId: tab.id, text: '' + cleaned_per_tab.get_count(tab.id)});
+				}
+			});
 		})
 
 	case 'rules':
@@ -330,11 +359,6 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 			link = info.linkUrl;
 		else if ('selectionText' in info && info.selectionText)
 			link = info.selectionText;
-		else
-		{
-			console.error('No link from context menu')
-			return;
-		}
 
 		// Clean & copy
 		let clean_url = clean_link(extract_javascript_link(link, tab.url) || link, tab.url);
@@ -348,14 +372,14 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',
-			contexts: Prefs.values.textcl ? ['link', 'selection', 'page'] : ['link', 'selection']
+			contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
 		});
 
 	// Auto update badge text for pages when loading is complete
 	browser.tabs.onUpdated.addListener((id, change_info, tab) =>
 	{
 		update_icon(disabled_tabs.is_disabled(id) ? icon_disabled : icon_default, id);
-		if (cleaned_per_tab.get_count(tab.id))
+		if (Prefs.values.show_clean_count && cleaned_per_tab.get_count(tab.id))
 			browser.browserAction.setBadgeText({tabId: id, text: '' + cleaned_per_tab.get_count(tab.id)});
 	});
 

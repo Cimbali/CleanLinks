@@ -14,17 +14,13 @@
 
 'use strict'
 
-/*
 function highlight_link(node, remove)
 {
 	// parse and apply ;-separated list of key:val style properties
-	('' + Prefs.values.hlstyle).split(';').forEach(function (r)
-	{
-		let [prop, val] = r.split(':').map(s => s.trim());
+	let css_property_list = ('' + Prefs.values.hlstyle).split(';').map(r => r.split(':').map(s => s.trim()));
+	for (let [prop, val] of css_property_list)
 		node.style.setProperty(prop, remove ? '' : val, 'important');
-	});
 }
-*/
 
 function event_do_click(url, node, evt)
 {
@@ -98,13 +94,8 @@ function on_click(evt)
 	{
 		if (node.nodeName === 'A')
 		{
-			if (node.href.startsWith('javascript:'))
-			{
-				text_link = node.href
-				break;
-			}
-			else if (node.href !== '#')
-				return;
+			text_link = node.href
+			break;
 		}
 
 		for (let evttype of ['onclick', 'onmouseup', 'onmousedown'])
@@ -120,12 +111,23 @@ function on_click(evt)
 	if (!text_link)
 		return;
 
-	var cleaned_link = extract_javascript_link(text_link, window.location);
+	last_clicked = node;
+	try
+	{
+		let url = new URL(text_link, window.location)
+		browser.runtime.sendMessage({action: 'highlight', link: url.href})
+	}
+	catch (e)
+	{
+		browser.runtime.sendMessage({action: 'highlight', link: text_link})
+	}
 
+
+	let cleaned_link = extract_javascript_link(text_link, window.location);
 	if (!cleaned_link || cleaned_link === text_link)
 		return;
 
-	log('Cleaning ' + text_link + ' to ' + cleaned_link)
+	log('Cleaning javascript ' + text_link + ' to ' + cleaned_link)
 	if (event_do_click(cleaned_link, node, evt))
 	{
 		// instead of blinking the URL bar, tell the background to show a notification.
@@ -135,6 +137,7 @@ function on_click(evt)
 
 
 let tab_enabled = false;
+let last_clicked = null;
 
 function toggle_active(enabled)
 {

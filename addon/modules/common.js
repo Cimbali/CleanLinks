@@ -35,11 +35,12 @@ const new_window = 2;
 const pref_values = {
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
+	show_clean_count: true,                                    // highlight cleaned links
 	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
 	httpall   : true,                                          // http capture all traffic, not just main frame
-	cbc       : true,                                          // Context menus to clean links
+	context_menu: true,                                        // Context menus to clean links
 	gotarget  : false,                                         // whether we respect target attributes on links that are being cleaned
-	textcl    : false,                                         // search for & clean links in selected text
+	textcl    : true,                                          // search for & clean links in selected text
 	ignhttp   : false,                                         // ignore non-http(s?) links
 	cltrack   : true,                                          // whether we track the link cleaning
 	switch_to_tab : true,                                      // Should be a copy of the browser preference: switch to a new tab when we open a link?
@@ -104,7 +105,7 @@ let import_domain_whitelist = undefined;
 
 function upgrade_options(options)
 {
-	for (let [rename, newname] in Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab'}))
+	for (let [rename, newname] in Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab', 'cbc': 'context_menu'}))
 		if (rename in options)
 		{
 			options[newname] = options[rename];

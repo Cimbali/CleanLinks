@@ -71,6 +71,10 @@
 	"message": "Highlight Cleaned Links?",
 	"description": ""
 },
+"show_clean_count_title": {
+	"message": "Show Cleaned Links Count?",
+	"description": ""
+},
 "hlstyle_emptytext": {
 	"message": "E.g. background:rgba(252,252,0,0.7); color: #000",
 	"description": ""
@@ -83,11 +87,11 @@
 	"message": "Apply this CSS Style to cleaned links.",
 	"description": ""
 },
-"cbc_title": {
+"context_menu_title": {
 	"message": "Copy clean links from the context menu",
 	"description": ""
 },
-"cbc_tooltip": {
+"context_menu_tooltip": {
 	"message": "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.",
 	"description": ""
 },
