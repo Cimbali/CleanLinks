@@ -71,9 +71,9 @@
 			<label><span>Match subdomains</span>
 				<input type="checkbox" name="subdomains" checked="checked" />
 			</label>
+			<span class="parsing_error" id="path_error"></span>
 			<label><span>Path</span>
-				<span class="parsing_error" id="path_error"></span>
-				<br /><input type="text" name="path" value="" placeholder="/path/in/link" />
+				<input type="text" name="path" value="" placeholder="/path/in/link" />
 			</label>
 		</fieldset>
 
@@ -114,9 +114,9 @@
 			</p>
 
 			<p class="editor" id="remove_editor">
+				<span class="parsing_error" id="remove_edit_error"></span>
 				<label>
 					<span>Add to removed query parameters:</span>
-					<span class="parsing_error" id="remove_edit_error"></span>
 					<br /><input type="text" name="remove_edit" value="" />
 				</label>
 
@@ -124,9 +124,9 @@
 			</p>
 
 			<p class="editor" id="whitelist_editor">
+				<span class="parsing_error" id="whitelist_edit_error"></span>
 				<label>
 					<span>Add to whitelisted query parameters:</span>
-					<span class="parsing_error" id="whitelist_edit_error"></span>
 					<br /><input type="text" name="whitelist_edit" value="" />
 				</label>
 
