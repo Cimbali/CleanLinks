@@ -134,13 +134,22 @@ function on_click(evt)
 }
 
 
-let tab_enabled = true;
+let tab_enabled = false;
 
-Prefs.loaded.then(() =>
+function toggle_active(enabled)
 {
-	if (tab_enabled)
-		window.addEventListener('click', on_click, true);
-})
+	if (tab_enabled === enabled)
+		return;
+
+	tab_enabled = enabled;
+
+	if (enabled)
+		window.addEventListener('click', on_click, {capture: true});
+	else
+		window.removeEventListener('click', on_click, {capture: true});
+}
+
+browser.runtime.sendMessage({action: 'check tab enabled'}).then(answer => toggle_active(answer.enabled));
 
 browser.runtime.onMessage.addListener(message =>
 {
@@ -148,16 +157,15 @@ browser.runtime.onMessage.addListener(message =>
 		return Prefs.reload();
 	else if (message.action === 'toggle')
 	{
-		if (tab_enabled == message.enabled)
-			return Promise.resolve({});
-		else
-			tab_enabled = message.enabled;
+		toggle_active(message.active);
+		return Promise.resolve({});
+	}
+	else if (message.action === 'highlight')
+	{
+		if (last_clicked !== null)
+			highlight_link(last_clicked, false);
 
-		if (message.enabled)
-			window.addEventListener('click', on_click, true);
-		else
-			window.removeEventListener('click', on_click, true);
-
+		last_clicked = null;
 		return Promise.resolve({});
 	}
 	else
