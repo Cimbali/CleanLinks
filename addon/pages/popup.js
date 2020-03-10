@@ -13,6 +13,11 @@
  * ***** END LICENSE BLOCK ***** */
 
 
+// N/A, stroke \u0336, low line \u0335, slashed through \u0338, double low line \u0333, overline \u305
+const utf8_markers = {deleted: '\u0336', inserted: '\u0332', whitelist: '\u0338', embedded: '\u0333'};
+const css_classes = {deleted: 'del', inserted: 'ins', whitelist: 'keep', embedded: 'url'};
+
+
 function set_selected(evt)
 {
 	var selected = document.querySelector('#history .selected');
@@ -29,10 +34,6 @@ function set_selected(evt)
 	document.querySelector('#whitelist').disabled = !target || !target.hasAttribute('actions');
 	document.querySelector('#open_editor').disabled = !target;
 }
-
-// N/A, stroke \u0336, low line \u0335, slashed through \u0338, double low line \u0333, overline \u305
-const utf8_markers = {deleted: '\u0336', inserted: '\u0332', whitelist: '\u0338', embedded: '\u0333'};
-const css_classes = {deleted: 'del', inserted: 'ins', whitelist: 'keep', embedded: 'url'};
 
 
 function append_decorated(node, text, type)
@@ -56,15 +57,18 @@ function append_decorated(node, text, type)
 // Find if the clean URL was embedded in the original URL
 function embed_url_pos(haystack, clean_url)
 {
-	let dest_base = clean_url.origin.slice(clean_url.protocol.length + 2);
 	let clean_encoded = [
-		clean_url.protocol.slice(0, -1) + '://' + dest_base,
-		clean_url.protocol.slice(0, -1) + encodeURIComponent('://') + dest_base,
+		// full origin with various possible encodings
+		clean_url.origin,
 		encodeURIComponent(clean_url.origin),
 		encodeURIComponent(clean_url.origin).replace(/\./g, '%2E'),
-		dest_base,
-		encodeURIComponent(dest_base),
-		encodeURIComponent(dest_base).replace(/\./g, '%2E'),
+		btoa(clean_url.origin.slice(0, - clean_url.origin.length % 3)),
+
+		// full origin with various possible encodings
+		clean_url.hostname,
+		encodeURIComponent(clean_url.hostname),
+		encodeURIComponent(clean_url.hostname).replace(/\./g, '%2E'),
+		btoa(clean_url.hostname.slice(0, - clean_url.hostname.length % 3)),
 	]
 
 	for (let needle of clean_encoded)
@@ -74,7 +78,7 @@ function embed_url_pos(haystack, clean_url)
 			return [pos, pos + needle.length];
 	}
 
-	// TODO: base 64 encoded base
+	return []
 }
 
 
@@ -126,7 +130,7 @@ function add_option(orig, clean, classes)
 			}
 		}
 
-		let [embed_start, embed_end] = embed_url_pos(modified_path, clean) || [], embed_range = undefined;
+		let [embed_start, embed_end] = embed_url_pos(modified_path, clean), embed_range = undefined;
 		if (embed_start !== undefined && embed_end !== undefined)
 			embed_range = new Range()
 
@@ -226,7 +230,7 @@ function add_option(orig, clean, classes)
 		else if (key.match(strip))
 			decorate = 'deleted';
 		else
-			[embed_start, embed_end] = embed_url_pos(keyval, clean) || [];
+			[embed_start, embed_end] = embed_url_pos(keyval, clean);
 
 		if (embed_start !== undefined && embed_end !== undefined)
 		{
@@ -251,10 +255,7 @@ function add_option(orig, clean, classes)
 	clean_node.append(document.createTextNode(clean.href))
 
 	if (Object.entries(actions_to_whitelist).length !== 0)
-	{
 		option.setAttribute('actions', JSON.stringify(actions_to_whitelist));
-		console.log(actions_to_whitelist)
-	}
 
 	history.appendChild(option);
 }

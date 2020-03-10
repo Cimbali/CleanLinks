@@ -101,13 +101,18 @@ function get_base_url(base)
 
 function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 {
-	let unencoded_match_start;
-	if (matched_protocol)
-		unencoded_match_start = embedded_link.href.slice(0, embedded_link.origin.length);
-	else
-		unencoded_match_start = embedded_link.href.slice(embedded_link.protocol.length + 2, embedded_link.origin.length + 1);
+	// get embedded_link.origin + username the way it is in the raw string
+	let substr = [0, embedded_link.origin.length + (embedded_link.username ? 1 + embedded_link.username.length : 0)];
 
-	let raw_pos = haystack.indexOf(unencoded_match_start)
+	if (!matched_protocol)
+	{
+		// if we did not match a protocol (e.g. a match starting with "www.") strip the protocol from the search string,
+		// and add the first unencoded character of the path/query/hash (whichever is present) to ensure a raw URL match
+		substr[0] += embedded_link.protocol.length + 2;
+		substr[1] += 1;
+	}
+
+	let raw_pos = haystack.indexOf(embedded_link.href.slice(...substr));
 	if (raw_pos === -1)
 		return null;
 
