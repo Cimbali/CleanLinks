@@ -80,7 +80,7 @@ function merge_rule_actions(actions, add)
 function find_rules(url, all_rules)
 {
 	let [suffix, domain] = split_suffix(url.hostname);
-	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '');
+	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '.');
 
 	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
 
