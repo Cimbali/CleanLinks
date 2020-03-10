@@ -17,7 +17,6 @@
 const _ = browser.i18n.getMessage
 const attr_cleaned_count = 'data-cleanedlinks';
 const attr_cleaned_link = 'data-cleanedlink';
-const str_cleanlink_touch = "\n\n- " + _("browser_touch");
 
 const title = browser.runtime.getManifest().name;
 const version = browser.runtime.getManifest().version;

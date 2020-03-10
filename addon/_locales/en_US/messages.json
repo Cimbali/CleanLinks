@@ -3,67 +3,43 @@
 	"message": "Converts obfuscated/nested links to genuine clean links",
 	"description": ""
 },
-"browser_status": {
-	"message": "Status:\u0020",
-	"description": ""
-},
 "browser_cleanedlinks": {
-	"message": "Cleaned Links:\u0020",
+	"message": "Cleaned Links:",
 	"description": ""
 },
-"browser_clicktheicon": {
-	"message": "Click the icon to\u0020",
+"browser_regex_err": {
+	"message": "Error Processing Regular expression:",
 	"description": ""
 },
-"browser_regexerr": {
-	"message": "Error Processing CleanLinks Pattern\u0020",
+"browser_regex_missing": {
+	"message": "Empty expression!",
 	"description": ""
 },
-"browser_touch": {
-	"message": "CleanLinks Touch!",
-	"description": ""
-},
-"browser_hashtag": {
-	"message": "#",
-	"description": ""
-},
-"bootstrap_listheader_original": {
-	"message": "Original Link",
-	"description": ""
-},
-"bootstrap_listheader_cleaned": {
-	"message": "Cleaned Link",
-	"description": ""
-},
-"bootstrap_openonce_button": {
+"popup_openonce_button": {
 	"message": "Open Un-cleaned Link",
 	"description": ""
 },
-"bootstrap_whitelist_button": {
+"popup_whitelist_button": {
 	"message": "Whitelist Embedded URL",
 	"description": ""
 },
-"bootstrap_clearlist_button": {
+"popup_clearlist_button": {
 	"message": "Clear List",
 	"description": ""
 },
-"bootstrap_whitelist_description": {
+"popup_whitelist_description": {
 	"message": "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.",
 	"description": ""
 },
-"extension_text": {
-	"message": "Extension ",
-	"description": ""
-},
-"extension_toggle_tooltip": {
+"popup_toggle_tooltip": {
 	"message": "Toggle to enable or disable the extension.",
 	"description": ""
 },
-"extension_enabled": {
+"popup_enabled_tab": {
 	"message": "Enabled",
 	"description": ""
 },
-"extension_disabled": {
+"popup_disabled_tab": {
 	"message": "Disabled",
 	"description": ""
 },
@@ -147,7 +123,7 @@
 	"message": "Link Tracking",
 	"description": ""
 },
-"cltrack_content": {
+"cltrack_tooltip": {
 	"message": "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.",
 	"description": ""
 },

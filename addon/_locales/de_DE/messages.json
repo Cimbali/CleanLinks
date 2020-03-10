@@ -3,84 +3,28 @@
 	"message": "Ersetzt verschachtelte/verschleierte Links zu authentischen sauberen Links",
 	"description": ""
 },
-"browser_status": {
-	"message": "Status:\u0020",
+"browser_cleanedlinks": {
+	"message": "Gesäuberte Links:",
 	"description": ""
 },
-"browser_enabled": {
+"browser_regex_err": {
+	"message": "Fehler beim abarbeiten der Reguläre Ausdrücke:",
+	"description": ""
+},
+"popup_enabled_tab": {
 	"message": "aktiviert",
 	"description": ""
 },
-"browser_disabled": {
+"popup_disabled_tab": {
 	"message": "deaktiviert",
 	"description": ""
 },
-"browser_enable": {
-	"message": "aktivieren",
-	"description": ""
-},
-"browser_disable": {
-	"message": "deaktivieren",
-	"description": ""
-},
-"browser_cleanedlinks": {
-	"message": "Gesäuberte Links:\u0020",
-	"description": ""
-},
-"browser_clicktheicon": {
-	"message": "Klicke das Symbol um\u0020",
-	"description": ""
-},
-"browser_regexerr": {
-	"message": "Fehler beim abarbeiten der CleanLinks Ausdrücke\u0020",
-	"description": ""
-},
-"browser_touch": {
-	"message": "CleanLinks Touch!",
-	"description": ""
-},
-"browser_hashtag": {
-	"message": "#",
-	"description": ""
-},
-"bootstrap_listheader_original": {
-	"message": "Original Link",
-	"description": ""
-},
-"bootstrap_listheader_cleaned": {
-	"message": "Gesäuberter Link",
-	"description": ""
-},
-"bootstrap_whitelist_button": {
+"popup_whitelist_button": {
 	"message": "Zu Ausnahmen hinzufügen",
 	"description": ""
 },
-"bootstrap_whitelist_description": {
+"popup_whitelist_description": {
 	"message": "Dies ist eine aktuelle Sitzungsliste für die gereinigten Links und der Originale von denen sie kamen, für eine einfache Aufnahme in die Ausnahmeliste. Bitte beachten Sie, manchmal ist es besser teile der URL in den regulären Ausdruck hinzuzufügen.",
-	"description": ""
-},
-"skipwhen_title": {
-	"message": "Links mit folgendem Muster ausschließen:",
-	"description": ""
-},
-"skipwhen_tooltip": {
-	"message": "Dieser reguläre Ausdruck wird gegen die Links angewendet um beschädigte Links zu verhindern (case-sensitive)",
-	"description": ""
-},
-"remove_title": {
-	"message": "Aus Links entfernen:",
-	"description": ""
-},
-"remove_tooltip": {
-	"message": "Dieser reguläre Ausdruck wird genutzt um tracking Tags und ähnliches aus Links zu entfernen. (case-insensitive)",
-	"description": ""
-},
-"skipdoms_title": {
-	"message": "Domains überspringen:",
-	"description": ""
-},
-"skipdoms_tooltip": {
-	"message": "Kommaseparierte Liste der Domains deren Links nicht gesäubert werden.",
 	"description": ""
 },
 "highlight_title": {
@@ -127,7 +71,7 @@
 	"message": "Auf Standardeinstellungen zurücksetzen.",
 	"description": ""
 },
-"reset_label": {
+"reset_options": {
 	"message": "Einstellungen zurücksetzen",
 	"description": ""
 },
@@ -135,11 +79,7 @@
 	"message": "Links Verfolgen",
 	"description": ""
 },
-"cltrackOLD_content": {
-	"message": "Diese Option verfolgt gesäuberte Links um ihre Domains durch Rechtsklick des Menübuttons einfach in die Ausnahmeliste einfügen zu können.",
-	"description": ""
-},
-"cltrack_content": {
+"cltrack_tooltip": {
 	"message": "Das Aktivieren dieser Option erlaubt die Nachverfolgung von gesäuberten Links um ihre Domains leichter mit einem Rechtsklick auf den Toolbar Button in die Ausnahmeliste aufnehmen zu können.",
 	"description": ""
 },

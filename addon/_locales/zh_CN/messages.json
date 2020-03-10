@@ -3,84 +3,28 @@
 	"message": "将加密/内嵌链接还原为直接链接。",
 	"description": ""
 },
-"browser_status": {
-	"message": "状态：",
-	"description": ""
-},
-"browser_enabled": {
-	"message": "已启用",
-	"description": ""
-},
-"browser_disabled": {
-	"message": "已禁用",
-	"description": ""
-},
-"browser_enable": {
-	"message": "启用",
-	"description": ""
-},
-"browser_disable": {
-	"message": "禁用",
-	"description": ""
-},
 "browser_cleanedlinks": {
 	"message": "已处理链接数：",
 	"description": ""
 },
-"browser_clicktheicon": {
-	"message": "点击图标以",
-	"description": ""
-},
-"browser_regexerr": {
+"browser_regex_err": {
 	"message": "处理规则时遇到错误：",
 	"description": ""
 },
-"browser_touch": {
-	"message": "CleanLinks Touch!",
+"popup_enabled_tab": {
+	"message": "已启用",
 	"description": ""
 },
-"browser_hashtag": {
-	"message": "#",
+"popup_disabled_tab": {
+	"message": "已禁用",
 	"description": ""
 },
-"bootstrap_listheader_original": {
-	"message": "原始链接",
-	"description": ""
-},
-"bootstrap_listheader_cleaned": {
-	"message": "直接链接",
-	"description": ""
-},
-"bootstrap_whitelist_button": {
+"popup_whitelist_button": {
 	"message": "添加到白名单",
 	"description": ""
 },
-"bootstrap_whitelist_description": {
+"popup_whitelist_description": {
 	"message": "此列表显示了本次浏览器会话中已处理的链接和它们的原始链接，您可以方便地将某个域名添加到白名单中。请注意白名单会对整个域名生效，因此有时您可能需要找到链接的模式并将它们添加到“忽略链接规则”选项中。",
-	"description": ""
-},
-"skipwhen_title": {
-	"message": "忽略链接规则：",
-	"description": ""
-},
-"skipwhen_tooltip": {
-	"message": "符合本正则表达式的链接将被忽略以防止误处理。区分大小写。",
-	"description": ""
-},
-"remove_title": {
-	"message": "匹配链接规则：",
-	"description": ""
-},
-"remove_tooltip": {
-	"message": "符合本正则表达式的链接将被移除跳转或追踪。区分大小写",
-	"description": ""
-},
-"skipdoms_title": {
-	"message": "忽略域名规则：",
-	"description": ""
-},
-"skipdoms_tooltip": {
-	"message": "匹配的域名上的链接将被忽略。使用逗号分隔多个域名。",
 	"description": ""
 },
 "highlight_title": {
@@ -127,7 +71,7 @@
 	"message": "还原所有设置到默认值",
 	"description": ""
 },
-"reset_label": {
+"reset_options": {
 	"message": "重置设置",
 	"description": ""
 },
@@ -151,7 +95,7 @@
 	"message": "追踪链接",
 	"description": ""
 },
-"cltrack_content": {
+"cltrack_tooltip": {
 	"message": "将会记录所有经过处理的链接，可以在工具栏按钮上右键以快速将域名添加到白名单。",
 	"description": ""
 }

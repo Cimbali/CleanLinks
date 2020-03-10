@@ -3,84 +3,28 @@
 	"message": "Convierte enlaces enmascarados/anidados en auténticos enlaces limpios",
 	"description": ""
 },
-"browser_status": {
-	"message": "Estado:\u0020",
+"browser_cleanedlinks": {
+	"message": "Enlaces limpiados:",
 	"description": ""
 },
-"browser_enabled": {
+"browser_regex_err": {
+	"message": "Error procesando el patrón regex:",
+	"description": ""
+},
+"popup_enabled_tab": {
 	"message": "Activado",
 	"description": ""
 },
-"browser_disabled": {
+"popup_disabled_tab": {
 	"message": "Desactivado",
 	"description": ""
 },
-"browser_enable": {
-	"message": "activar",
-	"description": ""
-},
-"browser_disable": {
-	"message": "desactivar",
-	"description": ""
-},
-"browser_cleanedlinks": {
-	"message": "Enlaces limpiados:\u0020",
-	"description": ""
-},
-"browser_clicktheicon": {
-	"message": "Pulsa en icono para\u0020",
-	"description": ""
-},
-"browser_regexerr": {
-	"message": "Error procesando el patrón regex",
-	"description": ""
-},
-"browser_touch": {
-	"message": "CleanLinks Touch!",
-	"description": ""
-},
-"browser_hashtag": {
-	"message": "#",
-	"description": ""
-},
-"bootstrap_listheader_original": {
-	"message": "Enlace Original",
-	"description": ""
-},
-"bootstrap_listheader_cleaned": {
-	"message": "Enlace Límpio",
-	"description": ""
-},
-"bootstrap_whitelist_button": {
+"popup_whitelist_button": {
 	"message": "Ignorar Dominios",
 	"description": ""
 },
-"bootstrap_whitelist_description": {
+"popup_whitelist_description": {
 	"message": "Esta lista contiene los enlaces limpiados y sus originales, para facilitar su adición a la opción de ignorados.",
-	"description": ""
-},
-"skipwhen_title": {
-	"message": "Evitar enlaces que coincidan con:",
-	"description": ""
-},
-"skipwhen_tooltip": {
-	"message": "Patrón REGEXP que se usara para comprobar las URLs y evitar problemas con ciertos enlaces.",
-	"description": ""
-},
-"remove_title": {
-	"message": "Eliminar de los enlaces:",
-	"description": ""
-},
-"remove_tooltip": {
-	"message": "Patrón REGEXP que se aplicara a los enlaces para eliminar etiquetas de seguimiento y similares.",
-	"description": ""
-},
-"skipdoms_title": {
-	"message": "Ignorar Dominios:",
-	"description": ""
-},
-"skipdoms_tooltip": {
-	"message": "Lista de dominios separados por comas cuyos enlaces no se modificaran.",
 	"description": ""
 },
 "highlight_title": {
@@ -127,7 +71,7 @@
 	"message": "Reinicia las opciones a sus valores por defecto.",
 	"description": ""
 },
-"reset_label": {
+"reset_options": {
 	"message": "Reiniciar Opciones",
 	"description": ""
 },
@@ -151,7 +95,7 @@
 	"message": "Seguimiento de enlaces",
 	"description": ""
 },
-"cltrack_content": {
+"cltrack_tooltip": {
 	"message": "Esta opción le permitirá añadir dominios fácilmente a la lista de ignorados usando RMB en el botón de la barra de navegación.",
 	"description": ""
 }
