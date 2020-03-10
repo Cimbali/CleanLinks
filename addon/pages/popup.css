@@ -102,17 +102,17 @@ body {
 .dropped {
 	background: rgb(255, 128, 128)
 }
-#filters {
+.filters {
 	margin-bottom: 5px;
 	display: flex;
 	justify-content: space-around;
 	flex-wrap: wrap;
 	align-items: center;
 }
-#filters input {
+.filters input {
 	margin: 0 5px 0 15px;
 }
-#filters label:last-child {
+.filters label:last-child {
 	margin-right: 15px;
 }
 .help {

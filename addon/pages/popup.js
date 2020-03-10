@@ -109,6 +109,7 @@ function add_option(orig, clean, classes)
 
 	else if ('rewrite' in rules && rules.rewrite.length)
 	{
+		option.classList.add('rewrite');
 		let matches = [], modified_path = orig.pathname;
 
 		for (let {search, replace, flags} of rules.rewrite)
@@ -197,7 +198,9 @@ function add_option(orig, clean, classes)
 			let span = document.createElement('span');
 			span.classList.add(css_classes['embedded']);
 			embed_range.surroundContents(span);
+
 			actions_to_whitelist.whitelist_path = true;
+			option.classList.add('embed');
 		}
 	}
 	else
@@ -208,7 +211,9 @@ function add_option(orig, clean, classes)
 			append_decorated(option, orig.pathname.substring(0, match_start))
 			append_decorated(option, orig.pathname.substring(match_start, match_end), 'embedded')
 			append_decorated(option, orig.pathname.substring(match_end))
+
 			actions_to_whitelist.whitelist_path = true;
+			option.classList.add('embed');
 		}
 		else
 			append_decorated(option, orig.pathname)
@@ -227,7 +232,10 @@ function add_option(orig, clean, classes)
 		if (key.match(keep))
 			decorate = 'whitelist'
 		else if (key.match(strip))
+		{
 			decorate = 'deleted';
+			option.classList.add('remove');
+		}
 		else
 			[embed_start, embed_end] = embed_url_pos(keyval, clean);
 
@@ -239,7 +247,9 @@ function add_option(orig, clean, classes)
 
 			if (!('whitelist' in actions_to_whitelist))
 				actions_to_whitelist.whitelist = []
+
 			actions_to_whitelist.whitelist.push(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+			option.classList.add('embed');
 		}
 		else
 			append_decorated(option, keyval, decorate)
@@ -262,10 +272,29 @@ function add_option(orig, clean, classes)
 
 function filter_from_input(evt)
 {
-	let display_value = evt.target.checked ? 'block' : 'none';
+	let filter_cat = {}, filter_act = {};
+	for (let input of document.querySelectorAll('#filter_categories input'))
+		filter_cat[input.name] = input.checked;
 
-	for (let opt of document.getElementById('history').getElementsByClassName(evt.target.name))
-		opt.style.display = display_value;
+	for (let input of document.querySelectorAll('#filter_actions input'))
+		filter_act[input.name] = input.checked;
+
+	console.log(filter_cat, filter_act)
+	for (let opt of document.querySelectorAll('#history p'))
+	{
+		// There is a single category per item, that must be selected, and there are a number of actions of which any one can be selected
+		let category_selected = false, action_matched = false;
+
+		for (let class_name of opt.classList)
+		{
+			if (class_name in filter_cat)
+				category_selected = filter_cat[class_name]
+			else if (class_name in filter_act)
+				action_matched = action_matched || filter_act[class_name];
+		}
+
+		opt.style.display = category_selected && action_matched ? 'block' : 'none';
+	}
 }
 
 
@@ -300,11 +329,10 @@ function populate_popup()
 				add_option(clean.orig, clean.url, classes);
 			}
 
-			for (input of document.querySelectorAll('#filters input'))
-			{
+			for (input of document.querySelectorAll('.filters input'))
 				input.onchange = filter_from_input
-				input.dispatchEvent(new Event('change'))
-			}
+
+			filter_from_input()
 
 			document.querySelector('button#clearlist').disabled = response.length === 0;
 		});

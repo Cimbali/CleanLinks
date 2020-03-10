@@ -25,10 +25,16 @@
 		</div>
 	</div>
 
-	<p id="filters">
-		<label><input type="checkbox" name="clicked" checked="checked" />Clicked links</label>
-		<label><input type="checkbox" name="request" checked="checked" />HTTP requests</label>
-		<label><input type="checkbox" name="header" checked="checked" />Header redirects</label>
+	<p class="filters" id="filter_categories">
+		<label i18n_text="popup_clicked_links_filter"><input type="checkbox" name="clicked" checked="checked" />Clicked links</label>
+		<label i18n_text="popup_http_requests_filter"><input type="checkbox" name="request" checked="checked" />HTTP requests</label>
+		<label i18n_text="popup_header_redir_filter"><input type="checkbox" name="header" checked="checked" />Header redirects</label>
+	</p>
+
+	<p class="filters" id="filter_actions">
+		<label i18n_text="popup_embed"><input type="checkbox" name="embed" checked="checked" />Embedded URL</label>
+		<label i18n_text="popup_remove"><input type="checkbox" name="remove" checked="checked" />Params stripped</label>
+		<label i18n_text="popup_rewrite"><input type="checkbox" name="rewrite" checked="checked" />Path rewritten</label>
 	</p>
 
 	<div id="history"></div>
