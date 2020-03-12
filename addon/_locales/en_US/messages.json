@@ -1,9 +1,30 @@
 {
+  "addon_description": {
+    "message": "Converts obfuscated/nested links to genuine clean links"
+  },
   "(usually same as top-level domain)": {
     "message": "(usually same as top-level domain)"
   },
+  "Add": {
+    "message": "Add"
+  },
+  "Add rule": {
+    "message": "Add rule"
+  },
+  "Add to removed query parameters:": {
+    "message": "Add to removed query parameters:"
+  },
+  "Add to the list": {
+    "message": "Add to the list"
+  },
+  "Add to whitelisted query parameters:": {
+    "message": "Add to whitelisted query parameters:"
+  },
   "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you.": {
     "message": "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you."
+  },
+  "Allow URL embedded inside path": {
+    "message": "Allow URL embedded inside path"
   },
   "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
     "message": "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode."
@@ -11,29 +32,50 @@
   "Apply this CSS Style to cleaned links.": {
     "message": "Apply this CSS Style to cleaned links."
   },
+  "Cancel": {
+    "message": "Cancel"
+  },
   "Catch Text Links": {
     "message": "Catch Text Links"
   },
   "Clean all outgoing HTTP requests, instead of only top frame": {
     "message": "Clean all outgoing HTTP requests, instead of only top frame"
   },
-  "Cleaned Links:": {
-    "message": "Cleaned Links:"
+  "Cleaning actions": {
+    "message": "Cleaning actions"
   },
   "Clear List": {
     "message": "Clear List"
   },
+  "Clicked links": {
+    "message": "Clicked links"
+  },
   "Copy clean links from the context menu": {
     "message": "Copy clean links from the context menu"
   },
+  "Delete rule": {
+    "message": "Delete rule"
+  },
   "Disabled": {
     "message": "Disabled"
+  },
+  "Display": {
+    "message": "Display"
+  },
+  "Domain": {
+    "message": "Domain"
   },
   "Domain name": {
     "message": "Domain name"
   },
   "E.g. background:rgba(252,252,0,0.7); color: #000": {
     "message": "E.g. background:rgba(252,252,0,0.7); color: #000"
+  },
+  "Edit rule": {
+    "message": "Edit rule"
+  },
+  "Embedded URL": {
+    "message": "Embedded URL"
   },
   "Empty expression!": {
     "message": "Empty expression!"
@@ -47,11 +89,26 @@
   "Error Processing Regular expression:": {
     "message": "Error Processing Regular expression:"
   },
+  "Export rules": {
+    "message": "Export rules"
+  },
+  "Features": {
+    "message": "Features"
+  },
   "Follow Target Attribute?": {
     "message": "Follow Target Attribute?"
   },
   "Fully-Qualified Domain Name (FQDN)": {
     "message": "Fully-Qualified Domain Name (FQDN)"
+  },
+  "HTTP requests": {
+    "message": "HTTP requests"
+  },
+  "Header redirects": {
+    "message": "Header redirects"
+  },
+  "Hide legend": {
+    "message": "Hide legend"
   },
   "Highlight Cleaned Links?": {
     "message": "Highlight Cleaned Links?"
@@ -59,11 +116,26 @@
   "Highlight Style": {
     "message": "Highlight Style"
   },
+  "Ignore case": {
+    "message": "Ignore case"
+  },
   "Ignore non-http/s links": {
     "message": "Ignore non-http/s links"
   },
+  "Import rules": {
+    "message": "Import rules"
+  },
   "Link Tracking": {
     "message": "Link Tracking"
+  },
+  "Link cleaning rules": {
+    "message": "Link cleaning rules"
+  },
+  "Match subdomains": {
+    "message": "Match subdomains"
+  },
+  "Open CleanLinks Options page": {
+    "message": "Open CleanLinks Options page"
   },
   "Open Un-cleaned Link": {
     "message": "Open Un-cleaned Link"
@@ -71,8 +143,14 @@
   "Parameter": {
     "message": "Parameter"
   },
+  "Params stripped": {
+    "message": "Params stripped"
+  },
   "Path": {
     "message": "Path"
+  },
+  "Path rewritten": {
+    "message": "Path rewritten"
   },
   "Protocol": {
     "message": "Protocol"
@@ -82,6 +160,21 @@
   },
   "Query": {
     "message": "Query"
+  },
+  "Remove from path:": {
+    "message": "Remove from path:"
+  },
+  "Remove or replace in path:": {
+    "message": "Remove or replace in path:"
+  },
+  "Remove query parameters:": {
+    "message": "Remove query parameters:"
+  },
+  "Replace all occurrences": {
+    "message": "Replace all occurrences"
+  },
+  "Replace with:": {
+    "message": "Replace with:"
   },
   "Reset Options": {
     "message": "Reset Options"
@@ -103,11 +196,23 @@
       }
     }
   },
+  "Rule to edit:": {
+    "message": "Rule to edit:"
+  },
+  "Rules": {
+    "message": "Rules"
+  },
+  "Save rule": {
+    "message": "Save rule"
+  },
   "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
     "message": "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs."
   },
   "Show Cleaned Links Count?": {
     "message": "Show Cleaned Links Count?"
+  },
+  "Show legend": {
+    "message": "Show legend"
   },
   "Subdomain": {
     "message": "Subdomain"
@@ -127,6 +232,12 @@
   "Toggle to enable or disable the extension.": {
     "message": "Toggle to enable or disable the extension."
   },
+  "URL example": {
+    "message": "URL example"
+  },
+  "URLs matched": {
+    "message": "URLs matched"
+  },
   "Use Redirect Watcher?": {
     "message": "Use Redirect Watcher?"
   },
@@ -139,7 +250,7 @@
   "Whitelist Embedded URL": {
     "message": "Whitelist Embedded URL"
   },
-  "addon_description": {
-    "message": "Converts obfuscated/nested links to genuine clean links"
+  "Whitelist query parameters (prevent removing and allow embedded URL):": {
+    "message": "Whitelist query parameters (prevent removing and allow embedded URL):"
   }
 }
