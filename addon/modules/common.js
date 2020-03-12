@@ -113,8 +113,15 @@ function upgrade_options(options)
 
 	if ('skipdoms' in options && import_domain_whitelist !== undefined)
 	{
-		// These are already handled in the default rules
-		for (let handled of ['accounts.google.com', 'signin.ebay.com'])
+		const old_defaults = ['accounts.google.com', 'docs.google.com', 'translate.google.com',
+			'login.live.com', 'plus.google.com', 'twitter.com',
+			'static.ak.facebook.com', 'www.linkedin.com', 'www.virustotal.com',
+			'account.live.com', 'admin.brightcove.com', 'www.mywot.com',
+			'webcache.googleusercontent.com', 'web.archive.org', 'accounts.youtube.com',
+			'accounts.google.com', 'signin.ebay.com']
+
+		// These are already handled in the new default rules
+		for (let handled of old_defaults)
 		{
 			let find = options.skipdoms.indexOf(handled)
 			if (find !== -1)
