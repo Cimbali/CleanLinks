@@ -1,6 +1,13 @@
 {
   ".*": {
     ".amazon": {
+      "/ap/signin": {
+        "actions": {
+          "whitelist": [
+            "openid.return_to"
+          ]
+        }
+      },
       "actions": {
         "remove": [
           "pf_rd_[a-zA-Z]",
@@ -36,7 +43,11 @@
           "tag"
         ],
         "rewrite": [
-          {"search": "/ref=[^/]*", "replace": "", "flags": ""}
+          {
+            "flags": "",
+            "replace": "",
+            "search": "/ref=[^/]*"
+          }
         ]
       }
     },
@@ -207,8 +218,16 @@
       "/ShowUrl.*-a_urlKey": {
         "actions": {
           "rewrite": [
-            {"search": "__([0-9A-F]{2})__", "replace": "%$1", "flags": "g"},
-            {"search": "-a_urlKey\\.\\d.*", "replace": "", "flags": ""}
+            {
+              "flags": "g",
+              "replace": "%$1",
+              "search": "__([0-9A-F]{2})__"
+            },
+            {
+              "flags": "",
+              "replace": "",
+              "search": "-a_urlKey\\.\\d.*"
+            }
           ]
         }
       }
@@ -269,6 +288,19 @@
         ]
       }
     },
+    ".aliexpress": {
+      "actions": {
+        "remove": [
+          "ws_ab_test",
+          "btsid",
+          "algo_expid",
+          "algo_pvid",
+          "gps-id",
+          "scm[_a-zA-Z\\-]*",
+          "pvid"
+        ]
+      }
+    },
     ".amazon": {
       ".aws": {
         ".signin": {
@@ -282,19 +314,6 @@
             }
           }
         }
-      }
-    },
-    ".aliexpress": {
-      "actions": {
-        "remove": [
-          "ws_ab_test",
-          "btsid",
-          "algo_expid",
-          "algo_pvid",
-          "gps-id",
-          "scm[_a-zA-Z\\-]*",
-          "pvid"
-        ]
       }
     },
     ".backcountry": {
@@ -355,6 +374,17 @@
         }
       }
     },
+    ".dropbox": {
+      ".www": {
+        "^/login$": {
+          "actions": {
+            "whitelist": [
+              "cont"
+            ]
+          }
+        }
+      }
+    },
     ".firefox": {
       ".": {
         "actions": {
@@ -392,6 +422,17 @@
         ]
       }
     },
+    ".google": {
+      ".www": {
+        "^/recaptcha/api2/anchor$": {
+          "actions": {
+            "whitelist": [
+              "co"
+            ]
+          }
+        }
+      }
+    },
     ".googleusercontent": {
       ".translate": {
         "/translate.*": {
@@ -399,6 +440,26 @@
             "whitelist": [
               "rurl",
               "u"
+            ]
+          }
+        }
+      },
+      ".webcache": {
+        "/search.*": {
+          "actions": {
+            "whitelist": [
+              "q"
+            ]
+          }
+        }
+      }
+    },
+    ".gravatar": {
+      ".www": {
+        "^/avatar/": {
+          "actions": {
+            "whitelist": [
+              "d"
             ]
           }
         }
@@ -447,10 +508,33 @@
         ]
       }
     },
+    ".live": {
+      ".account": {
+        ".": {
+          "actions": {
+            "whitelist": [
+              "ru"
+            ]
+          }
+        }
+      },
+      ".login": {
+        ".": {
+          "^/(login|logout)\\.srf$": {
+            "actions": {
+              "whitelist": [
+                "ru",
+                "wreply"
+              ]
+            }
+          }
+        }
+      }
+    },
     ".livejournal": {
       ".www": {
         ".": {
-          "/misc/get_domain_session.bml$" : {
+          "/misc/get_domain_session.bml$": {
             "actions": {
               "whitelist": [
                 "return"
@@ -611,7 +695,11 @@
     ".yahoo": {
       "actions": {
         "rewrite": [
-          {"search": "/R[KS]=\\d.*$", "replace": "", "flags": ""}
+          {
+            "flags": "",
+            "replace": "",
+            "search": "/R[KS]=\\d.*$"
+          }
         ]
       }
     },
@@ -734,7 +822,7 @@
       ".web": {
         "/web/.*": {
           "actions": {
-              "whitelist_path": true
+            "whitelist_path": true
           }
         }
       }
@@ -825,6 +913,13 @@
       }
     }
   },
+  "/(openid|oauth2?)/authorize$": {
+    "actions": {
+      "whitelist": [
+        "redirect_uri"
+      ]
+    }
+  },
   "actions": {
     "remove": [
       "utm(_[a-zA-Z]*)?",
@@ -856,7 +951,8 @@
       "dclid",
       "Echobox",
       "spm",
-      "vn(_[a-zA-Z]*)+"
+      "vn(_[a-zA-Z]*)+",
+      "(merchant|pogramme|media)ID"
     ]
   }
 }

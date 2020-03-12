@@ -21,7 +21,7 @@ const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComp
 
 function skip_link_type(link)
 {
-	return link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:")
+	return link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:") || link.startsWith("magnet:")
 }
 
 
