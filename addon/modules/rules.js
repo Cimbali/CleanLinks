@@ -68,7 +68,7 @@ function merge_rule_actions(actions, add)
 		if (!(key in actions))
 			actions[key] = Array.isArray(action) ? [...action] : action;
 		else if (Array.isArray(action))
-			actions[key].push(...action)
+			actions[key].push(...action.filter(val => !actions[key].includes(val)))
 		else if (typeof action === 'boolean')
 			actions[key] = actions[key] || action
 	}
@@ -151,10 +151,8 @@ function serialize_rules(rules, serialized_rule)
 	{
 		if (key[0] === '.')
 			list.push(...serialize_rules(value, {...serialized_rule, domain: [key].concat(serialized_rule.domain)}))
-		else if (key[0] === '/')
-			list.push(...serialize_rules(value, {...serialized_rule, path: key}))
 		else if (key !== 'actions')
-			console.error('Unexpected key while serializing rules:', key, '=>', value)
+			list.push(...serialize_rules(value, {...serialized_rule, path: key}))
 	}
 
 	return list
@@ -306,42 +304,44 @@ function load_rules()
 
 let Rules = {
 	all_rules: {},
-	find: url => {
+	find: function(url) {
 		return find_rules(url, this.all_rules)
 	},
-	serialize: () =>
+	serialize: function()
 	{
 		return serialize_rules(this.all_rules)
 	},
-	add: new_rule =>
+	add: function(new_rule)
 	{
 		push_rule(this.all_rules, new_rule)
 		return save_rules(this.all_rules)
 	},
-	remove: old_rule =>
+	remove: function(old_rule)
 	{
 		pop_rule(this.all_rules, old_rule)
 		return save_rules(this.all_rules)
 	},
-	exists: rule =>
+	exists: function(rule)
 	{
 		return rule_exists(this.all_rules, rule);
 	},
-	update: (old_rule, new_rule) =>
+	update: function(old_rule, new_rule)
 	{
 		let found = pop_rule(this.all_rules, old_rule)
 		merge_rule_actions(new_rule, found)
 		push_rule(this.all_rules, new_rule)
 		return save_rules(this.all_rules)
 	},
-	reload: () => load_rules().then(loaded => this.all_rules = loaded),
-	replace: (new_data) => {
+	reload: function() {
+		return load_rules().then(loaded => this.all_rules = loaded)
+	},
+	replace: function(new_data) {
 		return clear_rules().then(() => {
 			this.all_rules = new_data;
 			return save_rules(this.all_rules);
 		});
 	},
-	reset: () => {
+	reset: function() {
 		return clear_rules().then(() => load_rules().then(loaded => this.all_rules = loaded));
 	},
 }
