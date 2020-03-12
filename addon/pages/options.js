@@ -307,13 +307,21 @@ function erase_rule()
 	select[0].checked = true;
 
 	Rules.remove(JSON.parse(selected_opt.getAttribute('orig-value')))
-	if (select.selectedIndex > 0)
+
+	let next_up = selected_opt.previousSibling;
+	while (next_up !== null && next_up.style.display === 'none')
+		next_up = next_up.previousSibling;
+
+	if (next_up !== null)
 	{
-		select.selectedIndex--;
+		next_up.selected = true;
 		load_rule();
 	}
 	else
+	{
+		select.selectedIndex = -1;
 		no_rule_loaded();
+	}
 
 	selected_opt.remove()
 }
@@ -321,6 +329,9 @@ function erase_rule()
 
 function parse_rule(select)
 {
+	if (select.value === '')
+		return no_rule_loaded();
+
 	let rule = Object.assign(JSON.parse(select.value),
 	{
 		domain: document.querySelector('input[name="domain"]').value || '*.*',
@@ -341,8 +352,11 @@ function parse_rule(select)
 function rule_changed()
 {
 	/* some smarter checks */
-	let select = document.getElementById('rule_selector'), opt = select[select.selectedIndex];
+	let select = document.getElementById('rule_selector');
+	if (select.selectedIndex === -1)
+		return rule_pristine();
 
+	let opt = select[select.selectedIndex];
 	let rule = {...default_actions, ...parse_rule(select)};
 	let orig_rule = opt.hasAttribute('orig-value') ? {...default_actions, ...JSON.parse(opt.getAttribute('orig-value'))} : null;
 	let same_node = orig_rule && (orig_rule.domain || '*.*') === rule.domain && (orig_rule.path || '') === rule.path;

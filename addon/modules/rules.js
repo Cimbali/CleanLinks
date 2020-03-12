@@ -50,7 +50,7 @@ function recursive_find(rules, domain_bits, path)
 
 function split_suffix(hostname)
 {
-	if (hostname === '' || hostname === '*')
+	if (hostname === undefined || hostname === '' || hostname === '*')
 		return ['.*', '*']
 
 	// use public domain instead of TLD
