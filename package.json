@@ -8,8 +8,6 @@
 		"lint": "web-ext -s ./addon lint",
 		"start": "web-ext -s ./addon run",
 		"bundle": "web-ext -s ./addon -a ./dist build",
-		"beta": "scripts/beta.sh",
-		"release": "scripts/version_bump.sh",
 		"test": "karma start tests/karma.conf.js --single-run"
 	},
 	"devDependencies": {
