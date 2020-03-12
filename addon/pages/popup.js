@@ -62,19 +62,19 @@ function embed_url_pos(haystack, clean_url)
 		clean_url.origin,
 		encodeURIComponent(clean_url.origin),
 		encodeURIComponent(clean_url.origin).replace(/\./g, '%2E'),
-		btoa(clean_url.origin.slice(0, - clean_url.origin.length % 3)),
+		btoa(clean_url.origin.substring(0, clean_url.origin.length - clean_url.origin.length % 3)),
 
 		// full origin with various possible encodings
 		clean_url.hostname,
 		encodeURIComponent(clean_url.hostname),
 		encodeURIComponent(clean_url.hostname).replace(/\./g, '%2E'),
-		btoa(clean_url.hostname.slice(0, - clean_url.hostname.length % 3)),
+		btoa(clean_url.hostname.substring(0, clean_url.origin.length - clean_url.hostname.length % 3)),
 	]
 
 	for (let needle of clean_encoded)
 	{
-		let pos = haystack.indexOf(needle)
-		if (pos !== -1)
+		let pos;
+		if (needle !== '' && (pos = haystack.indexOf(needle)) !== -1)
 			return [pos, pos + needle.length];
 	}
 
@@ -133,7 +133,12 @@ function add_option(orig, clean, classes)
 
 		let [embed_start, embed_end] = embed_url_pos(modified_path, clean), embed_range = undefined;
 		if (embed_start !== undefined && embed_end !== undefined)
+		{
 			embed_range = new Range()
+
+			actions_to_whitelist.whitelist_path = true;
+			option.classList.add('embed');
+		}
 
 		matches.sort((a, b) => (a[0] - b[0]) || a[1] - b[1])
 
@@ -198,9 +203,6 @@ function add_option(orig, clean, classes)
 			let span = document.createElement('span');
 			span.classList.add(css_classes['embedded']);
 			embed_range.surroundContents(span);
-
-			actions_to_whitelist.whitelist_path = true;
-			option.classList.add('embed');
 		}
 	}
 	else
