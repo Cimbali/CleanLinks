@@ -6,6 +6,7 @@ facebook	.*	facebook	/ajax/
 facebook	.*	facebook	/privacy/specific_audience_selector_dialog/
 facebook	.*	facebook	/photo/download/
 
+global	.*	facebook	/groups/member_bio/bio_dialog/
 global	.*	facebook	/login_alerts/
 global	.*	facebook	/should_add_browser/
 global	.*	facebook	/ajax/
@@ -18,7 +19,7 @@ amazon	.*	amazon	^/message-us$
 google	.*	mail.google	^/mail/u/0
 google	.*	google	^(/upload)?/drive/
 google	.*	docs.google	/
-google	.*	accounts.google	/*
+google	.*	accounts.google
 google	.*	hangouts.google	^/webchat	zx
 google	.*	client-channel.google	^/client-channel	zx
 google	.*	google	^/complete/search$	gs_[a-zA-Z]
@@ -29,24 +30,22 @@ google	.*	google	^/appsactivity/
 google	.*	google	^/aclk$
 google	.*	drive.google	^/videoplayback
 
-global	.*	myaccount.google	/*
+global	.*	myaccount.google
 
 global	.*	([a-zA-Z0-9-.]*.)?amazon	/message-us$
-global	.ca	tangerine	/*
-global	.cc	clastarti	/*
-global	.cc	streamguard	/*
+global	.ca	tangerine
+global	.cc	clastarti
+global	.cc	streamguard
 global	.com	(authorization.)?td	^/*
-global	.com	blizzard	^/oauth2
-global	.com	bugtracker.fairphone	/*	ref[\_]?
-global	.com	cloudflare	/*
-global	.com	gcsip	/*	ref[\_]?
+global	.com	bugtracker.fairphone	ref[\_]?
+global	.com	cloudflare
+global	.com	gcsip	ref[\_]?
 global	.com	gitlab
 global	.com	login.meijer	^/.*$	ref
 global	.com	sso.serverplan	^/manage2fa/check$	ref
 global	.com	support.steampowered	^/*
 global	.de	cyberport	/adscript.php
-global	.de	kreditkarten-banking.lbb	/*
-global	.*	facebook	/groups/member_bio/bio_dialog/
+global	.de	kreditkarten-banking.lbb
 global	.*	git..*	/.*/-/branches$
 global	.*	git..*	/commit/.*/pipelines$
 global	.io	prismic
@@ -56,7 +55,7 @@ global	.net	tweakers	^/ext/lt.dsp$	ref[\_]?
 global	.nl	privacy.vakmedianet	^/*	ref
 global	.org	matrix	^/_matrix/
 global	.*	*	^/refs/switch	ref[\_]?
-global	.ru	tinkoff	/*
+global	.ru	tinkoff
 
 bing	.*	bing	^/WS/redirect/
 indeed	.com	indeed	^/rc/clk
