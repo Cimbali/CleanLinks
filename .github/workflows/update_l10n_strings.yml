@@ -1,0 +1,21 @@
+name: Update and upload translatable strings
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  strings:
+    name: Upload translatable strings
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -qy jq
+    - name: Extract and upload
+      env:
+        poeditor_api_token: ${{ secrets.POEDITOR_API_TOKEN }}
+      run: ./scripts/poedit.sh upload
