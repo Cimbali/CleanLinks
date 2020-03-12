@@ -287,8 +287,10 @@ function load_rule()
 			show_rule_item(list, val, 'inherit');
 	}
 
-	document.getElementById('remove_rule').disabled = !select[select.selectedIndex].hasAttribute('orig-value');
-	rule_pristine();
+	document.getElementById('remove_rule').disabled = false;
+
+	if (select[select.selectedIndex].hasAttribute('orig-value'))
+		rule_pristine();
 }
 
 
@@ -304,9 +306,9 @@ function erase_rule()
 {
 	let select = document.getElementById('rule_selector');
 	let selected_opt = select[select.selectedIndex];
-	select[0].checked = true;
 
-	Rules.remove(JSON.parse(selected_opt.getAttribute('orig-value')))
+	if (selected_opt.hasAttribute('orig-value'))
+		Rules.remove(JSON.parse(selected_opt.getAttribute('orig-value')))
 
 	let next_up = selected_opt.previousSibling;
 	while (next_up !== null && next_up.style.display === 'none')
