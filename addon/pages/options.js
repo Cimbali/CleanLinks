@@ -466,9 +466,11 @@ function prepopulate_rule(link)
 
 function populate_rules()
 {
-	let select = document.getElementById('rule_selector')
-	select.onchange = load_rule
-	no_rule_loaded();
+	let select = document.getElementById('rule_selector'), restore_selection = select.value;
+	select.onchange = null;
+
+	while (select.lastChild)
+		select.lastChild.remove();
 
 	for (let rule of Rules.serialize())
 	{
@@ -514,6 +516,18 @@ function populate_rules()
 		input.onkeyup = delayed_save(check_val);
 	}
 
+	if (restore_selection === '')
+		no_rule_loaded();
+	else
+		select.value = restore_selection;
+
+	filter_rules();
+	select.onchange = load_rule
+}
+
+
+function add_listeners()
+{
 	document.querySelector('input[name="domain"]').onchange = rule_changed
 	document.querySelector('input[name="domain"]').onkeyup = delayed_save(rule_changed)
 	document.querySelector('input[name="path"]').onchange = rule_changed
@@ -557,15 +571,20 @@ function populate_rules()
 
 	browser.runtime.onMessage.addListener(message =>
 	{
+		console.log('Options page message', message);
 		if (message.action === 'set prepopulate')
 		{
 			prepopulate_rule(message.link);
 			return browser.runtime.sendMessage({action: 'get prepopulate'})
 		}
+		else if (message.action === 'rules')
+			Rules.reload().then(populate_rules);
+		else if (message.action === 'reload options')
+			Prefs.reload().then(populate_options());
 	});
 }
 
 
 apply_i18n();
 Prefs.loaded.then(populate_options);
-Rules.loaded.then(populate_rules)
+Rules.loaded.then(populate_rules).then(add_listeners)
