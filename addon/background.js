@@ -213,10 +213,10 @@ function handle_message(message, sender)
 
 		cleaned_per_tab.get(tab_id).count += 1;
 
-		if (Prefs.values.show_clean_count)
+		if (Prefs.values.show_clean_count && tab_id !== -1)
 			browser.browserAction.setBadgeText({tabId: tab_id, text: '' + cleaned_per_tab.get_count(tab_id)});
 
-		if (Prefs.values.highlight)
+		if (Prefs.values.highlight && tab_id !== -1)
 		{
 			let orig_tab = tab_id;
 			if (cleaned_per_tab.get(orig_tab).pending_highlight !== message.orig)
