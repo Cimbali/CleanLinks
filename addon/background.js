@@ -347,6 +347,64 @@ browser.runtime.onMessage.addListener(handle_message);
 browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
 browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});
 
+
+function import_domain_whitelist(domains_list)
+{
+	return promise.then(async rules =>
+	{
+		let actions = {whitelist: ['.*'], whitelist_path: true};
+
+		for (let fqdn of domains_list)
+			await Rules.add({domain: fqdn, ...actions})
+	});
+};
+
+
+async function upgrade_options(prev_version)
+{
+	const options = await browser.storage.sync.get({'configuration': {}});
+
+	for (let [rename, newname] in Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab', 'cbc': 'context_menu'}))
+		if (rename in options)
+		{
+			options[newname] = options[rename];
+			delete options[rename];
+		}
+
+	if ('skipdoms' in options)
+	{
+		const skipdoms = options.skipdoms.split(',')
+
+		const old_defaults = ['accounts.google.com', 'docs.google.com', 'translate.google.com',
+			'login.live.com', 'plus.google.com', 'twitter.com',
+			'static.ak.facebook.com', 'www.linkedin.com', 'www.virustotal.com',
+			'account.live.com', 'admin.brightcove.com', 'www.mywot.com',
+			'webcache.googleusercontent.com', 'web.archive.org', 'accounts.youtube.com',
+			'accounts.google.com', 'signin.ebay.com']
+
+		// These are already handled in the new default rules
+		for (let handled of old_defaults)
+		{
+			let find = skipdoms.indexOf(handled)
+			if (find !== -1)
+				skipdoms.splice(find, 1)
+		}
+
+		let actions = {whitelist: ['.*'], whitelist_path: true};
+
+		await Rules.loaded
+		for (let fqdn of skipdoms)
+			await Rules.add({domain: fqdn, ...actions})
+
+		delete options.skipdoms;
+	}
+
+	await browser.storage.sync.set({configuration: options});
+	browser.runtime.sendMessage({action: 'options'});
+	Prefs.reload();
+}
+
+
 Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 {
 	browser.webRequest.onBeforeRequest.addListener(on_request, { urls: ['<all_urls>'] }, ['blocking']);
@@ -389,4 +447,10 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 		if (disabled_tabs.is_disabled(id))
 			disabled_tabs.remove(id);
 	});
+});
+
+browser.runtime.onInstalled.addListener(details =>
+{
+	if (details.reason === 'update')
+		return upgrade_options(details.version);
 });

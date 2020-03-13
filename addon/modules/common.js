@@ -100,79 +100,38 @@ function serialize_options()
 }
 
 
-let import_domain_whitelist = undefined;
-
-function upgrade_options(options)
-{
-	for (let [rename, newname] in Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab', 'cbc': 'context_menu'}))
-		if (rename in options)
-		{
-			options[newname] = options[rename];
-			delete options[rename];
-		}
-
-	if ('skipdoms' in options && import_domain_whitelist !== undefined)
-	{
-		const old_defaults = ['accounts.google.com', 'docs.google.com', 'translate.google.com',
-			'login.live.com', 'plus.google.com', 'twitter.com',
-			'static.ak.facebook.com', 'www.linkedin.com', 'www.virustotal.com',
-			'account.live.com', 'admin.brightcove.com', 'www.mywot.com',
-			'webcache.googleusercontent.com', 'web.archive.org', 'accounts.youtube.com',
-			'accounts.google.com', 'signin.ebay.com']
-
-		// These are already handled in the new default rules
-		for (let handled of old_defaults)
-		{
-			let find = options.skipdoms.indexOf(handled)
-			if (find !== -1)
-				options.skipdoms.splice(find, 1)
-		}
-
-		let actions = {whitelist: ['.*'], whitelist_path: true};
-		import_domain_whitelist(options.skipdoms.slice()).then(() =>
-		{
-			delete options.skipdoms;
-		});
-	}
-}
-
-
 function load_options()
 {
-	// return the promise so it can be chained
-	return browser.storage.sync.get('configuration').then(data =>
+	return browser.storage.sync.get({'configuration': {}}).then(data =>
 	{
-		if ('configuration' in data) {
-			upgrade_options(data.configuration);
-
-			for (var param in data.configuration) {
-				if (typeof pref_values[param] === 'number')
-					pref_values[param] = parseInt(data.configuration[param]);
-				else if (typeof pref_values[param] === 'boolean')
-				{
-					pref_values[param] = data.configuration[param] === true
-									|| data.configuration[param] === 'true'
-									|| data.configuration[param] === 'on';
-				}
-				else if (typeof pref_values[param] === 'string')
-					pref_values[param] = data.configuration[param] || '';
-				else if (pref_values[param] instanceof RegExp)
-				{
-					try
-					{
-						pref_values[param] = new RegExp(data.configuration[param] || '.^');
-					}
-					catch (e)
-					{
-						log('Error parsing regex ' + (data.configuration[param] || '.^') + ' : ' + e.message);
-					}
-				}
-				else if (Array.isArray(pref_values[param]))
-					pref_values[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
+		for (let param in data.configuration)
+		{
+			if (typeof pref_values[param] === 'number')
+				pref_values[param] = parseInt(data.configuration[param]);
+			else if (typeof pref_values[param] === 'boolean')
+			{
+				pref_values[param] = data.configuration[param] === true
+								|| data.configuration[param] === 'true'
+								|| data.configuration[param] === 'on';
 			}
+			else if (typeof pref_values[param] === 'string')
+				pref_values[param] = data.configuration[param] || '';
+			else if (pref_values[param] instanceof RegExp)
+			{
+				try
+				{
+					pref_values[param] = new RegExp(data.configuration[param] || '.^');
+				}
+				catch (e)
+				{
+					log('Error parsing regex ' + (data.configuration[param] || '.^') + ' : ' + e.message);
+				}
+			}
+			else if (Array.isArray(pref_values[param]))
+				pref_values[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
 		}
 		return pref_values;
-	});
+	}).catch(err => { console.error('Error loading preferences', err); });
 }
 
 function clear_options()

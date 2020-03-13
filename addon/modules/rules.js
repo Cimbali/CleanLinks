@@ -269,20 +269,6 @@ const load_default_rules = (done) =>
 }
 
 
-function make_domain_importer(promise)
-{
-	return domains_list => promise.then(rules =>
-	{
-		let actions = {whitelist: ['.*'], whitelist_path: true};
-
-		for (let fqdn of domains_list)
-			Rules.add({domain: fqdn, ...actions})
-
-		return save_rules(rules);
-	});
-}
-
-
 function load_rules()
 {
 	return new Promise(done =>
@@ -346,5 +332,3 @@ let Rules = {
 	},
 }
 Rules.loaded = Rules.reload()
-
-import_domain_whitelist = make_domain_importer(Rules.loaded)
