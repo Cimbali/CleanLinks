@@ -1,42 +1,89 @@
 # CleanLinks Mozilla Firefox Extension
 
+Install it from [addons.mozilla.org](https://addons.mozilla.org/addon/clean-links-webext/).
+
 ## What does it do?
-This Extension automatically detects and converts obfuscated/nested links to genuine/normal plain clean links.
+CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters (e.g. utm\_\* or fbclid) are also removed.
 
 _Eg:_
-
 - <http://www.foobar.com/track=ftp://gnu.org> ➠ <ftp://gnu.org/>
-
 - <http://example.com/aHR0cDovL3d3dy5nb29nbGUuY29t> ➠ <http://www.google.com>
-
 - javascript:window.open('http://somesite.com') ➠ <http://somesite.com/>
 
-It also allows to remove affiliate/tracking tags from URLs by the use of configurable patterns, being the most common used ones defined by default (ie, UTM, AFF, REF, etc)
+For maximum privacy, rules are maintained and editable locally (with decent defaults distributed in the add-on). CleanLinks will break some websites and you will need to manually whitelist these URLs for them to work. This can be done easily via the menu from the CleanLinks icon.
 
 You can [test the current (master) link cleaning code online](https://cimbali.github.io/CleanLinks/), by pasting a link in the text area and clicking the "Clean it!" button.
 
 ## More details
 
-This add-on protects your private life, by skipping intermediate pages that track you while redirecting you to your destination, or that divulge your current page while making requests. Any request that contains another URL is considered fishy, and skipped in favor of the target page (for foreground requests) or dropped (for background requests). A whitelist manages the pages and websites that have legitimate uses of such redirects. On links cleaned, tracking parameters (e.g. utm_* or fbclid) are also removed,
+This add-on protects your private life, by skipping intermediate pages that track you while redirecting you to your destination (1), or that divulge your current page while making requests (2). Any request that contains another URL is considered fishy, and skipped in favor of the target page (for foreground requests) or dropped (for background requests). A whitelist manages the pages and websites that have legitimate uses (3) of such redirects.
+
+Some illustrative examples are:
+1. Facebook tracks all the outgoing links by first sending you to the page `https://l.facebook.com/l.php?u=<the actual link here>` which then redirects you to the URL.
+2. Analytics report the page you are on, for example google analystics uses `https://www.google-analytics.com/collect?dl=<your current page>&<more info on what you do>`
+3. Logging in through openid requires to pass the original URL so you can return to that page once the login is performed, e.g. `https://github.com/login/oauth/authorize?redirect_uri=<URL to the previous page>&<more parameters for the request>`
+
+All these embedded links are detected automatically. Links of type 1 should be redirected to their destination, those of type 2 (identified by the fact they are not “top-level” requests) should be dropped, and those of type 3 allowed through a witelist.
+
+The whitelist is populated with a few sensible defaults, and must be maintained manually by each user as they encounter pages that break. A quick access to the last requests that were cleaned is available by clicking on the add-on icon. In this popup, all recently cleaned links for the tab appear, and these can be added to the whitelist definitively (“Whitelist Embedded URL” button) or for once only (“Open Un-cleaned Link” button).
+
+Other tracking data can be added to the URLs to follow your behaviour online. These can be for example `fbclid=` or `utm_campain=` query parameters, or `/ref=` in the pathname of the URL on amazon.
+Those can not be detected automatically, so CleanLinks has a set of rules (the same that maintains the embedded URL whitelist) that specifies which data is used for tracking and should be removed from URLs.
 
 
-Currently, the whitelist is populated with a few sensible defaults, and must be maintained manually by each user as they encounter pages that break. A quick access to the last requests that were cleaned is available by clicking on the add-on icon. In this popup, all recently cleaned links for the tab appear, and these can be added to the whitelist definitively (“Whitelist Selection” button) or for once only (“Open Un-cleaned Link” button).
+## How can I help?
 
-Another important configuration option is the choice of cleaning only links that are top-level (i.e. the main page being visited, for example from a clicked link) or whether all the traffic must be analyzed.
+Be part of the open-source community that helps each other browse safer and more privately !
+
+Bing part of a community means being respectful of everyone and keeping this environment friendly, welcoming, and harrasment-free.
+Abusive behaviour will not be tolerated, and can be reported by email at me@cimba.li − wrongdoers may be permanently banned from interacting with CleanLinks.
+
+### You can help by reporting issues!
+
+Any reports are welcome, including suggestions to improve and maintain the default rules that CleanLinks uses.
+
+### You can help by contributing to the code!
+
+Maintaining even a small addon like CleanLinks is in fact very time consuming, so every little bit helps!
+
+### You can help by contributing to translations!
+
+You can improve translations or add a new language [on CleanLink’s POEditor page](https://poeditor.com/join/project/H3u6Cttc4j), where the strings will directly be imported into the add-on at the next release.
+
+This is the current status of translations:
+
+![Chinese: 29%](https://img.shields.io/badge/%F0%9F%87%A8%F0%9F%87%B3%20Chinese-29%25-f80)
+![Chinese (TW): 29%](https://img.shields.io/badge/%F0%9F%87%B9%F0%9F%87%BC%20Chinese%20%28TW%29-29%25-f80)
+![German: 29%](https://img.shields.io/badge/%F0%9F%87%A9%F0%9F%87%AA%20German-29%25-f80)
+![Spanish: 29%](https://img.shields.io/badge/%F0%9F%87%AA%F0%9F%87%B8%20Spanish-29%25-f80)
 
 
-In the future, a set of rules will be maintained centrally, possibly in collaboration with other similar addon communities, so you may submit whitelist suggestions as issues.
+## Why are the requested permissions required?
 
-## Where can you get it?
-### From the AMO page:
+The permissions are listed [in the manifest file](https://github.com/Cimbali/CleanLinks/blob/master/addon/manifest.json#L14)
+and [described in the API documentation](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/permissions#API_permissions).
+Here is a breakdown of why we need each of the requested permissions:
 
-<https://addons.mozilla.org/addon/clean-links-webext/>
+| Permission                                             | Show (on addons.mozilla.org) as                                     | Needed for                                      |
+| ------------------------------------------------------ | ------------------------------------------------------------------- | ----------------------------------------------- |
+| clipboardWrite                                         | _Input data to the clipboard_                                       | Copying cleaned links from the context menu     |
+| contextMenus                                           | Not shown                                                           | Copying cleaned links from the context menu     |
+| alarms                                                 | Not shown                                                           | Automatically saving options                    |
+| webRequest                                             | _Access your data for all websites_                                 | Clean links while they are accessed             |
+| webRequestBlocking                                     | _Access your data for all websites_                                 | Clean links while they are accessed             |
+| \<all\_urls\>                                          | _Access your data for all websites_                                 | Clean javascript links, highlight cleaned links |
+| storage                                                | Not shown                                                           | Store rules and preferences                     |
+| downloads                                              | _Download files and read and modify the browser’s download history_ | Exporting and importing Rules files             |
+| <https://publicsuffix.org/list/public_suffix_list.dat> | Not shown                                                           | Identifying public suffixes (e.g. `.co.uk`)     |
 
-### Straight from this repo:
 
-Useful if you want to help testing for example.
 
-- Either get [web-ext](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext), and run `web-ext run` in the source code directory.
+## In which other ways can you get it?
+
+Except from the AMO page <https://addons.mozilla.org/addon/clean-links-webext/>, you can also get the addon straight from this repo.
+This is useful if you want to help testing for example.
+
+- Either get [web-ext](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext), and run `web-ext run` in the `addon/` source code directory.
 
 - Alternately, [temporarily load the add-on from `about:debugging#addons`](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Temporary_Installation_in_Firefox), by ticking "Enable add-on debugging", clicking "Load Temporary Add-on" and selecting the `manifest.json` file from the source code directory.
 
