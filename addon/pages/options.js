@@ -588,5 +588,6 @@ function add_listeners()
 
 
 apply_i18n();
+add_listeners();
 Prefs.loaded.then(populate_options);
-Rules.loaded.then(populate_rules).then(add_listeners)
+Rules.loaded.then(populate_rules);

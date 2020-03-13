@@ -376,7 +376,11 @@ function populate_popup()
 											 link: selected.querySelector('.original').getAttribute('raw-url')});
 		}
 	});
+}
 
+
+function add_listeners()
+{
 	document.querySelector('#open_editor').onclick = () =>
 	{
 		var selected = document.querySelector('#history .selected');
@@ -436,4 +440,5 @@ function populate_popup()
 }
 
 apply_i18n();
+add_listeners()
 Prefs.loaded.then(populate_popup);
