@@ -52,7 +52,7 @@ body {
 	white-space: normal;
 	word-break: break-all;
 }
-#history p[value] {
+#history p {
 	cursor: pointer;
 }
 #history p .del {
