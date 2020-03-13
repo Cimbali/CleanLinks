@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 cd `git rev-parse --show-toplevel`
 trap 'rm -f "$tmp"' INT QUIT TERM EXIT
