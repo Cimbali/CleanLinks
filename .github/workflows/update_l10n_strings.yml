@@ -18,4 +18,4 @@ jobs:
     - name: Extract and upload
       env:
         poeditor_api_token: ${{ secrets.POEDITOR_API_TOKEN }}
-      run: ./scripts/poedit.sh upload
+      run: ./scripts/poeditor.sh upload
