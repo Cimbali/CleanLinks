@@ -1,0 +1,268 @@
+{
+  "Apply this CSS Style to cleaned links.": {
+    "message": "Applique ce style CSS aux liens nettoyés."
+  },
+  "Copy clean links from the context menu": {
+    "message": "Copier les liens nettoyés depuis le menu contextuel"
+  },
+  "Disabled": {
+    "message": "Désactivé"
+  },
+  "E.g. background:rgba(252,252,0,0.7); color: #000": {
+    "message": "Par exemple: background:rgba(252,252,0,0.7); color: #000"
+  },
+  "Enabled": {
+    "message": "Activé"
+  },
+  "Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button.": {
+    "message": "Active le suivi des liens nettoyés, pour permettre de les ajouter facilement à la liste blanche depuis le menu de la barre d’outils."
+  },
+  "Error Processing Regular expression:": {
+    "message": "Erreur de traitement de l’expression régulière:"
+  },
+  "Follow Target Attribute?": {
+    "message": "Respecter l’attribut Target des liens?"
+  },
+  "Highlight Cleaned Links?": {
+    "message": "Surligner les liens nettoyés?"
+  },
+  "Highlight Style": {
+    "message": "Style du surlignage"
+  },
+  "Ignore non-http/s links": {
+    "message": "Ignorer les liens non http/s"
+  },
+  "Link Tracking": {
+    "message": "Suivi des liens"
+  },
+  "Reset Options": {
+    "message": "Réinitialiser les options"
+  },
+  "Reset options to their default values.": {
+    "message": "Réinitialiser les options à leurs valeurs par défaut."
+  },
+  "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
+    "message": "Mettre en place un observateur HTTP pour nettoyer les redirections par en-tète avec des codes 3xx. Cette option devrait permettre par exemple de nettoyer des liens cachés derrière des URLs raccourcis."
+  },
+  "This extends the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+    "message": "Ajoute une entrée au menu contextuel qui permet de nettoyer les liens avant de les copier dans le presse-papiers."
+  },
+  "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {
+    "message": "Cette liste contient les derniers liens nettoyés dans cet onglet: version initiale puis version nettoyée. Les fonds rouges indiquent un lien dont le chargement a été refusé. Ajouter un lien à la liste blanche empêchera de futurs nettoyages des liens de ce domaine."
+  },
+  "This options causes non-http/s links to be ignored when checking for nested urls on them.": {
+    "message": "Cette option fait en sorte que les liens qui ne sont pas sur http ou https sont ignorés par le processus de nettoyage."
+  },
+  "Use Redirect Watcher?": {
+    "message": "Utiliser l’observateur de redirections?"
+  },
+  "Whether the target attribute on links should be checked and respected.": {
+    "message": "Est-ce que l’attribut target des liens doit être consulté et respecté."
+  },
+  "Whitelist Embedded URL": {
+    "message": "Autoriser l’URL imbriquée"
+  },
+  "addon_description": {
+    "message": "Convertit les liens masqués ou imbriqués en véritables liens propres"
+  },
+  "(usually same as top-level domain)": {
+    "message": "(coïncide en général avec le domaine de premier niveau)."
+  },
+  "Add": {
+    "message": "Ajouter"
+  },
+  "Add rule": {
+    "message": "Ajouter la règle"
+  },
+  "Add to removed query parameters:": {
+    "message": "Ajouter aux paramètres à retirer:"
+  },
+  "Add to the list": {
+    "message": "Ajouter à la liste"
+  },
+  "Add to whitelisted query parameters:": {
+    "message": "Ajouter à la liste blanche des paramètres:"
+  },
+  "All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you.": {
+    "message": "Toutes les requêtes, comme pour des ressources ou des sous-documents (iframe), peuvent divulguer votre page actuelle ou vous rediriger."
+  },
+  "Allow URL embedded inside path": {
+    "message": "Autoriser une URL imbriquée dans le chemin"
+  },
+  "Cancel": {
+    "message": "Annuler"
+  },
+  "Clean all outgoing HTTP requests, instead of only top frame": {
+    "message": "Nettoyer toutes les requêtes HTTP, au lieu de se limiter document de premier niveau"
+  },
+  "Cleaning actions": {
+    "message": "Actions de nettoyage"
+  },
+  "Clear List": {
+    "message": "Vider la liste"
+  },
+  "Clicked links": {
+    "message": "Liens activés"
+  },
+  "Delete rule": {
+    "message": "Supprimer la règle"
+  },
+  "Display": {
+    "message": "Afficher"
+  },
+  "Domain": {
+    "message": "Domaine"
+  },
+  "Domain name": {
+    "message": "Nom de domaine"
+  },
+  "Edit rule": {
+    "message": "Modifier la régle"
+  },
+  "Embedded URL": {
+    "message": "URL imbriquée"
+  },
+  "Empty expression!": {
+    "message": "Expression vide!"
+  },
+  "Export rules": {
+    "message": "Exporter les règles"
+  },
+  "Features": {
+    "message": "Fonctionnalités"
+  },
+  "Fully-Qualified Domain Name (FQDN)": {
+    "message": "Nom de domaine absolu (« pleinement qualifié »)"
+  },
+  "HTTP requests": {
+    "message": "Requêtes HTTP"
+  },
+  "Header redirects": {
+    "message": "Redirections par en-tête"
+  },
+  "Hide legend": {
+    "message": "Masquer la légende"
+  },
+  "Import rules": {
+    "message": "Importer les règles"
+  },
+  "Link cleaning rules": {
+    "message": "Règles de nettoyage des liens"
+  },
+  "Match subdomains": {
+    "message": "Inclure les sous-domaines"
+  },
+  "Open CleanLinks Options page": {
+    "message": "Ouvrir la page de configuration de CleanLinks"
+  },
+  "Open Un-cleaned Link": {
+    "message": "Ouvrir le lien brut"
+  },
+  "Parameter": {
+    "message": "Paramètre"
+  },
+  "Params stripped": {
+    "message": "Paramètres retirés"
+  },
+  "Path": {
+    "message": "Chemin"
+  },
+  "Path rewritten": {
+    "message": "Chemin réécrit"
+  },
+  "Protocol": {
+    "message": "Protocole"
+  },
+  "Public suffix": {
+    "message": "Suffixe public"
+  },
+  "Query": {
+    "message": "Requête"
+  },
+  "Remove or replace in path:": {
+    "message": "Supprimer ou remplacer dans le chemin:"
+  },
+  "Remove query parameters:": {
+    "message": "Paramètres à retirer:"
+  },
+  "Reset Rules": {
+    "message": "Réinitialiser les règles"
+  },
+  "Reset rules to their default values.": {
+    "message": "Réinitialiser les règles à leurs valeurs par défaut"
+  },
+  "Rule $RULE_NAME$ already exists": {
+    "message": "La règle $RULE_NAME$ existe déjà",
+    "placeholders": {
+      "rule_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "Rules": {
+    "message": "Règles"
+  },
+  "Save rule": {
+    "message": "Sauvegarder"
+  },
+  "Show Cleaned Links Count?": {
+    "message": "Montrer le nombre de liens nettoyés?"
+  },
+  "Show legend": {
+    "message": "Afficher la légende"
+  },
+  "Subdomain": {
+    "message": "Sous-domaine"
+  },
+  "Switch to tabs opened by clicking links?": {
+    "message": "Aller à l’onglet ouvert en cliquant un lien?"
+  },
+  "Toggle to enable or disable the extension.": {
+    "message": "Active ou désactive l’extension"
+  },
+  "URL example": {
+    "message": "Example d’URL"
+  },
+  "URLs matched": {
+    "message": "Adresses filtrées"
+  },
+  "When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present.": {
+    "message": "Quand un lien est ouvert dans un nouvel onglet, ouvrir cet onglet immédiatement. Cette préférence réplique le paramètre de navigateur du même nom, que l’extension ne peut pas consulter actuellement."
+  },
+  "Whitelist query parameters (prevent removing and allow embedded URL):": {
+    "message": "Liste blanche de paramètres (pour empêcher leur suppression et permettre des URLs imbriquées):"
+  },
+  "Ignore case": {
+    "message": "Ignorer la casse"
+  },
+  "Remove from path:": {
+    "message": "Retirer du chemin:"
+  },
+  "Replace all occurrences": {
+    "message": "Remplacer toutes les occurrences:"
+  },
+  "Replace with:": {
+    "message": "Remplacer par:"
+  },
+  "Rule to edit:": {
+    "message": "Règle à modifier:"
+  },
+  "Add context menu cleaning for selected text": {
+    "message": "Modifier le menu contextuel pour du texte sélectionné"
+  },
+  "Allows cleaning non-clickable text-links to open them as normal links.": {
+    "message": "Permet de nettoyer des liens sous forme de texte non cliquable, pour les ouvrir comme des liens normaux"
+  },
+  "Javascript link": {
+    "message": "Lien javascript"
+  },
+  "CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters (e.g. utm_* or fbclid) are also removed.": {
+    "message": "CleanLinks protège votre vie privée, en détectant automatiquement et court-circuitant les pages de redirection, qui surveillent les liens que vous visitez. Les paramètres de suivi (comme utm_* ou fbclid) sont également retirés."
+  },
+  "For maximum privacy, rules are maintained and editable locally (with decent defaults distributed in the add-on). <strong>CleanLinks will break some websites</strong> and you will need to <strong>manually whitelist</strong> these URLs for them to work. This can be done easily via the menu from the CleanLinks icon.": {
+    "message": "Par souci de confidentialité, les règles de nettoyage sont maintenues et éditables localement (avec des valeurs par défauts raisonnables distribuées dans l’extension). <strong>CleanLinks cassera certains sites</strong>, et il vous faudra <strong>manuellement ajouter à la liste blanche</strong> leurs adresses pour les visiter. Ceci peut être fait facilement via le menu accessible par l’cône CleanLinks."
+  },
+  "This Extension converts obfuscated/nested links to genuine/normal plain clean links. For example:": {
+    "message": "Cette extension transforme les liens masqués ou imbriqués en véritables liens propres. Par exemple:"
+  }
+}

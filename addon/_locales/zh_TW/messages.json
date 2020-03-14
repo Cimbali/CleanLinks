@@ -1,15 +1,6 @@
 {
-  "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
-    "message": "將文本狀態的鏈接轉換成可直接點擊的鏈接。需要事件委託模式。"
-  },
   "Apply this CSS Style to cleaned links.": {
     "message": "本樣式將被應用到經過處理的鏈接標籤上"
-  },
-  "Catch Text Links": {
-    "message": "轉換文本鏈接"
-  },
-  "Cleaned Links:": {
-    "message": "已處理鏈接數："
   },
   "Copy clean links from the context menu": {
     "message": "接管複製鏈接地址菜單"
@@ -53,7 +44,7 @@
   "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
     "message": "使用 HTTP 監聽器捕捉 3xx 跳轉。例如將短鏈接還原成長鏈接。"
   },
-  "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+  "This extends the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
     "message": "使用自定義的 cmd_copyLink 控制器接管 複製鏈接地址 右鍵菜單，將經過處理的鏈接複製到剪貼板。 "
   },
   "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {

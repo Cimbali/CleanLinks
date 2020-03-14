@@ -41,6 +41,9 @@
   "Clean all outgoing HTTP requests, instead of only top frame": {
     "message": "Clean all outgoing HTTP requests, instead of only top frame"
   },
+  "CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters (e.g. utm_* or fbclid) are also removed.": {
+    "message": "CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters (e.g. utm_* or fbclid) are also removed."
+  },
   "Cleaning actions": {
     "message": "Cleaning actions"
   },
@@ -97,6 +100,9 @@
   },
   "Follow Target Attribute?": {
     "message": "Follow Target Attribute?"
+  },
+  "For maximum privacy, rules are maintained and editable locally (with decent defaults distributed in the add-on). CleanLinks will break some websites and you will need to manually whitelist these URLs for them to work. This can be done easily via the menu from the CleanLinks icon.": {
+    "message": "For maximum privacy, rules are maintained and editable locally (with decent defaults distributed in the add-on). CleanLinks will break some websites and you will need to manually whitelist these URLs for them to work. This can be done easily via the menu from the CleanLinks icon."
   },
   "Fully-Qualified Domain Name (FQDN)": {
     "message": "Fully-Qualified Domain Name (FQDN)"
@@ -223,8 +229,11 @@
   "Switch to tabs opened by clicking links?": {
     "message": "Switch to tabs opened by clicking links?"
   },
-  "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
-    "message": "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard."
+  "This Extension converts obfuscated/nested links to genuine/normal plain clean links. For example:": {
+    "message": "This Extension converts obfuscated/nested links to genuine/normal plain clean links. For example:"
+  },
+  "This extends the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+    "message": "This extends the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard."
   },
   "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {
     "message": "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain."

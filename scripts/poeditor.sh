@@ -16,6 +16,11 @@ from_poeditor='map({key: .term, value: {message: .definition}}) | map(.value.mes
 
 extract() {
 	{
+	# Also add the texts from addons.mozilla.org
+	echo This Extension converts obfuscated/nested links to genuine/normal plain clean links. For example:
+	echo CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters \(e.g. utm_\* or fbclid\) are also removed.
+	echo For maximum privacy, rules are maintained and editable locally \(with decent defaults distributed in the add-on\). CleanLinks will break some websites and you will need to manually whitelist these URLs for them to work. This can be done easily via the menu from the CleanLinks icon.
+
 	find addon/ -name '*.js' -exec grep -hPo "(?<=_\\((['\"])).*(?=\\1\\s*[,\\)])" {} +
 	find addon/ -name '*.html' -exec grep -hPo '\bi18n_[a-z]+\="\K([^"]|\\")+(?=")' {} +
 	} | sort -u | sed 's/"/\\&/g;s/.*/"&",/;1s/^/[/;$s/,$/]/' |

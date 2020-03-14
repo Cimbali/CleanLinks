@@ -1,15 +1,6 @@
 {
-  "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
-    "message": "Erlaubt klicken auf nicht verlinkte Text Links um die wie normale Links zu öffnen - Benötigt den Event Delegations Modus."
-  },
   "Apply this CSS Style to cleaned links.": {
     "message": "Wende diesen CSS Style auf gesäuberte Links an."
-  },
-  "Catch Text Links": {
-    "message": "Erfasse Text Links"
-  },
-  "Cleaned Links:": {
-    "message": "Gesäuberte Links:"
   },
   "Copy clean links from the context menu": {
     "message": "CopyLink Controller?"
@@ -53,7 +44,7 @@
   "Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs.": {
     "message": "Aktiviere einen HTTP Wächter um 3xx Umleitungen zu erkennen. Dies sollte zum Beispiel erlauben Links zu säubern die hinter gekürzten URLs stehen."
   },
-  "This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
+  "This extends the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard.": {
     "message": "Dies installiert einen cmd_copyLink Controller um bei Menüaufrufen zum Link kopieren den Link zu säubern bevor er in die Zwischenablage kopiert wird."
   },
   "This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain.": {
