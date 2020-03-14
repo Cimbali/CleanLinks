@@ -282,17 +282,17 @@ function handle_message(message, sender)
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
 			let changes = {}
-			for (let prop of ['cbc', 'progltr', 'httpall', 'textcl', 'show_clean_count'])
+			for (let prop of ['context_menu', 'progltr', 'httpall', 'textcl', 'show_clean_count'])
 				changes[prop] = (Prefs.values[prop] === true ? 1 : 0) - (old_pref_values[prop] === true ? 1 : 0)
 
-			if (changes.cbc > 0)
+			if (changes.context_menu > 0)
 				browser.contextMenus.create(
 				{
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
 					contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
 				});
-			else if (changes.cbc < 0)
+			else if (changes.context_menu < 0)
 				browser.contextMenus.remove('copy-clean-link')
 			else if (changes.textcl != 0)
 				browser.contextMenus.update('copy-clean-link',
@@ -444,7 +444,7 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 	if (Prefs.values.progltr)
 		browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
 
-	if (Prefs.values.cbc)
+	if (Prefs.values.context_menu)
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',
