@@ -181,7 +181,7 @@ function on_request(details)
 
 function handle_message(message, sender)
 {
-	log('received message : ' + JSON.stringify(message))
+	log('received message', message)
 
 	let tab_id = browser.tabs.TAB_ID_NONE;
 	if ('tab_id' in message)

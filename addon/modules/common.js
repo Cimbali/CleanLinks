@@ -45,10 +45,7 @@ const pref_values = {
 }
 
 
-function log()
-{
-	if (pref_values.debug) console.log.apply(null, arguments)
-}
+const log = (...args) => { if (pref_values.debug) console.log(...args); }
 
 
 function apply_i18n()

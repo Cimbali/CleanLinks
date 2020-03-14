@@ -285,45 +285,34 @@ function load_rules()
 
 let Rules = {
 	all_rules: {},
-	find: function(url) {
-		return find_rules(url, this.all_rules)
-	},
-	serialize: function()
+	find: url => find_rules(url, Rules.all_rules),
+	serialize: () => serialize_rules(Rules.all_rules),
+	add: (new_rule) =>
 	{
-		return serialize_rules(this.all_rules)
+		push_rule(Rules.all_rules, new_rule)
+		return save_rules(Rules.all_rules)
 	},
-	add: function(new_rule)
+	remove: (old_rule) =>
 	{
-		push_rule(this.all_rules, new_rule)
-		return save_rules(this.all_rules)
+		pop_rule(Rules.all_rules, old_rule)
+		return save_rules(Rules.all_rules)
 	},
-	remove: function(old_rule)
+	exists: (rule) =>
 	{
-		pop_rule(this.all_rules, old_rule)
-		return save_rules(this.all_rules)
+		return rule_exists(Rules.all_rules, rule);
 	},
-	exists: function(rule)
+	update: (old_rule, new_rule) =>
 	{
-		return rule_exists(this.all_rules, rule);
-	},
-	update: function(old_rule, new_rule)
-	{
-		let found = pop_rule(this.all_rules, old_rule)
+		let found = pop_rule(Rules.all_rules, old_rule)
 		merge_rule_actions(new_rule, found)
-		push_rule(this.all_rules, new_rule)
-		return save_rules(this.all_rules)
+		push_rule(Rules.all_rules, new_rule)
+		return save_rules(Rules.all_rules)
 	},
-	reload: function() {
-		return load_rules().then(loaded => this.all_rules = loaded)
-	},
-	replace: function(new_data) {
-		return clear_rules().then(() => {
-			this.all_rules = new_data;
-			return save_rules(this.all_rules);
-		});
-	},
-	reset: function() {
-		return clear_rules().then(() => load_rules().then(loaded => this.all_rules = loaded));
-	},
+	reload: () => load_rules().then(loaded => Rules.all_rules = loaded),
+	replace: new_data => clear_rules().then(() => {
+		Rules.all_rules = new_data;
+		return save_rules(Rules.all_rules);
+	}),
+	reset: () => clear_rules().then(() => load_rules().then(loaded => Rules.all_rules = loaded)),
 }
 Rules.loaded = Rules.reload()
