@@ -361,7 +361,8 @@ function import_domain_whitelist(domains_list)
 
 async function upgrade_options(prev_version)
 {
-	const options = await browser.storage.sync.get({'configuration': {}});
+	let num_prev_version = prev_version.split('.').map(s => parseInt(s))
+	const options = (await browser.storage.sync.get({'configuration': {}})).configuration;
 
 	for (let [rename, newname] of Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab', 'cbc': 'context_menu'}))
 		if (rename in options)
@@ -370,9 +371,9 @@ async function upgrade_options(prev_version)
 			delete options[rename];
 		}
 
-	if ('skipdoms' in options)
+	if (num_prev_version[0] < 4)
 	{
-		const skipdoms = options.skipdoms.split(',')
+		const skipdoms = options.skipdoms.split(',').map(s => s.trim()).filter(s => s.length !== 0);
 
 		const old_defaults = ['accounts.google.com', 'docs.google.com', 'translate.google.com',
 			'login.live.com', 'plus.google.com', 'twitter.com',
@@ -396,11 +397,29 @@ async function upgrade_options(prev_version)
 			await Rules.add({domain: fqdn, ...actions})
 
 		delete options.skipdoms;
+
+
+		let remove = [], parentheses_balance = 0;
+		const old_remove = '\\b((?:ref|aff)\\w*|utm_\\w+|(?:merchant|programme|media)ID)|fbclid';
+		for (let item of options.remove.split('|').filter(s => s.length !== 0))
+		{
+			if (parentheses_balance === 0)
+				remove.push(item)
+			else
+				remove.push(remove.pop() + '|' + item);
+
+			parentheses_balance += (item.match(/\(/g) || []).length
+			parentheses_balance -= (item.match(/\)/g) || []).length
+		}
+
+		await Rules.add({domain: '*.*', remove: remove})
 	}
 
 	await browser.storage.sync.set({configuration: options});
-	browser.runtime.sendMessage({action: 'options'});
-	Prefs.reload();
+	await Prefs.reload();
+
+	browser.runtime.sendMessage({action: 'reload options'}).catch(() => {});
+	browser.runtime.sendMessage({action: 'rules'}).catch(() => {});
 }
 
 
@@ -451,5 +470,5 @@ Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
 browser.runtime.onInstalled.addListener(details =>
 {
 	if (details.reason === 'update')
-		return upgrade_options(details.version);
+		return upgrade_options(details.previousVersion);
 });
