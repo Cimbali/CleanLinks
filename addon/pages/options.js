@@ -436,7 +436,11 @@ function export_rules()
 	return Rules.loaded.then(rules =>
 	{
 		let blob = new Blob([JSON.stringify(rules)], {type : 'data:application/json;charset=utf-8'})
-		browser.downloads.download({filename: 'clean_links_rules.json', url: URL.createObjectURL(blob)});
+
+		let a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = 'clean_links_rules.json';
+		a.click();
 	})
 }
 
