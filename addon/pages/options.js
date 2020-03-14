@@ -306,7 +306,10 @@ function erase_rule()
 	let selected_opt = select[select.selectedIndex];
 
 	if (selected_opt.hasAttribute('orig-value'))
+	{
 		Rules.remove(JSON.parse(selected_opt.getAttribute('orig-value')))
+			.then(() => browser.runtime.sendMessage({action: 'rules'}));
+	}
 
 	let next_up = selected_opt.previousSibling;
 	while (next_up !== null && next_up.style.display === 'none')
@@ -401,12 +404,11 @@ function save_rule()
 		return;
 
 	// Perform the update operation immediately in the DOM
+	selected_opt.replaceChild(document.createTextNode(name_rule(rule)), selected_opt.firstChild);
+
 	let replacing = null;
 	if (selected_opt.hasAttribute('orig-value'))
-	{
 		replacing = JSON.parse(selected_opt.getAttribute('orig-value'));
-		selected_opt.replaceChild(document.createTextNode(name_rule(rule)), selected_opt.firstChild);
-	}
 
 	let rule_str = JSON.stringify(rule);
 	selected_opt.setAttribute('value', rule_str);
@@ -417,6 +419,7 @@ function save_rule()
 		Queue.add(() => Rules.add(rule));
 	else
 		Queue.add(() => Rules.update(replacing, rule));
+	Queue.add(() => browser.runtime.sendMessage({action: 'rules'}));
 
 	rule_pristine();
 	filter_rules();
