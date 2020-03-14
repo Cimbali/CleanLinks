@@ -192,14 +192,12 @@ function pop_rule(all_rules, serialized_rule)
 
 	delete node.actions;
 
-	while (stack.length !== 0)
+	while (stack.length !== 0 && Object.entries(node).length === 0)
 	{
-		let [node, key] = stack.pop()
+		let [parent_node, key] = stack.pop()
+		delete parent_node[key]
 
-		if (Object.keys(node).length === 0)
-			delete node[key]
-		else
-			break
+		node = parent_node;
 	}
 
 	return found_actions;
