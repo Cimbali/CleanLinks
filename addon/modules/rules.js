@@ -175,21 +175,8 @@ function pop_rule(all_rules, serialized_rule)
 		}
 	}
 
+	// keep actions and backtrack removing all empty nodes
 	let found_actions = {...node.actions}
-
-	for (let [action, value] in Object.entries(expected_actions))
-	{
-		if (!(action in found_actions))
-			continue;
-		else if (Array.isArray(value))
-			found_actions[action] = found_actions[action].filter(x => !value.contains(x));
-		else if (typeof value === 'boolean')
-		{
-			if (value === found_actions[action])
-				delete found_actions[action];
-		}
-	}
-
 	delete node.actions;
 
 	while (stack.length !== 0 && Object.entries(node).length === 0)
@@ -198,6 +185,20 @@ function pop_rule(all_rules, serialized_rule)
 		delete parent_node[key]
 
 		node = parent_node;
+	}
+
+	// return actions that were found but not expected
+	for (let [action, expected_value] of Object.entries(expected_actions))
+	{
+		if (!(action in found_actions))
+			continue;
+		else if (Array.isArray(expected_value))
+			found_actions[action] = found_actions[action].filter(x => !expected_value.includes(x));
+		else if (typeof expected_value === 'boolean')
+		{
+			if (expected_value === found_actions[action])
+				delete found_actions[action];
+		}
 	}
 
 	return found_actions;
