@@ -47,7 +47,7 @@
 		}
 	],
 
-	"web_accessible_resources": [ "data/public_suffix_list.dat" ],
+	"web_accessible_resources": [ "data/rules.json", "data/public_suffix_list.dat" ],
 
 	"options_ui":
 	{
