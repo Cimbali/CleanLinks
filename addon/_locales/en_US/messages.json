@@ -8,6 +8,9 @@
   "Add": {
     "message": "Add"
   },
+  "Add context menu cleaning for selected text": {
+    "message": "Add context menu cleaning for selected text"
+  },
   "Add rule": {
     "message": "Add rule"
   },
@@ -26,17 +29,14 @@
   "Allow URL embedded inside path": {
     "message": "Allow URL embedded inside path"
   },
-  "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode.": {
-    "message": "Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode."
+  "Allows cleaning non-clickable text-links to open them as normal links.": {
+    "message": "Allows cleaning non-clickable text-links to open them as normal links."
   },
   "Apply this CSS Style to cleaned links.": {
     "message": "Apply this CSS Style to cleaned links."
   },
   "Cancel": {
     "message": "Cancel"
-  },
-  "Catch Text Links": {
-    "message": "Catch Text Links"
   },
   "Clean all outgoing HTTP requests, instead of only top frame": {
     "message": "Clean all outgoing HTTP requests, instead of only top frame"

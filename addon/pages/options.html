@@ -168,6 +168,9 @@
 		<label i18n_title="This extendes the context-menu with a Copy Clean Link entry to clear links before being copied to the clipboard."><span i18n_text="Copy clean links from the context menu"></span>
 			<input type="checkbox" name="context_menu" value="" />
 		</label>
+		<label i18n_title="Allows cleaning non-clickable text-links to open them as normal links."><span i18n_text="Add context menu cleaning for selected text"></span>
+			<input type="checkbox" name="textcl" value="" />
+		</label>
 		<label i18n_title="Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs."><span i18n_text="Use Redirect Watcher?"></span>
 			<input type="checkbox" name="progltr" value="" />
 		</label>
@@ -176,9 +179,6 @@
 		</label>
 		<label i18n_title="Whether the target attribute on links should be checked and respected."><span i18n_text="Follow Target Attribute?"></span>
 			<input type="checkbox" name="gotarget" value="" />
-		</label>
-		<label i18n_title="Allows clicking on non-clickable text-links to open them as normal links - Requires Event Delegation Mode."><span i18n_text="Catch Text Links"></span>
-			<input type="checkbox" name="textcl" value="" />
 		</label>
 		<label i18n_title="Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button."><span i18n_text="Link Tracking"></span>
 			<input type="checkbox" name="cltrack" value="" />
