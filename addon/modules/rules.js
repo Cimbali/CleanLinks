@@ -270,17 +270,14 @@ function load_rules()
 {
 	return new Promise(done =>
 	{
-		let cached = browser.storage.sync.get('rules')
-		if (cached === undefined)
-			load_default_rules(done)
-		else
-			cached.then(data =>
-			{
-				if ('rules' in data && data.rules)
-					PublicSuffixList.loaded.then(() => done(data.rules));
-				else
-					load_default_rules(done);
-			})
+		let cached = browser.storage.sync.get({'rules': null})
+		cached.then(data =>
+		{
+			if (data.rules)
+				PublicSuffixList.loaded.then(() => done(data.rules));
+			else
+				load_default_rules(done);
+		})
 	});
 }
 

@@ -627,20 +627,17 @@ const PublicSuffixList = {
 			});
 		}
 
-		var cached = browser.storage.local.get('PSL')
-		if (cached === undefined)
-			refresh()
-		else
-			cached.then(data =>
+		var cached = browser.storage.local.get({'PSL': null})
+		cached.then(data =>
+		{
+			if (data.PSL)
 			{
-				if ('PSL' in data)
-				{
-					fromSelfie(data.PSL, Base64Encoder)
-					done();
-				}
-				else
-					refresh();
-			})
+				fromSelfie(data.PSL, Base64Encoder)
+				done();
+			}
+			else
+				refresh();
+		})
 	})
 }
 
