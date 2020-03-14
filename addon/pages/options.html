@@ -10,14 +10,10 @@
 	<fieldset id="rule_editor">
 		<legend i18n_text="Link cleaning rules"></legend>
 
-		<label i18n_title="This options causes non-http/s links to be ignored when checking for nested urls on them."><span i18n_text="Ignore non-http/s links"></span>
-			<input type="checkbox" name="ignhttp" value="" />
-		</label>
-
 		<fieldset class="example">
 			<input type="checkbox" id="show_URL_legend" class="toggle noautosave" />
 
-			<legend i18n_title="URL example"> <label for="show_URL_legend">
+			<legend i18n_text="URL example"> <label for="show_URL_legend">
 					<span class="enabled" i18n_text="Hide legend"></span>
 					<span class="disabled" i18n_text="Show legend"></span>
 			</label></legend>
@@ -41,7 +37,7 @@
 		</fieldset>
 
 		<h4 id="rule_legend"><label for="rule_selector" i18n_text="Rule to edit:"></label>
-			<input type="text" id="rule_filter" placeholder="filter rules" class="noautosave" />
+			<input type="text" id="rule_filter" i18n_placeholder="filter rules" class="noautosave" />
 		</h4>
 
 		<select id="rule_selector" name="rule" size="2"></select>
@@ -70,14 +66,14 @@
 
 			<span class="parsing_error" id="rule_error"></span>
 			<label><span i18n_text="Domain"></span><br />
-				<input type="text" name="domain" id="domain_edit" value="" placeholder="subdomain.domain.suffix" />
+				<input type="text" name="domain" id="domain_edit" value="" i18n_placeholder="subdomain.domain.suffix" />
 			</label>
 			<label><span i18n_text="Match subdomains"></span>
 				<input type="checkbox" name="subdomains" checked="checked" />
 			</label>
 			<span class="parsing_error" id="path_error"></span>
 			<label><span i18n_text="Path"></span>
-				<input type="text" name="path" value="" placeholder="/path/in/link" />
+				<input type="text" name="path" value="" i18n_placeholder="/path/in/link" />
 			</label>
 		</fieldset>
 
@@ -162,6 +158,9 @@
 
 	<fieldset>
 		<legend i18n_text="Features"></legend>
+		<label i18n_title="This options causes non-http/s links to be ignored when checking for nested urls on them."><span i18n_text="Ignore non-http/s links"></span>
+			<input type="checkbox" name="ignhttp" value="" />
+		</label>
 		<label i18n_title="When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present."><span i18n_text="Switch to tabs opened by clicking links?"></span>
 			<input type="checkbox" name="switch_to_tab" value="" />
 		</label>

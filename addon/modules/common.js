@@ -55,6 +55,9 @@ function apply_i18n()
 
 	for (let elem of document.querySelectorAll('[i18n_title]'))
 		elem.setAttribute('title', _(elem.getAttribute('i18n_title')));
+
+	for (let elem of document.querySelectorAll('[i18n_placeholder]'))
+		elem.setAttribute('placeholder', _(elem.getAttribute('i18n_placeholder')));
 }
 
 
