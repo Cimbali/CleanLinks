@@ -109,11 +109,14 @@ body {
 	flex-wrap: wrap;
 	align-items: center;
 }
+#filter_actions {
+	font-size: .85em;
+}
 .filters input {
-	margin: 0 5px 0 15px;
+	margin: 0 2.5px 0 5px;
 }
 .filters label:last-child {
-	margin-right: 15px;
+	margin-right: 5px;
 }
 .help {
 	position: relative;

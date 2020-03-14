@@ -91,7 +91,24 @@ function add_option(orig, clean, classes)
 	option.classList.add(...classes);
 	option.onclick = set_selected
 
-	orig = new URL(orig)
+	let js_cleaned_link = extract_javascript_link(orig), prefix = null, suffix = null;
+	if (js_cleaned_link && js_cleaned_link !== orig)
+	{
+		let start = orig.indexOf(js_cleaned_link);
+		let end = start + js_cleaned_link.length;
+
+		if (start > 0)
+			prefix = orig.slice(0, start);
+
+		if (start !== -1 && end !== orig.length)
+			suffix = orig.slice(end);
+
+		orig = new URL(js_cleaned_link);
+		option.classList.add('javascript');
+	}
+	else
+		orig = new URL(orig);
+
 	clean = new URL(clean)
 
 	let origin_node = document.createElement('span');
@@ -101,6 +118,9 @@ function add_option(orig, clean, classes)
 
 	let rules = Rules.find(orig);
 	let actions_to_whitelist = {};
+
+	if (prefix !== null)
+		append_decorated(option, prefix, 'deleted')
 
 	append_decorated(option, orig.origin)
 
@@ -256,6 +276,9 @@ function add_option(orig, clean, classes)
 		else
 			append_decorated(option, keyval, decorate)
 	}
+
+	if (suffix !== null)
+		append_decorated(option, suffix, 'deleted')
 
 	let clean_node = document.createElement('span');
 	clean_node.setAttribute('raw-url', clean.href);
