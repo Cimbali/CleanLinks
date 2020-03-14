@@ -130,5 +130,6 @@ function clear_options()
 	return browser.storage.sync.remove('configuration');
 }
 
-const Prefs = {values: pref_values, serialize: serialize_options, reload: load_options, clear: clear_options}
+const Prefs = {values: pref_values, serialize: serialize_options, reload: load_options, clear: clear_options,
+	reset: () => clear_options().then(load_options)}
 Prefs.loaded = Prefs.reload()
