@@ -197,7 +197,7 @@ function handle_message(message, sender)
 	case 'highlight':
 		if (Prefs.values.highlight)
 			cleaned_per_tab.get(tab_id).pending_highlight = message.link;
-		return new Promise.resolve({});
+		return Promise.resolve({});
 
 	case 'check tab enabled':
 		return Promise.resolve({enabled: disabled_tabs.is_enabled(tab_id)});
