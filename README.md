@@ -64,17 +64,16 @@ The permissions are listed [in the manifest file](https://github.com/Cimbali/Cle
 and [described in the API documentation](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/permissions#API_permissions).
 Here is a breakdown of why we need each of the requested permissions:
 
-| Permission                                             | Show (on addons.mozilla.org) as                                     | Needed for                                      |
-| ------------------------------------------------------ | ------------------------------------------------------------------- | ----------------------------------------------- |
-| clipboardWrite                                         | _Input data to the clipboard_                                       | Copying cleaned links from the context menu     |
-| contextMenus                                           | Not shown                                                           | Copying cleaned links from the context menu     |
-| alarms                                                 | Not shown                                                           | Automatically saving options                    |
-| webRequest                                             | _Access your data for all websites_                                 | Clean links while they are accessed             |
-| webRequestBlocking                                     | _Access your data for all websites_                                 | Clean links while they are accessed             |
-| \<all\_urls\>                                          | _Access your data for all websites_                                 | Clean javascript links, highlight cleaned links |
-| storage                                                | Not shown                                                           | Store rules and preferences                     |
-| downloads                                              | _Download files and read and modify the browser’s download history_ | Exporting and importing Rules files             |
-| <https://publicsuffix.org/list/public_suffix_list.dat> | Not shown                                                           | Identifying public suffixes (e.g. `.co.uk`)     |
+| Permission                                             | Show (on addons.mozilla.org) as     | Needed for                                      |
+| ------------------------------------------------------ | ----------------------------------- | ----------------------------------------------- |
+| clipboardWrite                                         | _Input data to the clipboard_       | Copying cleaned links from the context menu     |
+| contextMenus                                           | Not shown                           | Copying cleaned links from the context menu     |
+| alarms                                                 | Not shown                           | Automatically saving options                    |
+| webRequest                                             | _Access your data for all websites_ | Clean links while they are accessed             |
+| webRequestBlocking                                     | _Access your data for all websites_ | Clean links while they are accessed             |
+| \<all\_urls\>                                          | _Access your data for all websites_ | Clean javascript links, highlight cleaned links |
+| storage                                                | Not shown                           | Store rules and preferences                     |
+| <https://publicsuffix.org/list/public_suffix_list.dat> | Not shown                           | Identifying public suffixes (e.g. `.co.uk`)     |
 
 
 
