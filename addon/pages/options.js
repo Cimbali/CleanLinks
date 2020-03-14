@@ -421,6 +421,7 @@ function save_rule()
 		Queue.add(() => Rules.update(replacing, rule));
 
 	rule_pristine();
+	filter_rules();
 }
 
 
