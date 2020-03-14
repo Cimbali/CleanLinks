@@ -423,6 +423,15 @@
       }
     },
     ".google": {
+      ".mail": {
+        "^/accounts/SetOSID$": {
+          "actions": {
+            "whitelist": [
+              "continue"
+            ]
+          }
+        }
+      },
       ".www": {
         "^/recaptcha/api2/anchor$": {
           "actions": {
@@ -795,6 +804,33 @@
     }
   },
   ".net": {
+    ".gandi": {
+      ".admin": {
+        "^/dashboard/api/v\\d+/login$": {
+          "actions": {
+            "whitelist": [
+              "redirect"
+            ]
+          }
+        }
+      },
+      ".id": {
+        "^/en/authorize$": {
+          "actions": {
+            "whitelist": [
+              "redirect_uri"
+            ]
+          }
+        },
+        "^/en/login$": {
+          "actions": {
+            "whitelist": [
+              "redirect"
+            ]
+          }
+        }
+      }
+    },
     ".tweakers": {
       "actions": {
         "remove": [
