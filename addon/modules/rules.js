@@ -309,7 +309,8 @@ let Rules = {
 		return save_rules(Rules.all_rules)
 	},
 	reload: () => load_rules().then(loaded => Rules.all_rules = loaded),
-	replace: new_data => clear_rules().then(() => {
+	replace: new_data => clear_rules().then(() =>
+	{
 		Rules.all_rules = new_data;
 		return save_rules(Rules.all_rules);
 	}),

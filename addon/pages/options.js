@@ -463,12 +463,12 @@ function reset_rules()
 
 function prepopulate_rule(link)
 {
-	let url = new URL(link)
-	document.getElementById('rule_selector').selectedIndex = 0;
-	document.querySelector('input[name="domain"]').value = url.hostname;
-	document.querySelector('input[name="path"]').value = url.pathname;
+	let url = new URL(link);
+	let rule = {domain: url.hostname, path: '^' + url.pathname + '$', ...default_actions};
 
-	rule_changed();
+	let opt = new Option(name_rule(rule), JSON.stringify(rule), false, true);
+	document.getElementById('rule_selector').appendChild(opt);
+	load_rule();
 }
 
 
@@ -584,12 +584,14 @@ function add_listeners()
 		if (message.action === 'set prepopulate')
 		{
 			prepopulate_rule(message.link);
-			return browser.runtime.sendMessage({action: 'get prepopulate'})
+			return browser.runtime.sendMessage({action: 'get prepopulate'}).catch(() => {});
 		}
 		else if (message.action === 'rules')
-			Rules.reload().then(populate_rules);
+			return Rules.reload().then(populate_rules);
 		else if (message.action === 'reload options')
-			Prefs.reload().then(populate_options());
+			return Prefs.reload().then(populate_options());
+		else
+			return Promise.resolve('Options page ignored unknown message ' + message.action)
 	});
 }
 
