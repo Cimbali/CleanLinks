@@ -102,34 +102,30 @@ function load_options()
 {
 	return browser.storage.sync.get({'configuration': {}}).then(data =>
 	{
-		for (let param in data.configuration)
+		for (let [param, stored] of Object.entries(data.configuration))
 		{
 			if (typeof pref_values[param] === 'number')
-				pref_values[param] = parseInt(data.configuration[param]);
+				pref_values[param] = parseInt(stored);
 			else if (typeof pref_values[param] === 'boolean')
-			{
-				pref_values[param] = data.configuration[param] === true
-								|| data.configuration[param] === 'true'
-								|| data.configuration[param] === 'on';
-			}
+				pref_values[param] = [true, 'true', 'on'].includes(stored);
 			else if (typeof pref_values[param] === 'string')
-				pref_values[param] = data.configuration[param] || '';
+				pref_values[param] = stored || '';
 			else if (pref_values[param] instanceof RegExp)
 			{
 				try
 				{
-					pref_values[param] = new RegExp(data.configuration[param] || '.^');
+					pref_values[param] = new RegExp(stored || '.^');
 				}
 				catch (e)
 				{
-					log('Error parsing regex ' + (data.configuration[param] || '.^') + ' : ' + e.message);
+					log('Error parsing regex ' + (stored || '.^') + ' : ' + e.message);
 				}
 			}
 			else if (Array.isArray(pref_values[param]))
-				pref_values[param] = (data.configuration[param] || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
+				pref_values[param] = (stored || '').split(',').map(s => s.trim()).filter(s => s.length > 0);
 		}
 		return pref_values;
-	}).catch(err => { console.error('Error loading preferences', err); });
+	}).catch(err => { console.error('Error loading preferences', JSON.parse(JSON.stringify(err))); });
 }
 
 function clear_options()

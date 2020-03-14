@@ -32,7 +32,7 @@ function check_regexp(expr, error_span)
 {
 	try
 	{
-		var r = new RegExp(expr);
+		let r = new RegExp(expr);
 		error_span.innerText = '';
 		return true;
 	}
@@ -88,7 +88,7 @@ function save_options()
 
 
 // for onKeyUp: save after 400ms of inactivity
-var delayed_save = (function(callback)
+function delayed_save(callback)
 {
 	browser.alarms.onAlarm.addListener(callback);
 	return function()
@@ -96,7 +96,7 @@ var delayed_save = (function(callback)
 		browser.alarms.clear('save');
 		browser.alarms.create('save', {when: Date.now() + 400});
 	}
-})
+}
 
 
 function reset_options()
@@ -115,14 +115,13 @@ function reset_options()
 
 function populate_options()
 {
-	var values = Prefs.serialize();
-	for (var pref in values)
+	let values = Prefs.serialize();
+	for (let [pref, value] of Object.entries(values))
 	{
-		var input = document.querySelector('[name=' + pref + ']');
+		let input = document.querySelector('[name=' + pref + ']');
 		if (!input)
 			continue;
 
-		var value = values[pref];
 		if (typeof value == 'boolean')
 			input.checked = value;
 		else
@@ -132,7 +131,6 @@ function populate_options()
 		input.onkeyup = delayed_save(save_options)
 	}
 
-	document.querySelector('button[name="reset_options"]').onclick = reset_options;
 	update_page(values);
 }
 
@@ -543,6 +541,8 @@ function add_listeners()
 	document.getElementById('remove_rule').onclick = erase_rule
 	document.getElementById('save_rule').onclick = save_rule
 	document.getElementById('add_rule').onclick = insert_rule
+
+	document.querySelector('button[name="reset_options"]').onclick = reset_options;
 	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
 	document.querySelector('button[name="export_rules"]').onclick = export_rules
 	document.querySelector('button[name="import_rules"]').onclick = () => document.getElementById('import_rules').click()

@@ -363,7 +363,7 @@ async function upgrade_options(prev_version)
 {
 	const options = await browser.storage.sync.get({'configuration': {}});
 
-	for (let [rename, newname] in Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab', 'cbc': 'context_menu'}))
+	for (let [rename, newname] of Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab', 'cbc': 'context_menu'}))
 		if (rename in options)
 		{
 			options[newname] = options[rename];
