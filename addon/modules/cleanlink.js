@@ -48,6 +48,10 @@ function getSimpleLinkSearchStrings(link, skip, whitelist_path)
 		}
 		arr.push(...vals);
 	}
+
+	// look again with double decoding if nothing was found
+	arr.push(...arr.map(decodeURIComponent))
+
 	return arr;
 }
 

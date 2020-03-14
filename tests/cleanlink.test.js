@@ -122,8 +122,11 @@ describe('clean_link', function() {
 				expect(clean_link(url)).to.equal(url);
 		})
 	);
+	it('should detect doubly-encoded links', () =>
+		expect(clean_link('https://trackmail.alumnforce.net/?tm_u=https%253A%252F%252Fax.polytechnique.org%252F%2523%252Fgroup%252Fx-alternative%252F211%252Fcalendar%252Fconference-frederic-lordon%252F2020%252F02%252F06%252F724&tm_h=68404220dbcf676445ae9f32a208f6bc'))
+		.to.equal('https://ax.polytechnique.org/#/group/x-alternative/211/calendar/conference-frederic-lordon/2020/02/06/724')
+	);
 });
-
 describe('extract_javascript_link', function() {
 	it('should clean the link to the simple javascript function argument', done =>
 	{
