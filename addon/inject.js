@@ -153,8 +153,9 @@ function toggle_active(enabled)
 }
 
 browser.runtime.sendMessage({action: 'check tab enabled'})
-	.then(answer => enabled !== undefined && toggle_active(answer.enabled))
+	.then(answer => answer !== undefined && toggle_active(answer.enabled))
 	.catch(() => {});
+
 
 browser.runtime.onMessage.addListener(message =>
 {
@@ -175,4 +176,4 @@ browser.runtime.onMessage.addListener(message =>
 	}
 	else
 		return Promise.reject('Unexpected message: ' + String(message));
-})
+});
