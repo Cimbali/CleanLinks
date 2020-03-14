@@ -224,7 +224,6 @@ function handle_message(message, sender)
 
 			if (orig_tab !== undefined)
 			{
-				console.log('Highlighting in ' + parseInt(orig_tab))
 				cleaned_per_tab.get(orig_tab).pending_highlight = null;
 				return browser.tabs.sendMessage(parseInt(orig_tab), {action: 'highlight'}).catch(() => {})
 			}

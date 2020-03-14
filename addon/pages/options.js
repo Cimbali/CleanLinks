@@ -573,7 +573,6 @@ function add_listeners()
 
 	browser.runtime.onMessage.addListener(message =>
 	{
-		console.log('Options page message', message);
 		if (message.action === 'set prepopulate')
 		{
 			prepopulate_rule(message.link);
