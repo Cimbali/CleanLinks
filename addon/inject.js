@@ -115,11 +115,11 @@ function on_click(evt)
 	try
 	{
 		let url = new URL(text_link, window.location)
-		browser.runtime.sendMessage({action: 'highlight', link: url.href})
+		browser.runtime.sendMessage({action: 'highlight', link: url.href}).catch(() => {});
 	}
 	catch (e)
 	{
-		browser.runtime.sendMessage({action: 'highlight', link: text_link})
+		browser.runtime.sendMessage({action: 'highlight', link: text_link}).catch(() => {});
 	}
 
 
@@ -131,7 +131,7 @@ function on_click(evt)
 	if (event_do_click(cleaned_link, node, evt))
 	{
 		// instead of blinking the URL bar, tell the background to show a notification.
-		browser.runtime.sendMessage({action: 'notify', url: cleaned_link, orig: text_link, type: 'clicked'});
+		browser.runtime.sendMessage({action: 'notify', url: cleaned_link, orig: text_link, type: 'clicked'}).catch(() => {});
 	}
 }
 
@@ -152,7 +152,9 @@ function toggle_active(enabled)
 		window.removeEventListener('click', on_click, {capture: true});
 }
 
-browser.runtime.sendMessage({action: 'check tab enabled'}).then(answer => toggle_active(answer.enabled));
+browser.runtime.sendMessage({action: 'check tab enabled'})
+	.then(answer => enabled !== undefined && toggle_active(answer.enabled))
+	.catch(() => {});
 
 browser.runtime.onMessage.addListener(message =>
 {
