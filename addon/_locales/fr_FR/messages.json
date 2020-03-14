@@ -264,5 +264,20 @@
   },
   "This Extension converts obfuscated/nested links to genuine/normal plain clean links. For example:": {
     "message": "Cette extension transforme les liens masqués ou imbriqués en véritables liens propres. Par exemple:"
+  },
+  "/path/in/link": {
+    "message": "/chemin/de/la/page"
+  },
+  "filter rules": {
+    "message": "filtrer les règles"
+  },
+  "subdomain.domain.suffix": {
+    "message": "sous-domaine.domaine.suffixe"
+  },
+  "CleanLinks directly redirects URLs to any embedded URL inside the path, and also supports removing tracking data from URLs.<br /> Here we display the rules for the matched URL, as well as inherited rules from broader matches (on a greyed background).": {
+    "message": "CleanLinks redirige les requêtes vers les URLs imbriquées détectées dans ces requêtes, et permet également de retirer des données de suivi des URLs.<br /> Cette partie montre les actions de nettoyage pour les URLs sélectionnées, ainsi que les actions héritées d’autres règles (sur fond gris)."
+  },
+  "Defines for which URLs cleaning actions are taken or prevented. <br /> The <strong>domain suffix</strong> (see legend) can be either a domain or * to catch domains with multiple TLDs such as google or amazon. The rest of the <strong>domain</strong> must match exactly, except for the optional inclusion of subdomains. <br /> The <strong>path</strong> is matched as a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions\" >Regular Expression</a>. Leave empty to match all paths, and set to ^/$ to match an empty path.": {
+    "message": "Définit à quelles URLs les actions de nettoyages s’appliquent.<br /> Le <strong>suffixe</strong> (cf. légende) peut être un domaine ou * pour appliquer les règles à des sites qui ont de multiples domaines de premier niveau, comme google ou amazon. Le reste du <strong>nom de domaine</strong> doit correspondre exactement, à l’exception de l’inclusion optionelle des sous-domaines. <br /> Le <strong>chemin</strong> est une <a href=\"https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide/Expressions_r%C3%A9guli%C3%A8res\" >expression régulière</a>. Laisser vide pour tous les chemins possibles, et utiliser ^/$ pour le chemin vide."
   }
 }

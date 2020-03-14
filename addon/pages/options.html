@@ -52,14 +52,17 @@
 			<legend><span i18n_text="URLs matched"></span>
 				<span class="help">
 					<span class="tooltip">?</span>
-					<span class="tooltiptext">
-						Defines for which URLs cleaning actions are taken or prevented.<br />
-						The <strong>domain suffix</strong> (see legend) can be either a domain or * to catch domains with multiple TLDs
-						such as google or amazon. The rest of the <strong>domain</strong> must match exactly, except for the optional inclusion
-						of subdomains.<br />
-						The <strong>path</strong> is matched as a <a
-							href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">Regular
-							Expression</a>. Leave empty to match all paths, and set to ^/$ to match an empty path.
+					<span class="tooltiptext" i18n_html="
+						Defines for which URLs cleaning actions are taken or prevented. &lt;br /&gt;
+						The &lt;strong&gt;domain suffix&lt;/strong&gt; (see legend) can be either a domain or *
+						to catch domains with multiple TLDs such as google or amazon.
+						The rest of the &lt;strong&gt;domain&lt;/strong&gt; must match exactly,
+						except for the optional inclusion of subdomains. &lt;br /&gt;
+						The &lt;strong&gt;path&lt;/strong&gt; is matched as a &lt;a
+							href=&quot;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions&quot;
+						&gt;Regular Expression&lt;/a&gt;.
+						Leave empty to match all paths, and set to ^/$ to match an empty path.
+					">
 					</span>
 				</span>
 			</legend>
@@ -81,11 +84,12 @@
 			<legend><span i18n_text="Cleaning actions"></span>
 				<span class="help">
 					<span class="tooltip">?</span>
-					<span class="tooltiptext">
+					<span class="tooltiptext" i18n_html="
 						CleanLinks directly redirects URLs to any embedded URL inside the path, and also supports removing
-						tracking data from URLs.<br />
+						tracking data from URLs.&lt;br /&gt;
 						Here we display the rules for the matched URL, as well as inherited rules from broader matches
 						(on a greyed background).
+					">
 					</span>
 				</span>
 			</legend>

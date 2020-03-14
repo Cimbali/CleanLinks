@@ -19,10 +19,12 @@ extract() {
 	# Also add the texts from addons.mozilla.org
 	echo This Extension converts obfuscated/nested links to genuine/normal plain clean links. For example:
 	echo CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters \(e.g. utm_\* or fbclid\) are also removed.
-	echo For maximum privacy, rules are maintained and editable locally \(with decent defaults distributed in the add-on\). CleanLinks will break some websites and you will need to manually whitelist these URLs for them to work. This can be done easily via the menu from the CleanLinks icon.
+	echo For maximum privacy, rules are maintained and editable locally \(with decent defaults distributed in the add-on\). \<strong\>CleanLinks will break some websites\</strong\> and you will need to \<strong\>manually whitelist\</strong\> these URLs for them to work. This can be done easily via the menu from the CleanLinks icon.
 
 	find addon/ -name '*.js' -exec grep -hPo "(?<=_\\((['\"])).*(?=\\1\\s*[,\\)])" {} +
-	find addon/ -name '*.html' -exec grep -hPo '\bi18n_[a-z]+\="\K([^"]|\\")+(?=")' {} +
+	find addon/ -name '*.html' -exec grep -hPo '\bi18n_(text|title|placeholder)\="\K([^"]|\\")+(?=")' {} +
+	find addon/ -name '*.html' -exec grep -zhPo '\bi18n_html\="\K([^"]|\\")+(?=")' {} + |
+		sed -zE 's/\s+/ /g;s/&lt;/</g;s/&gt;/>/g;s/&quot;/"/g;s/^\s*//;s/\s*$//' | xargs -0 -L1
 	} | sort -u | sed 's/"/\\&/g;s/.*/"&",/;1s/^/[/;$s/,$/]/' |
 		jq  -S 'map({key: ., value: {message: .}}) | from_entries' | jq  --argjson desc "$addon_msg" '$desc + .' |
 		jq "$add_placeholders" > addon/_locales/en_US/messages.json
