@@ -58,6 +58,10 @@ function apply_i18n()
 
 	for (let elem of document.querySelectorAll('[i18n_placeholder]'))
 		elem.setAttribute('placeholder', _(elem.getAttribute('i18n_placeholder')));
+
+	for (let elem of document.querySelectorAll('[i18n_html]'))
+		elem.innerHTML = _(elem.getAttribute('i18n_html').trim().replace(/\s+/g, ' ')
+								.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'));
 }
 
 
