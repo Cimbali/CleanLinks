@@ -229,7 +229,6 @@ function push_rule(all_rules, serialized_rule)
 function rule_exists(all_rules, serialized_rule)
 {
 	let [keys, actions] = unserialize_rule(serialized_rule)
-	console.log(keys)
 
 	let node = all_rules;
 	for (let key of keys)

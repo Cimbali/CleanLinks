@@ -25,9 +25,13 @@ function skip_link_type(link)
 }
 
 
-function getSimpleLinkSearchStrings(link, skip)
+function getSimpleLinkSearchStrings(link, skip, whitelist_path)
 {
-	let arr = [decodeURIComponent(link.pathname)], vals = [];
+	let arr = [], vals = [];
+
+	if (!whitelist_path)
+		arr.push(decodeURIComponent(link.pathname));
+
 	if (link.search)
 	{
 		// NB searchParams.values() does not work reliably, probably because URLSearchParams are some kind of generator:
@@ -42,15 +46,15 @@ function getSimpleLinkSearchStrings(link, skip)
 			if (val)
 				vals.push(val);
 		}
-		arr = arr.concat(vals);
+		arr.push(...vals);
 	}
 	return arr;
 }
 
 
-function getLinkSearchStrings(link, skip)
+function getLinkSearchStrings(link, skip, whitelist_path)
 {
-	let arr = getSimpleLinkSearchStrings(link, skip)
+	let arr = getSimpleLinkSearchStrings(link, skip, whitelist_path)
 
 	if (link.hash.startsWith('#!'))
 	{
@@ -125,7 +129,7 @@ function decode_embedded_uri(link, rules, original_string)
 	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$') : null;
 
 	// first try to find a base64-encoded link
-	for (let str of getLinkSearchStrings(link, skip))
+	for (let str of getLinkSearchStrings(link, skip, rules.whitelist_path))
 	{
 		let [base64match] = str.match(base64_encoded_url) || [];
 		if (base64match)
@@ -152,7 +156,7 @@ function decode_embedded_uri(link, rules, original_string)
 	let capture = undefined, matchedString, embedded_link;
 
 	// check every parsed (URL-decoded) substring in the URL
-	for (let str of getLinkSearchStrings(link, skip))
+	for (let str of getLinkSearchStrings(link, skip, rules.whitelist_path))
 	{
 		[, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
 		if (capture)

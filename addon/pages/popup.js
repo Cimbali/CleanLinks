@@ -281,7 +281,6 @@ function filter_from_input(evt)
 	for (let input of document.querySelectorAll('#filter_actions input'))
 		filter_act[input.name] = input.checked;
 
-	console.log(filter_cat, filter_act)
 	for (let opt of document.querySelectorAll('#history p'))
 	{
 		// There is a single category per item, that must be selected, and there are a number of actions of which any one can be selected
