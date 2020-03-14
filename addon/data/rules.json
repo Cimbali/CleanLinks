@@ -123,12 +123,11 @@
         }
       },
       ".consent": {
-        "/status": {
-          "actions": {
-            "whitelist": [
-              "continue"
-            ]
-          }
+        "actions": {
+          "whitelist": [
+            "continue",
+            "origin"
+          ]
         }
       },
       ".translate": {
@@ -259,6 +258,14 @@
       }
     },
     ".youtube": {
+      ".consent": {
+        "actions": {
+          "whitelist": [
+            "continue",
+            "origin"
+          ]
+        }
+      },
       "actions": {
         "remove": [
           "feature",
