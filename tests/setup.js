@@ -1,16 +1,18 @@
+'use strict';
+
 // sinon-chrome defines chrome, but firefox uses browser
-var browser = typeof chrome !== 'undefined' ? chrome : browser
+const browser = typeof chrome !== 'undefined' ? chrome : browser
 
 // sinon-chrome does not get the manifest
 browser.runtime = Object.assign({
 	getManifest: () => ({
 		"name": "Clean Links",
 		"description": "Converts obfuscated/nested links to genuine clean links",
-		"author": "Cimbali (maintainer), \nDiego Casorran (creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
-		"version": "3.0.3",
+		"author": "Cimbali (maintainer), \nDiego Casorran (historic creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
+		"version": "tests",
 		"homepage_url": "https://github.com/Cimbali/CleanLinks",
 	}),
-	getURL: (url) => ('/' + url.replace(/^\/+/, '')),
+	getURL: url => ('/' + url.replace(/^\/+/, '')),
 	onMessage: {addListener: () => {}}
 }, browser.runtime)
 
@@ -30,7 +32,7 @@ browser.storage.sync = browser.storage.local = {
 		else if (typeof keys === 'object')
 		{
 			key_filter = candidate => candidate in keys
-			defauts = {...keys};
+			defaults = {...keys};
 		}
 		else
 			return Promise.reject('Unknown type of key ' + keys)

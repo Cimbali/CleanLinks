@@ -7,23 +7,22 @@
 
 	<!-- Mock browser object so cleanLink can be loaded -->
 	<script>
-	let nop = () => Promise.resolve({})
-	var browser = {
-		runtime: {getManifest: () => ({
-			"name": "Clean Links",
-			"description": "Converts obfuscated/nested links to genuine clean links",
-			"author": "Cimbali (maintainer), \nDiego Casorran (creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
-			"version": "3.0.3",
-			"homepage_url": "https://github.com/Cimbali/CleanLinks",
-			}),
-			getURL: (url) => ('https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/' + url.replace(/^\/+/, '')),
+	var browser =
+	{
+		runtime:
+		{
+			getURL: url => ('https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/' + url.replace(/^\/+/, '')),
 		},
-		storage: {sync: {get: nop, set: nop, remove: nop}, local: {get: nop, set: nop, remove: nop}},
-		i18n: {getMessage: () => "string"}
+		i18n:
+		{
+			getMessage: () => null
+		},
+		storage: {}
 	}
 	</script>
+	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/tests/setup.js"></script>
 
-	<!-- Embed the actual cleanLink script -->
+	<!-- Embed the actual clean_link script -->
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/common.js"></script>
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/punycode.js"></script>
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/publicsuffixlist.js"></script>
@@ -32,32 +31,54 @@
 
 	<!-- Inner workings of this page -->
 	<script>
-	function addToList(dirty, clean)
+	function add_to_list(dirty, clean)
 	{
-		var l = document.querySelector('ul#clean_history');
+		let l = document.querySelector('ul#clean_history');
 
-		l.insertBefore(document.createElement('li'), l.children[0]);
-		l.children[0].textContent = ' ';
+		l.appendChild(document.createElement('li'));
+		l.appendChild(document.createElement('li'));
+		l.appendChild(document.createElement('li'));
 
-		l.insertBefore(document.createElement('li'), l.children[0]);
-		l.children[0].textContent = clean;
-		l.children[0].className = 'cleaned'
+		l.children[2].textContent = ' ';
 
-		l.insertBefore(document.createElement('li'), l.children[0]);
+		l.children[1].textContent = clean;
+		l.children[1].className = 'cleaned'
+
 		l.children[0].textContent = dirty;
 	}
 
-	function testCleaning()
+	function test_cleaning()
 	{
-		var link = document.querySelector('#paste_link input').value;
+		let link = document.querySelector('#paste_link input').value;
 		if (link)
-			cleanLink(link).then(result => addToList(link, result))
+			Rules.loaded.then(() =>
+			{
+				add_to_list(link, clean_link(link));
+				document.querySelector('#paste_link input').value = '';
+			})
 	}
 
-	window.onload = () =>
+	window.addEventListener('load', () =>
 	{
-		document.querySelector('#paste_link button').onclick = testCleaning
-	}
+		document.querySelector('#paste_link button').addEventListener('click', test_cleaning);
+		document.querySelector('#paste_link input').addEventListener('keyup', e =>
+		{
+			if (e.key === 'Enter')
+			{
+				e.stopPropagation();
+				e.preventDefault();
+				test_cleaning();
+			}
+		});
+
+		fetch(browser.runtime.getURL('manifest.json')).then(async json =>
+		{
+			const manifest = JSON.parse(await json.text());
+			const h1 = document.getElementsByTagName('h1')[0];
+			h1.textContent = manifest.name + ' v' + manifest.version;
+		});
+
+	});
 	</script>
 
 	<!-- Styling for the page -->
@@ -85,6 +106,8 @@
 </head>
 
 <body>
+	<h1></h1>
+	<p>Test default rules of Clean Links.</p>
 	<p id="paste_link">Link:&nbsp;<input type="text" />&nbsp;<button>Clean it!</button></p>
 	<ul id="clean_history"></ul>
 </body>

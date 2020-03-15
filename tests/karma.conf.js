@@ -26,6 +26,7 @@ module.exports = config => Object.assign(config,
 		"modules/cleanlink.js",
 
 		{type: 'css', included: false, served: true, nocache: true, pattern: "data/*"},
+		{type: 'css', included: false, served: true, nocache: false, pattern: "manifest.json"},
 
 		// The tests, finally
 		'../tests/*.test.js',
@@ -35,6 +36,7 @@ module.exports = config => Object.assign(config,
 		'/modules/': 'http://localhost:9876/base/modules/',
 		'/icons/': 'http://localhost:9876/base/icons/',
 		'/data/': 'http://localhost:9876/base/data/',
+		'/manifest.json': 'http://localhost:9876/base/manifest.json',
 	},
 
 	reporters: ['progress'],
