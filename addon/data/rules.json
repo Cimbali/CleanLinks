@@ -284,7 +284,8 @@
               "origin"
             ],
             "whitelist": [
-              "url"
+              "url",
+              "ref"
             ]
           }
         }
