@@ -120,6 +120,13 @@
               "continue"
             ]
           }
+        },
+        "\\boauth2\\b": {
+          "actions": {
+            "whitelist": [
+              "parent"
+            ]
+          }
         }
       },
       ".consent": {
@@ -431,11 +438,29 @@
       }
     },
     ".google": {
+      ".contacts": {
+        "^/widget/hovercard/": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        }
+      },
       ".mail": {
         "^/accounts/SetOSID$": {
           "actions": {
             "whitelist": [
               "continue"
+            ]
+          }
+        }
+      },
+      ".ogs": {
+        "^/u/0/widget/app$": {
+          "actions": {
+            "remove": [
+              "origin"
             ]
           }
         }
@@ -695,6 +720,17 @@
         ]
       }
     },
+    ".washingtonpost": {
+      ".www": {
+        "^/gdpr-consent/$": {
+          "actions": {
+            "whitelist": [
+              "next_url"
+            ]
+          }
+        }
+      }
+    },
     ".woot": {
       "actions": {
         "remove": [
@@ -786,6 +822,37 @@
         "remove": [
           "wbdcd"
         ]
+      }
+    }
+  },
+  ".edu": {
+    ".upc": {
+      ".biblioteca": {
+        "^/(login|connect)\\b": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      },
+      ".renoir": {
+        "^/login/": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      },
+      ".sso": {
+        "^/CAS/login$": {
+          "actions": {
+            "whitelist": [
+              "service"
+            ]
+          }
+        }
       }
     }
   },
