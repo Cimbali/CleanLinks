@@ -35,7 +35,7 @@ describe('find_rules', function() {
 		{
 			let result = Rules.find(cdn9gag_url)
 			console.log(cdn9gag_url.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
-			expect(result.whitelist).to.have.members(['url'])
+			expect(result.whitelist).to.have.members(['url', 'ref'])
 		})
 	);
 	it('should return correct whitelist and removing for 9gag CDN pages', () =>
