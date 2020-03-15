@@ -436,9 +436,9 @@ function import_rules()
 
 function export_rules()
 {
-	return Rules.loaded.then(rules =>
+	return Rules.loaded.then(() =>
 	{
-		let blob = new Blob([JSON.stringify(rules)], {type : 'data:application/json;charset=utf-8'})
+		let blob = new Blob([JSON.stringify(Rules.all_rules, null, 2)], {type : 'data:application/json;charset=utf-8'})
 
 		let a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
