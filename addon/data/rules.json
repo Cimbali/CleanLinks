@@ -763,6 +763,17 @@
         ]
       }
     },
+    ".youtube": {
+      ".www": {
+        "^/get_video_info$": {
+          "actions": {
+            "remove": [
+              "eurl"
+            ]
+          }
+        }
+      }
+    },
     ".zoho": {
       "actions": {
         "remove": [
@@ -1015,6 +1026,28 @@
       }
     }
   },
+  ".se": {
+    ".kth": {
+      ".login": {
+        "^/login\\b": {
+          "actions": {
+            "whitelist": [
+              "service"
+            ]
+          }
+        }
+      },
+      ".www": {
+        "^/social/accounts/login/$": {
+          "actions": {
+            "whitelist": [
+              "next"
+            ]
+          }
+        }
+      }
+    }
+  },
   ".us": {
     ".disq": {
       "actions": {
@@ -1028,6 +1061,13 @@
     "actions": {
       "whitelist": [
         "redirect_uri"
+      ]
+    }
+  },
+  "\\b(SSO|shibboleth|SAML2(\\.0)?)\\b": {
+    "actions": {
+      "whitelist": [
+        "SigAlg"
       ]
     }
   },
