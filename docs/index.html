@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Test cleaning links</title>
+	<title>Test cleaning links with CleanLinks defaults rules</title>
 
 	<!-- Mock browser object so cleanLink can be loaded -->
 	<script>
@@ -28,32 +28,18 @@
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/publicsuffixlist.js"></script>
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/rules.js"></script>
 	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/cleanlink.js"></script>
+	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/display_cleaned_link.js"></script>
 
 	<!-- Inner workings of this page -->
 	<script>
-	function add_to_list(dirty, clean)
-	{
-		let l = document.querySelector('ul#clean_history');
-
-		l.appendChild(document.createElement('li'));
-		l.appendChild(document.createElement('li'));
-		l.appendChild(document.createElement('li'));
-
-		l.children[2].textContent = ' ';
-
-		l.children[1].textContent = clean;
-		l.children[1].className = 'cleaned'
-
-		l.children[0].textContent = dirty;
-	}
-
 	function test_cleaning()
 	{
 		let link = document.querySelector('#paste_link input').value;
 		if (link)
 			Rules.loaded.then(() =>
 			{
-				add_to_list(link, clean_link(link));
+				const li = cleaned_link_item(document.createElement('li'), link, clean_link(link), []);
+				document.querySelector('ul#clean_history').prepend(li);
 				document.querySelector('#paste_link input').value = '';
 			})
 	}
@@ -75,14 +61,18 @@
 		{
 			const manifest = JSON.parse(await json.text());
 			const h1 = document.getElementsByTagName('h1')[0];
-			h1.textContent = manifest.name + ' v' + manifest.version;
+			h1.textContent = h1.textContent + ' v' + manifest.version;
 		});
 
+		document.querySelector('#paste_link input').focus();
 	});
 	</script>
 
 	<!-- Styling for the page -->
 	<style>
+	h1{
+		text-align: center;
+	}
 	p#paste_link {
 		width: 100%;
 		display: inline-flex;
@@ -95,19 +85,46 @@
 	}
 	ul#clean_history {
 		list-style: none;
+		padding: 0;
+		overflow-wrap: break-word;
+		word-break: break-all;
 	}
-	ul#clean_history li.cleaned:before{
+	ul#clean_history li {
+		margin: 10px 0;
+		padding: 0 10px;
+		border: black thin solid;
+		border-radius: 10px;
+	}
+	ul#clean_history li > span {
+		display: block;
+		padding: 5px 0;
+	}
+	ul#clean_history li span.cleaned::before {
 		content: '→';
 		position: relative;
 		left: -5px;
 		padding-bottom: 10px;
 	}
+	.del {
+		text-decoration: line-through;
+		color: red;
+	}
+	.ins {
+		text-decoration: underline;
+		color: green;
+	}
+	.keep {
+		background-color: rgba(230, 230, 230, 0.5);
+	}
+	.url {
+		text-decoration: underline overline;
+		color: #339;
+	}
 	</style>
 </head>
 
 <body>
-	<h1></h1>
-	<p>Test default rules of Clean Links.</p>
+	<h1>Test cleaning with default rules of Clean Links</h1>
 	<p id="paste_link">Link:&nbsp;<input type="text" />&nbsp;<button>Clean it!</button></p>
 	<ul id="clean_history"></ul>
 </body>
