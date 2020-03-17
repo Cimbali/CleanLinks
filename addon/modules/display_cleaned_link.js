@@ -84,8 +84,11 @@ function remove_js(orig)
 function append_rewritten_path(link_elem, orig, clean, rules, actions_to_whitelist)
 {
 	link_elem.classList.add('rewrite');
-	let matches = [], modified_path = orig.pathname;
+	const orig_node = link_elem.querySelector('.original');
 
+	// Gather the matches, their replacements, and their offsets in the original URL.
+	// NB: this might not work if successive rules overwrite at the same locations.
+	let matches = [], modified_path = orig.pathname;
 	for (let {search, replace, flags} of rules.rewrite)
 	{
 		modified_path = modified_path.replace(new RegExp(search, flags), replace);
@@ -105,93 +108,74 @@ function append_rewritten_path(link_elem, orig, clean, rules, actions_to_whiteli
 		}
 	}
 
-	let [embed_start, embed_end] = embed_url_pos(modified_path, clean), embed_range = undefined;
-	if (embed_start !== undefined && embed_end !== undefined)
-	{
-		embed_range = new Range()
-
-		actions_to_whitelist.whitelist_path = true;
-		link_elem.classList.add('embed');
-	}
-
 	matches.sort((a, b) => (a[0] - b[0]) || a[1] - b[1])
+	matches.push([orig.pathname.length, orig.pathname.length, '']);
 
+	const [embed_start, embed_end] = embed_url_pos(modified_path, clean), embed_range = new Range();
 	let pos = 0, modified_pos = 0;
-	for (let [start, end, replacement] of matches)
+
+	for (const [start, end, replacement] of matches)
 	{
-		if (start >= pos)
+		// add path part common to original and rewritten URL
+		if (start > pos)
 		{
 			append_decorated_text(link_elem, orig.pathname.substring(pos, start));
-			let increment = start - pos;
-
-			if (embed_start !== undefined && embed_start >= modified_pos && embed_start <= modified_pos + increment)
-			{
-				embed_range.setStart(link_elem.querySelector('.original').lastChild, embed_start - modified_pos)
-				embed_start = undefined;
-			}
-			if (embed_end !== undefined && embed_end >= modified_pos && embed_end <= modified_pos + increment)
-			{
-				embed_range.setEnd(link_elem.querySelector('.original').lastChild, embed_end - modified_pos)
-				embed_end = undefined;
-			}
-
-			pos += increment;
-			modified_pos += increment;
+			modified_pos += (start - pos);
+			pos = start;
 		}
+
+		// mark start and/or end of embedded URL if it happened in the last common URL section
+		if (embed_range.startContainer === document && embed_start <= modified_pos)
+			embed_range.setStart(orig_node.lastChild, orig_node.lastChild.textContent.length + embed_start - modified_pos);
+		if (embed_range.collapsed && embed_end <= modified_pos)
+			embed_range.setEnd(orig_node.lastChild, orig_node.lastChild.textContent.length + embed_end - modified_pos);
+
+		// add path part removed from original URL
 		if (end > pos)
 		{
 			append_decorated_text(link_elem, orig.pathname.substring(pos, end), 'deleted')
 			pos = end;
 		}
+
+		// add path part inserted into rewritten URL
 		if (replacement)
 		{
 			append_decorated_text(link_elem, replacement, 'inserted')
 			modified_pos += replacement.length;
 		}
 
-		if (embed_start !== undefined && embed_start <= modified_pos)
-		{
-			embed_range.setStartAfter(link_elem.querySelector('.original').lastChild)
-			embed_start = undefined;
-		}
-		if (embed_end !== undefined && embed_end <= modified_pos)
-		{
-			embed_range.setEndAfter(link_elem.querySelector('.original').lastChild)
-			embed_end = undefined;
-		}
+		// mark start and/or end of embedded URL if it happened in the last replaced URL section
+		if (embed_range.startContainer === document && embed_start <= modified_pos)
+			embed_range.setStartAfter(orig_node.lastChild)
+		if (embed_range.collapsed && embed_end <= modified_pos)
+			embed_range.setEndAfter(orig_node.lastChild)
 	}
 
-	if (pos < orig.pathname.length)
-		append_decorated_text(link_elem, orig.pathname.substring(pos))
-
-	let increment = orig.pathname.length - pos;
-	let clip = val => val < 0 ? 0 : (val >= increment ? increment - 1 : val)
-
-	if (embed_start !== undefined)
-		embed_range.setStart(link_elem.querySelector('.original').lastChild, clip(embed_start - modified_pos))
-	if (embed_end !== undefined)
-		embed_range.setEnd(link_elem.querySelector('.original').lastChild, clip(embed_end - modified_pos))
-
-	if (embed_range !== undefined)
+	if (!embed_range.collapsed)
 	{
 		let span = document.createElement('span');
 		span.classList.add(css_classes['embedded']);
 		embed_range.surroundContents(span);
+
+		link_elem.classList.add('embed');
+		actions_to_whitelist.whitelist_path = true;
+		actions_to_whitelist.path = '^' + orig.pathname.slice(0, embed_start);
 	}
 }
 
 
 function append_normal_path(link_elem, orig, clean, actions_to_whitelist)
 {
-	let [match_start, match_end] = embed_url_pos(orig.pathname, clean);
+	const [match_start, match_end] = embed_url_pos(orig.pathname, clean);
 	if (match_start !== undefined && match_end !== undefined)
 	{
 		append_decorated_text(link_elem, orig.pathname.substring(0, match_start))
 		append_decorated_text(link_elem, orig.pathname.substring(match_start, match_end), 'embedded')
 		append_decorated_text(link_elem, orig.pathname.substring(match_end))
 
-		actions_to_whitelist.whitelist_path = true;
 		link_elem.classList.add('embed');
+		actions_to_whitelist.whitelist_path = true;
+		actions_to_whitelist.path = '^' + orig.pathname.slice(0, match_start);
 	}
 	else
 		append_decorated_text(link_elem, orig.pathname)
@@ -236,7 +220,7 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean, classes)
 
 	const [orig, prefix, suffix] = remove_js(raw_orig), clean = new URL(raw_clean);
 	const rules = Rules.find(orig);
-	let actions_to_whitelist = {};
+	const actions_to_whitelist = {domain: orig.hostname, path: '^' + orig.pathname + '$'};
 
 	let origin_node = link_elem.appendChild(document.createElement('span'));
 	origin_node.setAttribute('raw-url', orig.href);
@@ -245,7 +229,6 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean, classes)
 	if (prefix || suffix)
 		link_elem.classList.add('javascript');
 
-	console.log('Prefixing with', prefix, orig.href, orig.protocol, orig.origin);
 	if (prefix)
 		append_decorated_text(link_elem, prefix, 'deleted')
 
@@ -279,7 +262,7 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean, classes)
 	link_elem.setAttribute('title', link_elem.getAttribute('title') + '\n-> ' + clean.href);
 	clean_node.append(document.createTextNode(clean.href));
 
-	if (Object.entries(actions_to_whitelist).length !== 0)
+	if (Object.keys(actions_to_whitelist).length !== 2)
 		link_elem.setAttribute('actions', JSON.stringify(actions_to_whitelist));
 
 	return link_elem;
