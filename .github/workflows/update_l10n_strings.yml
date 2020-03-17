@@ -37,6 +37,7 @@ jobs:
         run: |
           sed -i 's,\.\./\(addon\|tests\)/,,g' docs/index.html
           cp -rt docs/ tests/setup.js addon/manifest.json addon/modules/ addon/data/
+          cp addon/icons/32.png docs/favicon.png
 
       - name: Deploy
         uses: crazy-max/ghaction-github-pages@v1
