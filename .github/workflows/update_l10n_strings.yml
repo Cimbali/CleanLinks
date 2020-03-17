@@ -1,4 +1,4 @@
-name: Update and upload translatable strings
+name: Update / upload translatable strings and github pages
 
 on:
   push:
@@ -10,12 +10,38 @@ jobs:
     name: Upload translatable strings
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
     - name: Install dependencies
       run: |
         sudo apt-get update -q
         sudo apt-get install -qy jq
+
     - name: Extract and upload
       env:
         poeditor_api_token: ${{ secrets.POEDITOR_API_TOKEN }}
       run: ./scripts/poeditor.sh upload
+
+
+  publish:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Build
+        run: |
+          sed -i 's,\.\./\(addon\|tests\)/,,g' docs/index.html
+          cp -rt docs/ tests/setup.js addon/modules/ addon/data/
+
+      - name: Deploy
+        uses: crazy-max/ghaction-github-pages@v1
+        with:
+          target_branch: gh-pages
+          build_dir: docs/
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
