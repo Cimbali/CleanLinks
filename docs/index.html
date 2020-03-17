@@ -11,7 +11,7 @@
 	{
 		runtime:
 		{
-			getURL: url => ('https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/' + url.replace(/^\/+/, '')),
+			getURL: url => ('../addon/' + url.replace(/^\/+/, '')),
 		},
 		i18n:
 		{
@@ -20,15 +20,15 @@
 		storage: {}
 	}
 	</script>
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/tests/setup.js"></script>
+	<script src="../tests/setup.js"></script>
 
 	<!-- Embed the actual clean_link script -->
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/common.js"></script>
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/punycode.js"></script>
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/publicsuffixlist.js"></script>
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/rules.js"></script>
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/cleanlink.js"></script>
-	<script src="https://cdn.rawgit.com/Cimbali/CleanLinks/master/addon/modules/display_cleaned_link.js"></script>
+	<script src="../addon/modules/common.js"></script>
+	<script src="../addon/modules/punycode.js"></script>
+	<script src="../addon/modules/publicsuffixlist.js"></script>
+	<script src="../addon/modules/rules.js"></script>
+	<script src="../addon/modules/cleanlink.js"></script>
+	<script src="../addon/modules/display_cleaned_link.js"></script>
 
 	<!-- Inner workings of this page -->
 	<script>
