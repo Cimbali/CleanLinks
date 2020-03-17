@@ -36,7 +36,7 @@ jobs:
       - name: Build
         run: |
           sed -i 's,\.\./\(addon\|tests\)/,,g' docs/index.html
-          cp -rt docs/ tests/setup.js addon/modules/ addon/data/
+          cp -rt docs/ tests/setup.js addon/manifest.json addon/modules/ addon/data/
 
       - name: Deploy
         uses: crazy-max/ghaction-github-pages@v1
