@@ -1,7 +1,8 @@
 'use strict';
 
 // sinon-chrome defines chrome, but firefox uses browser
-const browser = typeof chrome !== 'undefined' ? chrome : browser
+if (typeof browser === 'undefined' && typeof chrome !== 'undefined')
+	var browser = chrome;
 
 // sinon-chrome does not get the manifest
 browser.runtime = Object.assign({
