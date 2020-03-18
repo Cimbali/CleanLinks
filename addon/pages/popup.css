@@ -122,12 +122,10 @@ body {
 	position: relative;
 }
 .tooltip {
-	font-weight: bold;
-	border:thin solid black;
-	border-radius: 2em;
 	display: inline-block;
-	width:1.3em;
-	text-align:center;
+	width: 30px;
+	height: 30px;
+	background-image: url("/icons/settings.svg");
 	cursor: help;
 }
 .help .tooltiptext {
