@@ -1,41 +1,63 @@
-html, button, input, select {
-	background: white;
-}
-* {
-	color: black;
-	margin: 0;
-	padding: 0;
+.disabled, button:disabled {
+	 background-color: #ddd;
 }
 button {
 	padding: 0 5px;
 }
+
+
 html, body {
-	max-height: 500px;
-	width: 400px;
-	overflow-x: hidden;
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
 }
 body {
-	display: flex;
 	font-size: .8em;
-	flex-direction: column;
-	align-content: stretch;
 }
-.disabled, button:disabled {
-	 background: #ddd;
+#title {
+    font-size: smaller;
+    background-color: #444;
+    color: #bbb;
+    border: 0;
+    margin: 0;
+    padding: 1px 0;
+    width: 100%;
+	text-align: center;
+}
+#icon {
+	text-align: center;
+	flex: 80px 1 1;
+}
+#icon img {
+	width: 60px;
+	height: 60px;
+	padding: 0;
+	margin: 0;
+}
+#bottom {
+	margin: 5px;
+	display: flex;
+	align-items: end;
 }
 #history {
+	max-height: calc(500px - 60px - 40px - 40px);
+
 	display: block;
-	min-height: 3.5em;
-	max-height: 15em;
-	flex: 1 1 auto;
-	border: black thin solid;
+	border-top: black thin solid;
+	border-bottom: black thin solid;
 	overflow-y: scroll;
 	overflow-x: hidden;
-	padding-right: 17px;
+	padding-right: 1px;
 }
 #history p {
-	width: 384px;
-	border-bottom: black thin solid;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	border: black thin solid;
+	cursor: pointer;
+}
+#history p.dropped {
+	background: rgb(255, 128, 128)
 }
 #history p > span {
 	display: block;
@@ -44,16 +66,13 @@ body {
 	text-overflow: ellipsis;
 	border-left: black thin solid;
 }
-#history p > span.cleaned::before {
-	content: " → ";
-}
 #history p.selected > span {
-	background: #BBF;
+	background: #CCF;
 	white-space: normal;
 	word-break: break-all;
 }
-#history p {
-	cursor: pointer;
+#history p > span.cleaned::before {
+	content: " → ";
 }
 #history p .del {
 	text-decoration: line-through;
@@ -70,62 +89,92 @@ body {
 	text-decoration: underline overline;
 	color: #339;
 }
-#icon {
-	float: left;
-	margin: 5px 15px 5px 5px;
-}
-#icon img {
-	width: 45px;
-	height: 45px;
-}
-#title {
-	margin-top: 5px;
-}
-#toggle, #options {
-	display: block;
-	float: right;
-	margin: 5px 5px 0 0;
-	width: 30px;
-	height: 30px;
-	background: center / 80% no-repeat;
-}
-#toggle {
-	background-image: url("/icons/onoff.svg");
-}
-#options  {
-	background-image: url("/icons/settings.svg");
-}
-#bottom button {
-	display: block;
-	margin: 5px 0 5px 10px;
-}
-.dropped {
-	background: rgb(255, 128, 128)
-}
-.filters {
-	margin-bottom: 5px;
+
+#filters {
 	display: flex;
-	justify-content: space-around;
+	align-items: flex-end;
 	flex-wrap: wrap;
-	align-items: center;
+	margin: 0;
+}
+#filter_categories {
+	flex: 3;
 }
 #filter_actions {
-	font-size: .85em;
+	flex: 4;
+}
+
+.filters {
+	display: inline-flex;
+	justify-content: space-around;
+	border: grey thin solid;
+	border-radius: 5px;
+	margin: 5px;
+}
+.filters label {
+	flex: none;
+	margin: 5px;
 }
 .filters input {
-	margin: 0 2.5px 0 5px;
+	display: none;
 }
-.filters label:last-child {
-	margin-right: 5px;
+.filters span::before {
+	display: block;
+	content: ' ';
+	width: 30px;
+	height: 30px;
+	background: center no-repeat;
+	background-size: 30px 30px;
+}
+.filters input:not(:checked) + span::before {
+	opacity: 0.2;
+}
+#filter_categories input[name="clicked"] + span::before {
+	background-image: url("../icons/clicked.svg");
+}
+#filter_categories input[name="request"] + span::before {
+	background-image: url("../icons/request.svg");
+}
+#filter_categories input[name="header"] + span::before {
+	background-image: url("../icons/header.svg");
+}
+#filter_actions input[name="embed"] + span::before {
+	background-image: url("../icons/skip.svg");
+}
+#filter_actions input[name="remove"] + span::before {
+	background-image: url("../icons/remove.svg");
+}
+#filter_actions input[name="rewrite"] + span::before {
+	background-image: url("../icons/replace.png");
+}
+#filter_actions input[name="javascript"] + span::before {
+	background-image: url("../icons/javascript.svg");
+}
+
+#bottom button, .tooltip {
+	display: block;
+	display: inline-block;
+	margin-left: 5px;
+	width: 30px;
+	height: 30px;
+	background-size: 25px 25px;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+#toggle { background-image: url("../icons/onoff.svg"); }
+#options  { background-image: url("../icons/settings.svg"); }
+#clearlist { background-image: url("../icons/trashcan.svg"); }
+#openonce { background-image: url("../icons/shield-1.svg"); }
+#whitelist { background-image: url("../icons/shield-check.svg"); }
+#blacklist { background-image: url("../icons/shield-x.svg"); }
+#open_editor { background-image: url("../icons/shield-edit.svg"); }
+.spacer {
+	flex-grow: 1;
 }
 .help {
 	position: relative;
 }
 .tooltip {
-	display: inline-block;
-	width: 30px;
-	height: 30px;
-	background-image: url("/icons/settings.svg");
+	background-image: url("../icons/question.svg");
 	cursor: help;
 }
 .help .tooltiptext {
@@ -148,14 +197,8 @@ body {
 .help:hover .tooltiptext {
 	visibility: visible;
 }
-#bottom {
-	margin: 0 5px;
-	display: flex;
-	align-items: center;
-}
-.spacer {
-	flex-grow: 1;
-}
+
+
 input#enabled {
 	display: none;
 }

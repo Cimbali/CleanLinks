@@ -182,10 +182,11 @@ dd {
 }
 .tooltip {
 	display: inline-block;
-	width: 30px;
-	height: 30px;
+	width: 20px;
+	height: 20px;
 	cursor: help;
-	background-image: url("/icons/question.svg");
+	background: url("/icons/question.svg") center no-repeat;
+	background-size: 20px 20px;
 }
 .help .tooltiptext {
 	visibility: hidden;
