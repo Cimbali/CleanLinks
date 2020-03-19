@@ -151,7 +151,6 @@ body {
 }
 
 #bottom button, .tooltip {
-	display: block;
 	display: inline-block;
 	margin-left: 5px;
 	width: 30px;
@@ -160,8 +159,12 @@ body {
 	background-position: center;
 	background-repeat: no-repeat;
 }
+#bottom .help {
+	height: 30px;
+}
 #toggle { background-image: url("/icons/onoff.svg"); }
 #options  { background-image: url("/icons/settings.svg"); }
+#refresh  { background-image: url("/icons/refresh.svg"); }
 #clearlist { background-image: url("/icons/trashcan.svg"); }
 #openonce { background-image: url("/icons/shield-1.svg"); }
 #whitelist { background-image: url("/icons/shield-check.svg"); }
@@ -208,4 +211,3 @@ input#enabled:checked ~ * .when_disabled {
 input#enabled:not(:checked) ~ * .when_enabled {
 	display: none !important;
 }
-

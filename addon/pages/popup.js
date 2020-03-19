@@ -113,6 +113,11 @@ function populate_popup()
 			document.querySelector('input#enabled').checked = !document.querySelector('input#enabled').checked;
 		}
 
+		document.querySelector('#refresh').onclick = () =>
+		{
+			browser.tabs.reload(tab_id);
+		}
+
 		document.querySelector('#whitelist').onclick = () =>
 		{
 			Rules.add(JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'))).then(() =>
@@ -141,8 +146,11 @@ function populate_popup()
 		{
 			var selected = document.querySelector('#history .selected');
 			if (selected)
-				browser.runtime.sendMessage({action: 'open bypass', tab_id: tab_id, target: same_tab,
-											 link: selected.querySelector('.original').getAttribute('raw-url')});
+			{
+				const url = selected.querySelector('.original').getAttribute('raw-url');
+				browser.runtime.sendMessage({action: 'open bypass', link: url})
+								.then(() => browser.tabs.update(tab_id, {url: url}));
+			}
 		}
 	});
 }

@@ -232,11 +232,8 @@ function handle_message(message, sender)
 		return Promise.resolve({});
 
 	case 'open bypass':
-		log('Adding to one-time whitelist ' + message.link);
 		temporary_whitelist.push(message.link);
-
-		// then continue to open URL
-		message.target = same_tab;
+		return Promise.resolve({});
 
 	case 'open url':
 		if (message.target == new_window)
