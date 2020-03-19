@@ -548,6 +548,18 @@
         ]
       }
     },
+    ".instagram": {
+      ".www": {
+        "^/p/\\w+/embed/captioned/$": {
+          "actions": {
+            "remove": [
+              "rd",
+              "rp"
+            ]
+          }
+        }
+      }
+    },
     ".lidl": {
       ".newsletter": {
         "actions": {
