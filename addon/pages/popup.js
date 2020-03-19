@@ -27,6 +27,7 @@ function set_selected(evt)
 
 	document.querySelector('#openonce').disabled = !target;
 	document.querySelector('#whitelist').disabled = !target || !target.hasAttribute('actions');
+	document.querySelector('#blacklist').disabled = !target || !target.hasAttribute('actions');
 	document.querySelector('#open_editor').disabled = !target;
 }
 
@@ -68,6 +69,7 @@ function populate_popup()
 	{
 		document.querySelector('#history').classList.add('disabled')
 		document.querySelector('button#whitelist').disabled = true;
+		document.querySelector('button#blacklist').disabled = true;
 		document.querySelector('button#clearlist').disabled = true;
 		return;
 	}
@@ -116,6 +118,16 @@ function populate_popup()
 			Rules.add(JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'))).then(() =>
 				browser.runtime.sendMessage({action: 'rules'})
 			)
+		}
+
+		document.querySelector('#blacklist').onclick = () =>
+		{
+			let rules = JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'));
+
+			rules.remove = rules.whitelist.slice();
+			delete rules.whitelist;
+
+			Rules.add(rules).then(() => browser.runtime.sendMessage({action: 'rules'}))
 		}
 
 		document.querySelector('#clearlist').onclick = () =>
