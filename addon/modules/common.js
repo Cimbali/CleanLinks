@@ -48,6 +48,20 @@ const pref_values = {
 const log = (...args) => { if (pref_values.debug) console.log(...args); }
 
 
+// does DFS be able to sort array of objects (JSON.stringify does BFS)
+function sorted_stringify(val)
+{
+	if (['string', 'number', 'boolean'].includes(typeof val))
+		return JSON.stringify(val);
+
+	else if (Array.isArray(val))
+        return '[' + val.map(sorted_stringify).sort().join(',') + ']';
+
+    else
+        return '{' + Object.entries(val).map(([key, value]) => JSON.stringify(key) + ':' + sorted_stringify(value)).join(',') + '}';
+}
+
+
 function apply_i18n()
 {
 	for (let elem of document.querySelectorAll('[i18n_text]'))

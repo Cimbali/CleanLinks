@@ -414,6 +414,27 @@ async function upgrade_options(prev_version)
 
 		await Rules.add({domain: '*.*', remove: remove})
 	}
+	else if (num_prev_version[0] >= 4)
+	{
+		const default_rules = serialize_rules(await new Promise(load_default_rules)).map(sorted_stringify).sort();
+		const current_rules = Rules.serialize().map(sorted_stringify).sort();
+
+		for (let i = 0, j = 0; i < default_rules.length; )
+		{
+			if (j === current_rules.length || default_rules[i] < current_rules[j])
+			{
+				// NB: adding does not replace but merge with an existing rule
+				Rules.add(JSON.parse(default_rules[i]));
+				i++;
+			}
+			else if (default_rules[i] > current_rules[j])
+			{
+				j++;
+			}
+			else
+				i++, j++;
+		}
+	}
 
 	await browser.storage.sync.set({configuration: options});
 	await Prefs.reload();

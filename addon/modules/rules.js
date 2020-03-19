@@ -253,7 +253,7 @@ function save_rules(all_rules)
 }
 
 
-const load_default_rules = (done) =>
+function load_default_rules(done)
 {
 	fetch(new Request(browser.runtime.getURL('/data/rules.json'))).then((response) =>
 	{
