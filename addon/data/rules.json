@@ -549,6 +549,15 @@
       }
     },
     ".instagram": {
+      ".api": {
+        "^/oembed/$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      },
       ".www": {
         "^/p/\\w+/embed/captioned/$": {
           "actions": {
