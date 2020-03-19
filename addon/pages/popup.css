@@ -129,25 +129,25 @@ body {
 	opacity: 0.2;
 }
 #filter_categories input[name="clicked"] + span::before {
-	background-image: url("../icons/clicked.svg");
+	background-image: url("/icons/clicked.svg");
 }
 #filter_categories input[name="request"] + span::before {
-	background-image: url("../icons/request.svg");
+	background-image: url("/icons/request.svg");
 }
 #filter_categories input[name="header"] + span::before {
-	background-image: url("../icons/header.svg");
+	background-image: url("/icons/header.svg");
 }
 #filter_actions input[name="embed"] + span::before {
-	background-image: url("../icons/skip.svg");
+	background-image: url("/icons/skip.svg");
 }
 #filter_actions input[name="remove"] + span::before {
-	background-image: url("../icons/remove.svg");
+	background-image: url("/icons/remove.svg");
 }
 #filter_actions input[name="rewrite"] + span::before {
-	background-image: url("../icons/replace.png");
+	background-image: url("/icons/replace.png");
 }
 #filter_actions input[name="javascript"] + span::before {
-	background-image: url("../icons/javascript.svg");
+	background-image: url("/icons/javascript.svg");
 }
 
 #bottom button, .tooltip {
@@ -160,13 +160,13 @@ body {
 	background-position: center;
 	background-repeat: no-repeat;
 }
-#toggle { background-image: url("../icons/onoff.svg"); }
-#options  { background-image: url("../icons/settings.svg"); }
-#clearlist { background-image: url("../icons/trashcan.svg"); }
-#openonce { background-image: url("../icons/shield-1.svg"); }
-#whitelist { background-image: url("../icons/shield-check.svg"); }
-#blacklist { background-image: url("../icons/shield-x.svg"); }
-#open_editor { background-image: url("../icons/shield-edit.svg"); }
+#toggle { background-image: url("/icons/onoff.svg"); }
+#options  { background-image: url("/icons/settings.svg"); }
+#clearlist { background-image: url("/icons/trashcan.svg"); }
+#openonce { background-image: url("/icons/shield-1.svg"); }
+#whitelist { background-image: url("/icons/shield-check.svg"); }
+#blacklist { background-image: url("/icons/shield-x.svg"); }
+#open_editor { background-image: url("/icons/shield-edit.svg"); }
 .spacer {
 	flex-grow: 1;
 }
@@ -174,7 +174,7 @@ body {
 	position: relative;
 }
 .tooltip {
-	background-image: url("../icons/question.svg");
+	background-image: url("/icons/question.svg");
 	cursor: help;
 }
 .help .tooltiptext {
