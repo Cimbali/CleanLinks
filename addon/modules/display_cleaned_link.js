@@ -205,8 +205,8 @@ function append_query_param(link_elem, keyval, clean, keep, strip, actions_to_wh
 		if (!('whitelist' in actions_to_whitelist))
 			actions_to_whitelist.whitelist = []
 
+		actions_to_whitelist.whitelist.push(keyval.substring(1, keyval.indexOf('=')).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 		link_elem.classList.add('embed');
-		return keyval.substring(1, keyval.indexOf('=')).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	}
 	else
 		append_decorated_text(link_elem, keyval, decorate)
