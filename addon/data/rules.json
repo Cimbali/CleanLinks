@@ -4,7 +4,7 @@
       "/ap/signin": {
         "actions": {
           "whitelist": [
-            "openid.return_to"
+            "openid\\..+"
           ]
         }
       },
@@ -933,6 +933,17 @@
               "test"
             ]
           }
+        }
+      }
+    }
+  },
+  ".io": {
+    ".shields": {
+      ".img": {
+        "actions": {
+          "whitelist": [
+            ".*"
+          ]
         }
       }
     }
