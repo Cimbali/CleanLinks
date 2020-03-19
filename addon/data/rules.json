@@ -273,6 +273,13 @@
           ]
         }
       },
+      "^/embed/": {
+        "actions": {
+          "remove": [
+            "origin"
+          ]
+        }
+      },
       "actions": {
         "remove": [
           "feature",
@@ -418,6 +425,15 @@
               "entrypoint",
               "form_type"
             ]
+          }
+        }
+      }
+    },
+    ".ft": {
+      ".www": {
+        "^/__origami/service/image/v2/images/raw/": {
+          "actions": {
+            "whitelist_path": true
           }
         }
       }
@@ -660,6 +676,17 @@
         ]
       }
     },
+    ".soundcloud": {
+      ".w": {
+        "^/player/$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      }
+    },
     ".spotify": {
       "actions": {
         "remove": [
@@ -746,6 +773,15 @@
       }
     },
     ".yahoo": {
+      ".guce": {
+        "^/consent$": {
+          "actions": {
+            "whitelist": [
+              "done"
+            ]
+          }
+        }
+      },
       "actions": {
         "rewrite": [
           {
