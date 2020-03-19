@@ -93,8 +93,8 @@ function append_rewritten_path(link_elem, orig, clean, rules, actions_to_whiteli
 	{
 		modified_path = modified_path.replace(new RegExp(search, flags), replace);
 
-		let global = flags.indexOf('g') !== -1
-		let pattern = new RegExp(search, flags.replace('g', ''));
+		let global = (flags || '').indexOf('g') !== -1
+		let pattern = new RegExp(search, (flags || '').replace('g', ''));
 
 		for (let pos = 0, match; (global || pos === 0) && (match = orig.pathname.substr(pos).match(pattern)) !== null;
 				pos += match.index + match[0].length)
