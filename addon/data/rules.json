@@ -357,6 +357,18 @@
         ]
       }
     },
+    ".bandcamp": {
+      "^/EmbeddedPlayer.html/": {
+        "actions": {
+          "rewrite": [
+            {
+              "replace": "",
+              "search": "/ref=[^/]+"
+            }
+          ]
+        }
+      }
+    },
     ".boredpanda": {
       "actions": {
         "remove": [
