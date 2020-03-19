@@ -1,6 +1,7 @@
-# CleanLinks Mozilla Firefox Extension
+# CleanLinks Mozilla Firefox Extension ![rating on addons.mozilla.org via shields.io][amo_stars] ![users on addons.mozilla.org via shields.io][amo_users]
 
-Install it from [addons.mozilla.org](https://addons.mozilla.org/addon/clean-links-webext/).
+[![Install it from addons.mozilla.org][get_addon_image]][addon]
+
 
 ## What does it do?
 CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters (e.g. utm\_\* or fbclid) are also removed.
@@ -52,10 +53,11 @@ You can improve translations or add a new language [on CleanLink’s POEditor pa
 
 This is the current status of translations:
 
-![Chinese: 29%](https://img.shields.io/badge/%F0%9F%87%A8%F0%9F%87%B3%20Chinese-29%25-f80)
-![Chinese (TW): 29%](https://img.shields.io/badge/%F0%9F%87%B9%F0%9F%87%BC%20Chinese%20%28TW%29-29%25-f80)
-![German: 29%](https://img.shields.io/badge/%F0%9F%87%A9%F0%9F%87%AA%20German-29%25-f80)
-![Spanish: 29%](https://img.shields.io/badge/%F0%9F%87%AA%F0%9F%87%B8%20Spanish-29%25-f80)
+![Chinese: 22%](https://img.shields.io/badge/%F0%9F%87%A8%F0%9F%87%B3%20Chinese-22%25-f60)
+![Chinese (TW): 22%](https://img.shields.io/badge/%F0%9F%87%B9%F0%9F%87%BC%20Chinese%20%28TW%29-22%25-f60)
+![French: 92%](https://img.shields.io/badge/%F0%9F%87%AB%F0%9F%87%B7%20French-92%25-3f0)
+![German: 22%](https://img.shields.io/badge/%F0%9F%87%A9%F0%9F%87%AA%20German-22%25-f60)
+![Spanish: 22%](https://img.shields.io/badge/%F0%9F%87%AA%F0%9F%87%B8%20Spanish-22%25-f60)
 
 
 ## Why are the requested permissions required?
@@ -87,3 +89,11 @@ This is useful if you want to help testing for example.
 - Alternately, [temporarily load the add-on from `about:debugging#addons`](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Temporary_Installation_in_Firefox), by ticking "Enable add-on debugging", clicking "Load Temporary Add-on" and selecting the `manifest.json` file from the source code directory.
 
 - Finally, you can build the add-on using `yarn bundle` or `web-ext -s ./addon -a ./dist build` in this repository’s top-level directory, and [install the add-on from the file that was generated](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Distribution_options/Sideloading_add-ons#Using_Install_Add-on_From_File).
+
+
+
+[addon]: https://addons.mozilla.org/addon/clean-links-webext/
+[license]: https://img.shields.io/github/license/Cimbali/CleanLinks.svg?style=popout-square&logo=mozilla&colorA=333333&colorB=coral
+[amo_stars]: https://img.shields.io/amo/stars/clean-links-webext.svg?style=popout-square&logo=mozilla-firefox
+[amo_users]: https://img.shields.io/amo/users/clean-links-webext.svg?style=popout-square&logo=mozilla-firefox&colorB=blue
+[get_addon_image]: https://cimbali.github.io/CleanLinks/get-the-addon-small.png
