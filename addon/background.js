@@ -301,9 +301,10 @@ function handle_message(message, sender)
 
 		return Prefs.reload().then(() =>
 		{
-			if (!Prefs.values.cltrack) {
-				for (let key of cleaned_per_tab)
-					if (typeof cleaned_per_tab[key] !== 'function')
+			if (!Prefs.values.cltrack)
+			{
+				for (const [key, val] of Object.entries(cleaned_per_tab))
+					if (typeof val !== 'function')
 						cleaned_per_tab.clear(key);
 			}
 
