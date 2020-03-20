@@ -573,12 +573,6 @@ function add_listeners()
 			evt.preventDefault();
 	});
 
-	browser.runtime.sendMessage({action: 'get prepopulate'}).then(answer =>
-	{
-		if ('link' in answer)
-			prepopulate_rule(answer.link)
-	})
-
 	browser.runtime.onMessage.addListener(message =>
 	{
 		if (message.action === 'set prepopulate')
@@ -598,5 +592,11 @@ function add_listeners()
 
 apply_i18n();
 add_listeners();
-Prefs.loaded.then(populate_options);
+Prefs.loaded.then(populate_options).then(() =>
+	browser.runtime.sendMessage({action: 'get prepopulate'}).then(answer =>
+	{
+		if ('link' in answer)
+			prepopulate_rule(answer.link)
+	})
+);
 Rules.loaded.then(populate_rules);
