@@ -50,7 +50,8 @@ function getSimpleLinkSearchStrings(link, skip, whitelist_path)
 	}
 
 	// look again with double decoding if nothing was found
-	arr.push(...arr.map(decodeURIComponent))
+	for (const token of arr.slice())
+		try { arr.push(decodeURIComponent(token)); } catch (e) {}
 
 	return arr;
 }
