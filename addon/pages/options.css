@@ -6,7 +6,6 @@ label {
 	margin: 1ex 0;
 }
 
-fieldset > label > span:first-child,
 p.editor > label > span:first-child {
 	display:inline-block;
 	min-width: 20em;
@@ -26,9 +25,12 @@ p.editor > label > span:first-child {
 p.editor > label > span:first-child {
 	margin-bottom: .5em;
 }
+.editor_fields {
+	text-align: left;
+}
 .editor button.ok,
 .editor button.cancel {
-	margin: 0 1em;
+	margin: 1em;
 }
 label[for="show_URL_legend"] {
 	display: inline-block;
@@ -42,6 +44,7 @@ label[for="show_URL_legend"] {
 	border-radius: 5px;
 }
 span.parsing_error {
+	float: right;
 	color: red;
 	font-weight:bold;
 }
@@ -75,7 +78,7 @@ input.toggle:checked ~ .disabled, input.toggle:checked ~ * .disabled {
 input[type=number] {
 	width: 5em;
 }
-input[type=text], textarea {
+textarea {
 	width: 100%;
 }
 p.replace_editor > label {
@@ -163,6 +166,25 @@ dd {
 	margin: auto 0;
 }
 
+#matching, .editor_fields, #features, #display {
+	display: grid;
+	grid-template-columns: max-content auto;
+	align-items: center;
+}
+#matching input[type="checkbox"],
+.editor_fields input[type="checkbox"],
+#features input[type="checkbox"],
+#display input[type="checkbox"] {
+	grid-column-start: 2;
+	justify-self: start;
+}
+#matching input[type="text"],
+.editor_fields input[type="text"],
+#display input[type="text"] {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
 #reset_buttons {
 	display: flex;
 	align-items: center;
@@ -193,7 +215,6 @@ dd {
 	position: absolute;
 	z-index: 1;
 
-	width: 20em;
 	left: 50%;
 	width: 20em;
 	bottom: 100%;
@@ -207,4 +228,69 @@ dd {
 }
 .help:hover .tooltiptext {
 	visibility: visible;
+}
+
+
+@media only screen and (max-device-width: 480px) {
+	.not-android, .not-android + input {
+		display: none;
+	}
+	body > fieldset {
+		border: none;
+		padding: 0;
+	}
+	body > fieldset > fieldset {
+		margin: 0! important;
+	}
+	#rule_legend, #rule_selector {
+		margin: .5em 1em;
+	}
+	#rule_legend * {
+		margin: 0 !important;
+	}
+	#rule_selector {
+		height: 5em;
+	}
+	.URL {
+		white-space: normal !important;
+		word-break: break-all;
+	}
+	#features, #display {
+		grid-template-columns: calc(100% - 2em) auto;
+	}
+	dl {
+		display: block;
+	}
+	dd {
+		margin: 0 0 0 3em;
+	}
+	#rule_buttons, #rule_legend, #reset_buttons {
+		flex-direction: column;
+		align-items: stretch !important;
+	}
+	#rule_buttons button, #rule_legend button, #reset_buttons button {
+		margin-top: .5ex;
+		margin-bottom: .5ex;
+	}
+	button {
+		min-width: 2em;
+		min-height: 2em;
+	}
+	.editor {
+		position: absolute;
+		width: auto !important;
+		left: 5px !important;
+		right: 5px !important;
+		padding: 1em 10px !important;
+	}
+	.help {
+		position: inherit !important;
+	}
+	.help .tooltiptext {
+		margin: 0 auto;
+		width: 80% !important;
+		bottom: auto !important;
+		left: 0 !important;
+		right: 0 !important;
+	}
 }
