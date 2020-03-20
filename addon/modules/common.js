@@ -21,9 +21,6 @@ const version = browser.runtime.getManifest().version;
 const homepage = browser.runtime.getManifest().homepage_url;
 const copyright = browser.runtime.getManifest().author;
 
-const icon_default = '';
-const icon_disabled = '-off';
-
 const same_tab = 0;
 const new_tab = 1;
 const new_window = 2;

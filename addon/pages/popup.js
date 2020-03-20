@@ -74,10 +74,14 @@ function populate_popup()
 		return;
 	}
 
-	browser.tabs.query({active: true, currentWindow: true}).then(tab_list =>
-	{
-		let tab_id = tab_list[0].id;
+	let location_search = new URLSearchParams(document.location.search.substring(1)), resolve_tab_id;
+	if (location_search.has('tab'))
+		resolve_tab_id = Promise.resolve(parseInt(location_search.get('tab')));
+	else
+		resolve_tab_id = browser.tabs.query({active: true, currentWindow: true}).then(tab_list => tab_list[0].id)
 
+	resolve_tab_id.then(tab_id =>
+	{
 		browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
 		{
 			const history = document.getElementById('history');

@@ -14,20 +14,6 @@
 
 'use strict'
 
-function update_icon(marker, tab_id)
-{
-	browser.browserAction.setIcon(
-	{
-		path:
-		{
-			16: 'icons/16' + (marker || icon_default) + '.png',
-			32: 'icons/32' + (marker || icon_default) + '.png'
-		},
-		tabId: tab_id
-	})
-}
-
-
 // Count of clean links per page, reset it at every page load
 const cleaned_per_tab = {
 	get: tab_id =>
@@ -41,10 +27,6 @@ const cleaned_per_tab = {
 	get_count: tab_id => cleaned_per_tab.get(tab_id).count,
 }
 
-// wrap the promise in an async function call, to catch a potential ReferenceError
-const get_browser_version = (async () => await browser.runtime.getBrowserInfo())()
-							.then(info => parseFloat(info.version)).catch(() => NaN)
-
 const disabled_tabs = []
 
 disabled_tabs.is_enabled = tab => disabled_tabs.indexOf(tab) === -1
@@ -55,6 +37,58 @@ disabled_tabs.remove = tab => disabled_tabs.splice(disabled_tabs.indexOf(tab), 1
 const temporary_whitelist = []
 
 let prepopulate_link = undefined;
+
+
+let android = null;
+let browser_version = null;
+
+
+function load_metadata()
+{
+	return [browser.runtime.getPlatformInfo().then(info => { android = info.os === 'android' }),
+			browser.runtime.getBrowserInfo().then(info => { browser_version = parseFloat(info.version); })
+											 .catch(() => { browser_version = NaN; }),
+	];
+}
+
+
+function update_action(tab_id)
+{
+	const enabled = disabled_tabs.is_enabled(tab_id), clean_count = cleaned_per_tab.get_count(tab_id);
+	let badge_text = null, badge_title = title;
+
+	if (!enabled)
+		badge_title += ' (off)';
+
+	else if (Prefs.values.show_clean_count)
+	{
+		badge_title += ` (${clean_count})`
+		if (clean_count)
+			badge_text = '' + clean_count;
+	}
+
+	browser.browserAction.setTitle({tabId: tab_id, title: badge_title});
+
+	if (android)
+	{
+		log('Setting popup for tab', tab_id, 'to', browser.runtime.getURL(`/pages/popup.html?tab=${tab_id}`))
+		browser.browserAction.setPopup({tabId: tab_id, popup: browser.runtime.getURL(`/pages/popup.html?tab=${tab_id}`)});
+		return;
+	}
+
+	// on desktop only
+	browser.browserAction.setBadgeText({tabId: tab_id, text: badge_text});
+	browser.browserAction.setIcon(
+	{
+		path:
+		{
+			16: 'icons/16' + (enabled ? '' : '-off') + '.png',
+			32: 'icons/32' + (enabled ? '' : '-off') + '.png'
+		},
+		tabId: tab_id
+	})
+}
+
 
 function clean_redirect_headers(details)
 {
@@ -214,7 +248,7 @@ function handle_message(message, sender)
 		cleaned_per_tab.get(tab_id).count += 1;
 
 		if (Prefs.values.show_clean_count && tab_id !== -1)
-			browser.browserAction.setBadgeText({tabId: tab_id, text: '' + cleaned_per_tab.get_count(tab_id)});
+			update_action(tab_id);
 
 		if (Prefs.values.highlight && tab_id !== -1)
 		{
@@ -254,15 +288,11 @@ function handle_message(message, sender)
 
 	case 'toggle':
 		if (disabled_tabs.is_enabled(tab_id))
-		{
 			disabled_tabs.push(tab_id)
-			update_icon(icon_disabled, tab_id);
-		}
 		else
-		{
 			disabled_tabs.remove(tab_id)
-			update_icon(icon_default, tab_id);
-		}
+
+		update_action(tab_id);
 
 		return browser.tabs.sendMessage(tab_id, {action: 'toggle', enabled: disabled_tabs.is_enabled(tab_id)}).catch(() => {})
 
@@ -310,10 +340,8 @@ function handle_message(message, sender)
 				{
 					browser.tabs.sendMessage(tab.id, {action: 'reload options'}).catch(() => {})
 
-					if (changes.show_cleaned_count < 0)
-						browser.browserAction.setBadgeText({tabId: tab.id, text: null});
-					else if (changes.show_cleaned_count > 0)
-						browser.browserAction.setBadgeText({tabId: tab.id, text: '' + cleaned_per_tab.get_count(tab.id)});
+					if (changes.show_cleaned_count !== 0)
+						update_action(tab.id);
 				}
 			});
 		})
@@ -339,9 +367,54 @@ function handle_message(message, sender)
 	}
 }
 
-browser.runtime.onMessage.addListener(handle_message);
-browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
-browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});
+
+Promise.all([Prefs.loaded, Rules.loaded, ...load_metadata()]).then(() =>
+{
+	browser.runtime.onMessage.addListener(handle_message);
+	browser.webRequest.onBeforeRequest.addListener(on_request, { urls: ['<all_urls>'] }, ['blocking']);
+
+	if (Prefs.values.progltr)
+		browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
+
+	// Auto update badge text for pages when loading is complete
+	browser.tabs.onCreated.addListener(info => { update_action(info.id); });
+	browser.tabs.onUpdated.addListener(update_action);
+
+	browser.tabs.onRemoved.addListener((id, remove_info) =>
+	{
+		cleaned_per_tab.clear(id);
+		if (disabled_tabs.is_disabled(id))
+			disabled_tabs.remove(id);
+	});
+
+
+	if (android)
+		return;
+
+	browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
+	browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});
+
+	// Always add the listener, even if CleanLinks is disabled. Only add the menu item on enabled.
+	browser.contextMenus.onClicked.addListener((info, tab) =>
+	{
+		let link;
+		if ('linkUrl' in info && info.linkUrl)
+			link = info.linkUrl;
+		else if ('selectionText' in info && info.selectionText)
+			link = info.selectionText;
+
+		// Clean & copy
+		let clean_url = clean_link(extract_javascript_link(link, tab.url) || link, tab.url);
+		navigator.clipboard.writeText(clean_url);
+	});
+
+	if (Prefs.values.context_menu)
+		browser.contextMenus.create({
+			id: 'copy-clean-link',
+			title: 'Copy clean link',
+			contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
+		});
+});
 
 
 function import_domain_whitelist(domains_list)
@@ -440,50 +513,6 @@ async function upgrade_options(prev_version)
 	browser.runtime.sendMessage({action: 'rules'}).catch(() => {});
 }
 
-
-Promise.all([Prefs.loaded, Rules.loaded]).then(() =>
-{
-	browser.webRequest.onBeforeRequest.addListener(on_request, { urls: ['<all_urls>'] }, ['blocking']);
-
-	// Always add the listener, even if CleanLinks is disabled. Only add the menu item on enabled.
-	browser.contextMenus.onClicked.addListener((info, tab) =>
-	{
-		let link;
-		if ('linkUrl' in info && info.linkUrl)
-			link = info.linkUrl;
-		else if ('selectionText' in info && info.selectionText)
-			link = info.selectionText;
-
-		// Clean & copy
-		let clean_url = clean_link(extract_javascript_link(link, tab.url) || link, tab.url);
-		navigator.clipboard.writeText(clean_url);
-	});
-
-	if (Prefs.values.progltr)
-		browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
-
-	if (Prefs.values.context_menu)
-		browser.contextMenus.create({
-			id: 'copy-clean-link',
-			title: 'Copy clean link',
-			contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
-		});
-
-	// Auto update badge text for pages when loading is complete
-	browser.tabs.onUpdated.addListener((id, change_info, tab) =>
-	{
-		update_icon(disabled_tabs.is_disabled(id) ? icon_disabled : icon_default, id);
-		if (Prefs.values.show_clean_count && cleaned_per_tab.get_count(tab.id))
-			browser.browserAction.setBadgeText({tabId: id, text: '' + cleaned_per_tab.get_count(tab.id)});
-	});
-
-	browser.tabs.onRemoved.addListener((id, remove_info) =>
-	{
-		cleaned_per_tab.clear(id);
-		if (disabled_tabs.is_disabled(id))
-			disabled_tabs.remove(id);
-	});
-});
 
 browser.runtime.onInstalled.addListener(details =>
 {

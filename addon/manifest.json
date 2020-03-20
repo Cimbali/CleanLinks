@@ -51,13 +51,11 @@
 
 	"options_ui":
 	{
-		"page": "pages/options.html",
-		"browser_style": true
+		"page": "pages/options.html"
 	},
 
 	"browser_action":
 	{
-		"browser_style": false,
 		"default_icon": "icons/32.png",
 		"default_popup": "pages/popup.html"
 	},
