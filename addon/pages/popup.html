@@ -16,25 +16,54 @@
 	<div id="filters">
 		<p id="icon">
 			<a id="homepage">
-				<img src="../icons/CleanLinks.png" class="when_enabled"/>
-				<img src="../icons/disabled.png" class="when_disabled"/>
+				<img src="/icons/CleanLinks.png" class="when_enabled"/>
+				<img src="/icons/disabled.png" class="when_disabled"/>
 			</a>
 		</p>
 
 		<fieldset class="filters" id="filter_categories">
 			<legend i18n_text="Filter link type"></legend>
-			<label i18n_title="Clicked links"><input type="checkbox" name="clicked" checked="checked" /><span></span></label>
-			<label i18n_title="HTTP requests"><input type="checkbox" name="request" checked="checked" /><span></span></label>
-			<label i18n_title="Header redirects"><input type="checkbox" name="header" checked="checked" /><span></span></label>
+
+			<label i18n_title="Clicked links">
+				<input type="checkbox" name="clicked" checked="checked" />
+				<img src="/icons/clicked.svg" />
+			</label>
+
+			<label i18n_title="HTTP requests">
+				<input type="checkbox" name="request" checked="checked" />
+				<img src="/icons/request.svg" />
+			</label>
+
+			<label i18n_title="Header redirects">
+				<input type="checkbox" name="header" checked="checked" />
+				<img src="/icons/header.svg" />
+			</label>
 		</fieldset>
 
 		<fieldset class="filters" id="filter_actions">
 			<legend i18n_text="Filter cleaning action"></legend>
-			<label i18n_title="Redirected to embedded URL"><input type="checkbox" name="embed" checked="checked" /><span></span></label>
-			<label i18n_title="Tracking parameters removed"><input type="checkbox" name="remove" checked="checked" /><span></span></label>
-			<label i18n_title="Path elements replaced"><input type="checkbox" name="rewrite" checked="checked" /><span></span></label>
-			<label i18n_title="Javascript link"><input type="checkbox" name="javascript" checked="checked" /><span></span></label>
+
+			<label i18n_title="Redirected to embedded URL">
+				<input type="checkbox" name="embed" checked="checked" />
+				<img src="/icons/skip.svg" />
+			</label>
+
+			<label i18n_title="Tracking parameters removed">
+				<input type="checkbox" name="remove" checked="checked" />
+				<img src="/icons/remove.svg" />
+			</label>
+
+			<label i18n_title="Path elements replaced">
+				<input type="checkbox" name="rewrite" checked="checked" />
+				<img src="/icons/replace.png" />
+			</label>
+
+			<label i18n_title="Javascript link">
+				<input type="checkbox" name="javascript" checked="checked" />
+				<img src="/icons/javascript.svg" />
+			</label>
 		</fieldset>
+
 	</div>
 
 	<div id="history"></div>

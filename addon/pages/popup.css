@@ -23,6 +23,7 @@ body {
     padding: 1px 0;
     width: 100%;
 	text-align: center;
+	align-items: center;
 }
 #icon {
 	text-align: center;
@@ -37,7 +38,7 @@ body {
 #bottom {
 	margin: 5px;
 	display: flex;
-	align-items: end;
+	align-items: center;
 }
 #history {
 	max-height: calc(500px - 60px - 40px - 40px);
@@ -92,7 +93,7 @@ body {
 
 #filters {
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	flex-wrap: wrap;
 	margin: 0;
 }
@@ -102,7 +103,6 @@ body {
 #filter_actions {
 	flex: 4;
 }
-
 .filters {
 	display: inline-flex;
 	justify-content: space-around;
@@ -111,43 +111,18 @@ body {
 	margin: 5px;
 }
 .filters label {
-	flex: none;
+	flex: 30px 0 1;
 	margin: 5px;
+	min-width: 22px;
+}
+.filters label img {
+	width: 100%;
 }
 .filters input {
 	display: none;
 }
-.filters span::before {
-	display: block;
-	content: ' ';
-	width: 30px;
-	height: 30px;
-	background: center no-repeat;
-	background-size: 30px 30px;
-}
-.filters input:not(:checked) + span::before {
+.filters input:not(:checked) + img {
 	opacity: 0.2;
-}
-#filter_categories input[name="clicked"] + span::before {
-	background-image: url("/icons/clicked.svg");
-}
-#filter_categories input[name="request"] + span::before {
-	background-image: url("/icons/request.svg");
-}
-#filter_categories input[name="header"] + span::before {
-	background-image: url("/icons/header.svg");
-}
-#filter_actions input[name="embed"] + span::before {
-	background-image: url("/icons/skip.svg");
-}
-#filter_actions input[name="remove"] + span::before {
-	background-image: url("/icons/remove.svg");
-}
-#filter_actions input[name="rewrite"] + span::before {
-	background-image: url("/icons/replace.png");
-}
-#filter_actions input[name="javascript"] + span::before {
-	background-image: url("/icons/javascript.svg");
 }
 
 #bottom button, .tooltip {
@@ -155,7 +130,7 @@ body {
 	margin-left: 5px;
 	width: 30px;
 	height: 30px;
-	background-size: 25px 25px;
+	background-size: 80%;
 	background-position: center;
 	background-repeat: no-repeat;
 }
@@ -185,7 +160,6 @@ body {
 	position: absolute;
 	z-index: 1;
 
-	width: 20em;
 	left: 50%;
 	width: 20em;
 	bottom: 100%;
@@ -210,4 +184,40 @@ input#enabled:checked ~ * .when_disabled {
 }
 input#enabled:not(:checked) ~ * .when_enabled {
 	display: none !important;
+}
+
+
+@media only screen and (max-device-width: 480px) {
+	body {
+		font-size: 2em !important;
+	}
+	#icon {
+		text-align: center !important;
+		flex: 20px 1 0 !important;
+	}
+	#bottom {
+		bottom: 0;
+		position: fixed;
+		width: 100%;
+	}
+	.filters {
+		margin: 2px;
+	}
+	#history {
+		max-height: calc(100vh - 25vw - 50px) !important;
+	}
+	.filters label {
+		flex: 14% 1 1;
+		margin: 2px;
+	}
+
+	#filter_actions label {
+		flex-grow: 1;
+	}
+
+	#bottom button {
+		object-fit: contain;
+		width: 11%;
+		padding-top: 11%;
+	}
 }
