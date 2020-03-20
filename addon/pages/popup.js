@@ -171,14 +171,12 @@ function add_listeners()
 		browser.runtime.sendMessage({action: 'set prepopulate', link: selected.firstChild.getAttribute('raw-url')}).then(() =>
 		{
 			browser.runtime.openOptionsPage();
-			window.close();
 		});
 	}
 
 	document.querySelector('#options').onclick = () =>
 	{
 		browser.runtime.openOptionsPage();
-		window.close();
 	}
 
 	document.addEventListener('keyup', e =>
