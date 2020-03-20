@@ -135,12 +135,12 @@ function decode_embedded_uri(link, rules, original_string)
 	// first try to find a base64-encoded link
 	for (let str of getLinkSearchStrings(link, skip, rules.whitelist_path))
 	{
-		let [base64match] = str.match(base64_encoded_url) || [];
+		let [base64match] = str.match(base64_encoded_url) || [], decoded;
 		if (base64match)
 		{
 			try
 			{
-				let decoded = decodeURIComponent(atob(base64match));
+				decoded = decodeURIComponent(atob(base64match));
 				if (!decoded)
 					continue;
 
