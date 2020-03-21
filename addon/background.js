@@ -67,26 +67,24 @@ function update_action(tab_id)
 			badge_text = '' + clean_count;
 	}
 
-	browser.browserAction.setTitle({tabId: tab_id, title: badge_title});
-
 	if (android)
 	{
-		log('Setting popup for tab', tab_id, 'to', browser.runtime.getURL(`/pages/popup.html?tab=${tab_id}`))
+		browser.browserAction.setTitle({tabId: tab_id, title: badge_title});
 		browser.browserAction.setPopup({tabId: tab_id, popup: browser.runtime.getURL(`/pages/popup.html?tab=${tab_id}`)});
-		return;
 	}
-
-	// on desktop only
-	browser.browserAction.setBadgeText({tabId: tab_id, text: badge_text});
-	browser.browserAction.setIcon(
+	else
 	{
-		path:
+		browser.browserAction.setBadgeText({tabId: tab_id, text: badge_text});
+		browser.browserAction.setIcon(
 		{
-			16: 'icons/16' + (enabled ? '' : '-off') + '.png',
-			32: 'icons/32' + (enabled ? '' : '-off') + '.png'
-		},
-		tabId: tab_id
-	})
+			path:
+			{
+				16: 'icons/16' + (enabled ? '' : '-off') + '.png',
+				32: 'icons/32' + (enabled ? '' : '-off') + '.png'
+			},
+			tabId: tab_id
+		})
+	}
 }
 
 
