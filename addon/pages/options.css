@@ -25,11 +25,13 @@ p.editor > label > span:first-child {
 #parents {
 	border: grey thin solid;
 	background: #eef;
-	padding: .4em 1em;
+	width: calc(100% - 4.5em);
+	padding: .4em 1em .4em 3em;
+	text-indent: -2em;
 	border-radius: 1px;
 }
 #parents > span {
-	display: inline-block;
+	display: inline;
 	white-space: nowrap;
 	word-break: keep-all;
 }
@@ -112,7 +114,7 @@ fieldset {
 	width: 100%;
 	margin: 0 0 2em;
 }
-fieldset fieldset, #rule_selector, #parents {
+fieldset fieldset, #rule_selector {
 	width: calc(100% - 2em);
 	margin: 0 1em;
 }

@@ -137,9 +137,6 @@ body {
 	background-position: center;
 	background-repeat: no-repeat;
 }
-#bottom .help {
-	height: 30px;
-}
 #toggle_on { background-image: url("/icons/onoff.svg"); }
 #toggle_off { background-image: url("/icons/onoff.svg"); }
 #options  { background-image: url("/icons/settings.svg"); }
@@ -200,6 +197,7 @@ input#enabled:not(:checked) ~ * .when_enabled {
 		flex: 20px 1 0 !important;
 	}
 	#bottom {
+		background: white;
 		bottom: 0;
 		position: fixed;
 		width: 100%;
@@ -208,7 +206,8 @@ input#enabled:not(:checked) ~ * .when_enabled {
 		margin: 2px;
 	}
 	#history {
-		max-height: calc(100vh - 25vw - 50px) !important;
+		max-height: calc(100vh - 25vw - 120px) !important;
+		height: auto !important;
 	}
 	.filters label {
 		flex: 14% 1 1;
@@ -219,6 +218,10 @@ input#enabled:not(:checked) ~ * .when_enabled {
 		flex-grow: 1;
 	}
 
+	.tooltip {
+		height: 60px;
+		width: 60px;
+	}
 	#bottom button {
 		object-fit: contain;
 		width: 11%;
