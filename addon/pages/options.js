@@ -140,12 +140,13 @@ function remove_rule_item(list, element)
 	let selection = document.getElementById('rule_selector');
 	let selected_opt = selection[selection.selectedIndex];
 
-	let rule = JSON.parse(selected_opt.value);
+	let rule = JSON.parse(selected_opt.getAttribute('rule'));
 	let pos = rule[list].indexOf(element);
 	if (pos === -1)
 		return;
+
 	rule[list].splice(pos, 1)
-	selected_opt.value = JSON.stringify(rule);
+	selected_opt.setAttribute('rule', sorted_stringify(rule));
 
 	rule_changed();
 }
@@ -176,12 +177,12 @@ function add_rule_item(list, element, replace, flags)
 	if (list === 'rewrite')
 		element = {search: element, replace: replace, flags: flags}
 
-	let rule = JSON.parse(selected_opt.value);
+	let rule = JSON.parse(selected_opt.getAttribute('rule'));
 	let pos = rule[list].indexOf(element);
 	if (pos === -1)
 	{
 		rule[list].push(element)
-		selected_opt.value = JSON.stringify(rule);
+		selected_opt.setAttribute('rule', sorted_stringify(rule));
 		show_rule_item(list, element, 'item')
 	}
 
@@ -257,12 +258,17 @@ function no_rule_loaded()
 
 function load_rule()
 {
-	for (let list of document.querySelectorAll('span.itemlist, span.inheritlist'))
+	for (const list of document.querySelectorAll('span.itemlist, span.inheritlist'))
 		while (list.lastChild)
 			list.removeChild(list.lastChild);
 
-	let select = document.getElementById('rule_selector');
-	let rule = {domain: '*.*', path: '', inherited: {...default_actions}, ...JSON.parse(select.value)};
+	const select = document.getElementById('rule_selector');
+	if (select.selectedIndex === -1)
+		return no_rule_loaded();
+
+	const rule_defaults = {domain: '*.*', path: '', inherited: {...default_actions}}
+	const rule = {rule_defaults, ...JSON.parse(select[select.selectedIndex].getAttribute('rule'))}
+
 	const subdomains = !rule.domain.startsWith('.');
 	document.querySelector('input[name="domain"]').value = rule.domain.substring(subdomains ? 0 : 1)
 	document.querySelector('input[name="subdomains"]').checked = subdomains;
@@ -274,20 +280,20 @@ function load_rule()
 	document.querySelector('input[name="subdomains"]').disabled = false;
 	document.querySelector('input[name="whitelist_path"]').disabled = false;
 
-	for (let [list, action] of Object.entries(default_actions))
+	for (const [list, action] of Object.entries(default_actions))
 	{
 		if (!Array.isArray(action))
 			continue;
 
-		for (let val of rule[list])
+		for (const val of rule[list])
 			show_rule_item(list, val, 'item');
-		for (let val of rule.inherited[list])
+		for (const val of rule.inherited[list])
 			show_rule_item(list, val, 'inherit');
 	}
 
 	document.getElementById('remove_rule').disabled = false;
 
-	if (select[select.selectedIndex].hasAttribute('orig-value'))
+	if (select[select.selectedIndex].hasAttribute('orig-rule'))
 		rule_pristine();
 }
 
@@ -295,7 +301,7 @@ function load_rule()
 function filter_rules()
 {
 	let search = document.getElementById('rule_filter').value;
-	for (let opt of document.querySelectorAll('#rule_selector option'))
+	for (const opt of document.querySelectorAll('#rule_selector option'))
 		opt.style.display = !search || opt.text.match(search) ? 'block' : 'none';
 }
 
@@ -305,9 +311,12 @@ function erase_rule()
 	let select = document.getElementById('rule_selector');
 	let selected_opt = select[select.selectedIndex];
 
-	if (selected_opt.hasAttribute('orig-value'))
+	if (selected_opt === undefined)
+		return;
+
+	if (selected_opt.hasAttribute('orig-rule'))
 	{
-		Rules.remove(JSON.parse(selected_opt.getAttribute('orig-value')))
+		Rules.remove(JSON.parse(selected_opt.getAttribute('orig-rule')))
 			.then(() => browser.runtime.sendMessage({action: 'rules'}));
 	}
 
@@ -326,21 +335,20 @@ function erase_rule()
 		no_rule_loaded();
 	}
 
-	selected_opt.remove()
+	selected_opt.remove();
 }
 
 
 function parse_rule(select)
 {
-	if (select.value === '')
+	if (select.selectedIndex === -1)
 		return no_rule_loaded();
 
-	let rule = Object.assign(JSON.parse(select.value),
-	{
+	let rule = {...JSON.parse(select[select.selectedIndex].getAttribute('rule')), ...{
 		domain: document.querySelector('input[name="domain"]').value || '*.*',
 		path: document.querySelector('input[name="path"]').value || '',
 		whitelist_path: document.querySelector('input[name="whitelist_path"]').checked,
-	});
+	}};
 
 	if (rule.path !== '' && !check_regexp(rule.path, document.getElementById('path_error')))
 		return;
@@ -361,7 +369,7 @@ function rule_changed()
 
 	let opt = select[select.selectedIndex];
 	let rule = {...default_actions, ...parse_rule(select)};
-	let orig_rule = opt.hasAttribute('orig-value') ? {...default_actions, ...JSON.parse(opt.getAttribute('orig-value'))} : null;
+	let orig_rule = opt.hasAttribute('orig-rule') ? {...default_actions, ...JSON.parse(opt.getAttribute('orig-rule'))} : null;
 	let same_node = orig_rule && (orig_rule.domain || '*.*') === rule.domain && (orig_rule.path || '') === rule.path;
 
 	if (!same_node && Rules.exists(rule))
@@ -385,9 +393,19 @@ function rule_pristine()
 }
 
 
-function insert_rule()
+function insert_rule(rule, selected)
 {
-	let opt = new Option(name_rule(default_actions), JSON.stringify(default_actions), false, true);
+	const json = sorted_stringify({...default_actions, ...rule});
+	const name = name_rule({...default_actions, ...rule});
+	const opt = new Option(name, `${rule.domain || '*.*'}/${rule.path || ''}`, false, selected);
+
+	opt.setAttribute('rule', json);
+	if (rule !== undefined)
+		opt.setAttribute('orig-rule', json);
+
+	if (rule !== undefined && 'parents' in rule)
+		opt.setAttribute('parents', rule.parents.map(name_rule).join(', '));
+
 	document.getElementById('rule_selector').appendChild(opt);
 	load_rule();
 }
@@ -396,23 +414,23 @@ function insert_rule()
 function save_rule()
 {
 	let select = document.getElementById('rule_selector');
-	let selected_opt = select[select.selectedIndex];
+
+	if (select.selectedIndex === -1)
+		return;
 
 	let rule = parse_rule(select);
-
-	if (!rule)
-		return;
+	let selected_opt = select[select.selectedIndex];
 
 	// Perform the update operation immediately in the DOM
 	selected_opt.replaceChild(document.createTextNode(name_rule(rule)), selected_opt.firstChild);
 
 	let replacing = null;
-	if (selected_opt.hasAttribute('orig-value'))
-		replacing = JSON.parse(selected_opt.getAttribute('orig-value'));
+	if (selected_opt.hasAttribute('orig-rule'))
+		replacing = JSON.parse(selected_opt.getAttribute('orig-rule'));
 
-	let rule_str = JSON.stringify(rule);
-	selected_opt.setAttribute('value', rule_str);
-	selected_opt.setAttribute('orig-value', rule_str);
+	let rule_str = sorted_stringify(rule);
+	selected_opt.setAttribute('rule', rule_str);
+	selected_opt.setAttribute('orig-rule', rule_str);
 
 	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
 	if (replacing === null)
@@ -464,11 +482,9 @@ function reset_rules()
 function prepopulate_rule(link)
 {
 	let url = new URL(link);
-	let rule = {domain: url.hostname, path: '^' + url.pathname + '$', ...default_actions};
+	let rule = {...default_actions, domain: url.hostname, path: '^' + url.pathname + '$'};
 
-	let opt = new Option(name_rule(rule), JSON.stringify(rule), false, true);
-	document.getElementById('rule_selector').appendChild(opt);
-	load_rule();
+	insert_rule(rule, true);
 }
 
 
@@ -481,11 +497,7 @@ function populate_rules()
 		select.lastChild.remove();
 
 	for (let rule of Rules.serialize())
-	{
-		let opt = select.appendChild(new Option(name_rule(rule), JSON.stringify({...default_actions, ...rule})))
-		opt.setAttribute('orig-value', opt.getAttribute('value'))
-		opt.setAttribute('parents', rule.parents.map(name_rule).join(', '));
-	}
+		insert_rule(rule)
 
 	for (const list of ['remove', 'whitelist', 'rewrite'])
 	{
@@ -547,7 +559,7 @@ function add_listeners()
 	document.getElementById('rule_filter').onkeyup = delayed_save(filter_rules)
 	document.getElementById('remove_rule').onclick = erase_rule
 	document.getElementById('save_rule').onclick = save_rule
-	document.getElementById('add_rule').onclick = insert_rule
+	document.getElementById('add_rule').onclick = () => insert_rule(undefined, true)
 
 	document.querySelector('button[name="reset_options"]').onclick = reset_options;
 	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
