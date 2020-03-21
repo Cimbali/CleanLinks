@@ -32,8 +32,9 @@ function set_selected(evt)
 }
 
 
-function filter_from_input(evt)
+function filter_from_input(opt_iterable)
 {
+
 	let filter_cat = {}, filter_act = {};
 	for (let input of document.querySelectorAll('#filter_categories input'))
 		filter_cat[input.name] = input.checked;
@@ -41,7 +42,11 @@ function filter_from_input(evt)
 	for (let input of document.querySelectorAll('#filter_actions input'))
 		filter_act[input.name] = input.checked;
 
-	for (let opt of document.querySelectorAll('#history p'))
+	// By default, apply to all “opt”s in #history
+	if (opt_iterable === undefined || opt_iterable instanceof Event)
+		opt_iterable = document.querySelectorAll('#history p');
+
+	for (let opt of opt_iterable)
 	{
 		// There is a single category per item, that must be selected, and there are a number of actions of which any one can be selected
 		let category_selected = false, action_matched = false;
@@ -59,7 +64,24 @@ function filter_from_input(evt)
 }
 
 
-function populate_popup()
+function append_link(history, link)
+{
+	let classes = [link.type];
+	if ('dropped' in link)
+		classes.push('dropped')
+	else if (link.type === 'promoted')
+		classes.push('clicked')
+
+	const link_elem = cleaned_link_item(document.createElement('p'), link.orig, link.url, classes);
+	link_elem.onclick = set_selected
+	filter_from_input([link_elem])
+
+	history.appendChild(link_elem);
+	document.querySelector('button#clearlist').disabled = false;
+}
+
+
+async function populate_popup()
 {
 	document.querySelector('#title').prepend(document.createTextNode(title + ' v' + version));
 	document.querySelector('#homepage').setAttribute('href', homepage);
@@ -80,82 +102,76 @@ function populate_popup()
 	else
 		resolve_tab_id = browser.tabs.query({active: true, currentWindow: true}).then(tab_list => tab_list[0].id)
 
-	resolve_tab_id.then(tab_id =>
+	const tab_id = await resolve_tab_id;
+
+	await browser.runtime.sendMessage({action: 'check tab enabled', tab_id: tab_id}).then(answer =>
 	{
-		browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
+		document.querySelector('input#enabled').checked = answer.enabled;
+	})
+
+	await browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
+	{
+		const history = document.getElementById('history');
+		for (let clean of response)
+			append_link(history, clean);
+
+		for (input of document.querySelectorAll('.filters input'))
+			input.onchange = filter_from_input
+
+		document.querySelector('button#clearlist').disabled = response.length === 0;
+	});
+
+	document.querySelector('#toggle').onclick = () =>
+	{
+		browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
+		document.querySelector('input#enabled').checked = !document.querySelector('input#enabled').checked;
+	}
+
+	document.querySelector('#refresh').onclick = () =>
+	{
+		browser.tabs.reload(tab_id);
+	}
+
+	document.querySelector('#whitelist').onclick = () =>
+	{
+		Rules.add(JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'))).then(() =>
+			browser.runtime.sendMessage({action: 'rules'})
+		)
+	}
+
+	document.querySelector('#blacklist').onclick = () =>
+	{
+		let rules = JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'));
+
+		rules.remove = rules.whitelist.slice();
+		delete rules.whitelist;
+
+		Rules.add(rules).then(() => browser.runtime.sendMessage({action: 'rules'}))
+	}
+
+	document.querySelector('#openonce').onclick = () =>
+	{
+		var selected = document.querySelector('#history .selected');
+		if (selected)
 		{
-			const history = document.getElementById('history');
-			for (let clean of response)
-			{
-				let classes = [clean.type];
-				if ('dropped' in clean)
-					classes.push('dropped')
-				else if (clean.type === 'promoted')
-					classes.push('clicked')
-
-				const link_elem = document.createElement('p');
-				link_elem.onclick = set_selected
-				history.appendChild(cleaned_link_item(link_elem, clean.orig, clean.url, classes));
-			}
-
-			for (input of document.querySelectorAll('.filters input'))
-				input.onchange = filter_from_input
-
-			filter_from_input()
-
-			document.querySelector('button#clearlist').disabled = response.length === 0;
-		});
-
-		browser.runtime.sendMessage({action: 'check tab enabled', tab_id: tab_id}).then(answer =>
-		{
-			document.querySelector('input#enabled').checked = answer.enabled;
-		})
-
-		document.querySelector('#toggle').onclick = () =>
-		{
-			browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
-			document.querySelector('input#enabled').checked = !document.querySelector('input#enabled').checked;
+			const url = selected.querySelector('.original').getAttribute('raw-url');
+			browser.runtime.sendMessage({action: 'open bypass', link: url})
+							.then(() => browser.tabs.update(tab_id, {url: url}));
 		}
+	}
 
-		document.querySelector('#refresh').onclick = () =>
-		{
-			browser.tabs.reload(tab_id);
-		}
+	return tab_id
+}
 
-		document.querySelector('#whitelist').onclick = () =>
-		{
-			Rules.add(JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'))).then(() =>
-				browser.runtime.sendMessage({action: 'rules'})
-			)
-		}
 
-		document.querySelector('#blacklist').onclick = () =>
-		{
-			let rules = JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'));
-
-			rules.remove = rules.whitelist.slice();
-			delete rules.whitelist;
-
-			Rules.add(rules).then(() => browser.runtime.sendMessage({action: 'rules'}))
-		}
-
-		document.querySelector('#clearlist').onclick = () =>
-		{
-			browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
-			// remove cleared (all) elements (should be in sendMessage.then())
-			document.querySelectorAll('#history p').forEach(opt => { opt.remove() });
-		}
-
-		document.querySelector('#openonce').onclick = () =>
-		{
-			var selected = document.querySelector('#history .selected');
-			if (selected)
-			{
-				const url = selected.querySelector('.original').getAttribute('raw-url');
-				browser.runtime.sendMessage({action: 'open bypass', link: url})
-								.then(() => browser.tabs.update(tab_id, {url: url}));
-			}
-		}
+function start_appending_new_links(tab_id)
+{
+	browser.runtime.onMessage.addListener(message =>
+	{
+		if (message.action === 'notify' && message.tab_id === tab_id)
+			append_link(document.getElementById('history'), message);
+		else
+			return Promise.resolve('Popup page ignored unknown message ' + message.action)
 	});
 }
 
@@ -177,6 +193,15 @@ function add_listeners()
 	document.querySelector('#options').onclick = () =>
 	{
 		browser.runtime.openOptionsPage();
+	}
+
+	document.querySelector('#clearlist').onclick = () =>
+	{
+		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
+		// remove cleared (all) elements (should be in sendMessage.then())
+		const history = document.getElementById('history');
+		while (history.lastChild)
+			history.lastChild.remove();
 	}
 
 	document.addEventListener('keyup', e =>
@@ -220,4 +245,4 @@ function add_listeners()
 
 apply_i18n();
 add_listeners()
-Prefs.loaded.then(populate_popup);
+Prefs.loaded.then(populate_popup).then(start_appending_new_links);

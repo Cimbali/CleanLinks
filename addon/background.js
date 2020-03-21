@@ -220,7 +220,7 @@ function handle_message(message, sender)
 	let tab_id = browser.tabs.TAB_ID_NONE;
 	if ('tab_id' in message)
 		tab_id = message.tab_id;
-	else if ('tab' in sender)
+	else if (sender !== undefined && 'tab' in sender)
 		tab_id = sender.tab.id;
 
 	switch (message.action)
@@ -240,7 +240,7 @@ function handle_message(message, sender)
 		if (Prefs.values.cltrack)
 		{
 			let hist = cleaned_per_tab.get(tab_id).history;
-			hist.push(Object.assign({}, message));
+			hist.push({...message});
 			if (hist.length > 100)
 				hist.splice(0, hist.length - 100);
 		}
@@ -262,6 +262,10 @@ function handle_message(message, sender)
 				return browser.tabs.sendMessage(parseInt(orig_tab), {action: 'highlight'}).catch(() => {})
 			}
 		}
+
+		// if the message was not broadcasted, do so (we won’t get it here) to alert open popups
+		if (sender === undefined)
+			browser.runtime.sendMessage(message)
 
 		return Promise.resolve({});
 
