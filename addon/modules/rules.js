@@ -77,7 +77,7 @@ function merge_rule_actions(actions, add)
 }
 
 
-function find_rules(url, all_rules)
+function find_rules(all_rules, url)
 {
 	let [suffix, domain] = split_suffix(url.hostname);
 	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '.');
@@ -285,7 +285,7 @@ function load_rules()
 
 let Rules = {
 	all_rules: {},
-	find: url => find_rules(url, Rules.all_rules),
+	find: url => find_rules(Rules.all_rules, url),
 	serialize: () => serialize_rules(Rules.all_rules),
 	add: (new_rule) =>
 	{
