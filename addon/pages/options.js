@@ -69,7 +69,7 @@ function actions_differ(rule, orig_rule)
 function save_options()
 {
 	let options = {}
-	for (let field of Array.from(document.querySelectorAll('input, textarea')))
+	for (let field of Array.from(document.querySelectorAll('input')))
 	{
 		if (typeof Prefs.values[field.name] == 'boolean')
 			options[field.name] = field.checked;
@@ -159,12 +159,13 @@ function show_rule_item(list, element, elemtype)
 		text = element.search + ' → ' + element.replace
 
 	span.appendChild(document.createTextNode(text));
-	if (elemtype !== 'inherit') {
-		span.onclick = () => {
+	if (elemtype !== 'inherit')
+		span.onclick = () =>
+		{
 			remove_rule_item(list, element)
 			span.remove()
 		}
-	}
+
 	document.getElementById(list + '_' + elemtype + 'list').appendChild(span)
 }
 
@@ -259,12 +260,13 @@ function no_rule_loaded()
 	document.querySelector('input[name="whitelist_path"]').disabled = true;
 
 	document.getElementById('remove_rule').disabled = true
+	document.getElementById('parents').style.display = 'none';
 }
 
 
 function load_rule()
 {
-	for (const list of document.querySelectorAll('span.itemlist, span.inheritlist'))
+	for (const list of document.querySelectorAll('span.itemlist, span.inheritlist, #parents'))
 		while (list.lastChild)
 			list.removeChild(list.lastChild);
 
@@ -301,6 +303,16 @@ function load_rule()
 
 	if (select[select.selectedIndex].hasAttribute('orig-rule'))
 		rule_pristine();
+
+	const list = document.getElementById('parents');
+	if (select[select.selectedIndex].hasAttribute('parents'))
+	{
+		list.style.display = 'block';
+		for (const ancestor of JSON.parse(select[select.selectedIndex].getAttribute('parents')))
+			insert_parent_rule(list, name_rule(ancestor), id_rule(ancestor));
+	}
+
+	list.appendChild(document.createTextNode(name_rule(rule)))
 }
 
 
@@ -400,19 +412,35 @@ function rule_pristine()
 
 function insert_rule(new_rule, rule)
 {
-	const json = sorted_stringify({...default_actions, ...rule});
-	const name = name_rule({...default_actions, ...rule});
-	const opt = new Option(name, id_rule(rule), false, new_rule);
+	const rule_with_defaults = {...default_actions, ...rule};
+	const opt = new Option(name_rule(rule_with_defaults), id_rule(rule_with_defaults), false, new_rule);
+	opt.setAttribute('name', id_rule(rule))
 
-	opt.setAttribute('rule', json);
+	opt.setAttribute('rule', sorted_stringify(rule_with_defaults));
 	if (!new_rule)
-		opt.setAttribute('orig-rule', json);
+		opt.setAttribute('orig-rule', opt.getAttribute('rule'));
 
-	if (rule !== undefined && 'parents' in rule)
-		opt.setAttribute('parents', rule.parents.map(name_rule).join(', '));
+	if (rule !== undefined && 'parents' in rule && rule.parents.length !== 0)
+		opt.setAttribute('parents', JSON.stringify(rule.parents));
 
 	document.getElementById('rule_selector').appendChild(opt);
 	load_rule();
+}
+
+
+function insert_parent_rule(list, name, id)
+{
+	const a = document.createElement('span').appendChild(document.createElement('a'));
+	a.appendChild(document.createTextNode(name));
+	a.href = '#';
+	a.setAttribute('title', _('Edit rule $RULE_NAME$', name));
+	a.onclick = () =>
+	{
+		document.getElementById('rule_selector').value = id;
+		load_rule()
+	}
+
+	list.prepend(a.parentNode);
 }
 
 
@@ -429,6 +457,9 @@ function save_rule()
 	// Perform the update operation immediately in the DOM
 	selected_opt.replaceChild(document.createTextNode(name_rule(rule)), selected_opt.firstChild);
 	selected_opt.value = id_rule(rule);
+
+	const list = document.getElementById('parents');
+	list.replaceChild(document.createTextNode(name_rule(rule)), list.lastChild)
 
 	let replacing = null;
 	if (selected_opt.hasAttribute('orig-rule'))
@@ -497,7 +528,7 @@ function prepopulate_rule(link)
 	}
 
 	// gather and normalize the data for this rule
-	rule.parents = Rules.serialize_matching(url);
+	rule.parents = Rules.serialize_matching(url).reverse();
 	rule.inherited = merge_rule_actions({}, default_actions)
 
 	for (const p of rule.parents)

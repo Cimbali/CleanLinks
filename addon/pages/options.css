@@ -22,6 +22,23 @@ p.editor > label > span:first-child {
 	padding: 1em 2em;
 	border-radius: 1em;
 }
+#parents {
+	border: grey thin solid;
+	background: #eef;
+	padding: .4em 1em;
+	border-radius: 1px;
+}
+#parents > span {
+	display: inline-block;
+	white-space: nowrap;
+	word-break: keep-all;
+}
+#parents span::after {
+	content: ' ❭ '
+}
+#matching {
+	margin-top: 1em;
+}
 p.editor > label > span:first-child {
 	margin-bottom: .5em;
 }
@@ -78,9 +95,6 @@ input.toggle:checked ~ .disabled, input.toggle:checked ~ * .disabled {
 input[type=number] {
 	width: 5em;
 }
-textarea {
-	width: 100%;
-}
 p.replace_editor > label {
 	display: inline-block;
 	width: calc(50% - 2ch - 2.5em);
@@ -98,7 +112,7 @@ fieldset {
 	width: 100%;
 	margin: 0 0 2em;
 }
-fieldset fieldset, #rule_selector {
+fieldset fieldset, #rule_selector, #parents {
 	width: calc(100% - 2em);
 	margin: 0 1em;
 }
@@ -127,9 +141,6 @@ fieldset.example legend {
 }
 #rule_selector {
 	height: 15em;
-}
-textarea {
-	height:10em;
 }
 legend {
 	font-weight: bold;
@@ -210,6 +221,7 @@ dd {
 	background: url("/icons/question.svg") center no-repeat;
 	background-size: 20px 20px;
 }
+
 .help .tooltiptext {
 	visibility: hidden;
 	position: absolute;
