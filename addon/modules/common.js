@@ -59,6 +59,18 @@ function sorted_stringify(val)
 }
 
 
+function node_whitelist(node)
+{
+	if (['span', 'a', 'strong', 'em', 'br'].includes(node.tagName.toLowerCase()))
+		return NodeFilter.FILTER_SKIP;
+	else
+	{
+		node.remove();
+		return NodeFilter.FILTER_REJECT;
+	}
+}
+
+
 function apply_i18n()
 {
 	for (let elem of document.querySelectorAll('[i18n_text]'))
@@ -70,9 +82,19 @@ function apply_i18n()
 	for (let elem of document.querySelectorAll('[i18n_placeholder]'))
 		elem.setAttribute('placeholder', _(elem.getAttribute('i18n_placeholder')));
 
+	const domparser = new DOMParser();
 	for (let elem of document.querySelectorAll('[i18n_html]'))
-		elem.innerHTML = _(elem.getAttribute('i18n_html').trim().replace(/\s+/g, ' ')
-								.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'));
+	{
+		const l10n_html = _(elem.getAttribute('i18n_html').trim().replace(/\s+/g, ' ')
+								.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'))
+
+		// parse, sanitize, then add into tree
+		const dom = domparser.parseFromString(l10n_html, 'text/html');
+		dom.createTreeWalker(dom.body, NodeFilter.SHOW_ELEMENT, { acceptNode: node_whitelist }).firstChild();
+
+		while (dom.body.firstChild)
+			elem.appendChild(dom.body.removeChild(dom.body.firstChild));
+	}
 }
 
 
