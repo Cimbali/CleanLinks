@@ -8,17 +8,19 @@
 
 <body>
 	<input type="checkbox" name="enabled" id="enabled" checked="checked" />
-	<h3 id="title"> &mdash;
-		<span i18n_text="Enabled" class="when_enabled"></span>
-		<span i18n_text="Disabled" class="when_disabled"></span>
+	<h3 id="title">
+		<a id="homepage"> &mdash;
+			<span i18n_text="Enabled" class="when_enabled"></span>
+			<span i18n_text="Disabled" class="when_disabled"></span>
+		</a>
 	</h3>
 
 	<div id="filters">
 		<p id="icon">
-			<a id="homepage">
+			<label for="enabled">
 				<img src="/icons/CleanLinks.png" class="when_enabled"/>
 				<img src="/icons/disabled.png" class="when_disabled"/>
-			</a>
+			</label>
 		</p>
 
 		<fieldset class="filters" id="filter_categories">
@@ -74,7 +76,9 @@
 			<span i18n_text="This is a list of the last links cleaned in this tab: original version above cleaned version. Red backgrounds indicate a link whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain." class="tooltiptext"></span>
 		</span>
 		<span class="spacer"></span>
-		<button id="toggle" i18n_title="Toggle to enable or disable the extension."></button>
+
+		<button id="toggle_off" i18n_title="Disable the extension for this tab" class="when_enabled"></button>
+		<button id="toggle_on" i18n_title="Enable the extension for this tab" class="when_disabled"></button>
 		<button id="options" i18n_title="Open CleanLinks Options page"></button>
 		<button id="refresh" i18n_title="Refresh page open in tab"></button>
 		<button id="clearlist" i18n_title="Clear List" disabled="disabled"></button>

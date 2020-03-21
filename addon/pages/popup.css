@@ -14,10 +14,13 @@ html, body {
 body {
 	font-size: .8em;
 }
+#title a {
+    color: #bbb;
+	text-decoration: none;
+}
 #title {
     font-size: smaller;
     background-color: #444;
-    color: #bbb;
     border: 0;
     margin: 0;
     padding: 1px 0;
@@ -137,7 +140,8 @@ body {
 #bottom .help {
 	height: 30px;
 }
-#toggle { background-image: url("/icons/onoff.svg"); }
+#toggle_on { background-image: url("/icons/onoff.svg"); }
+#toggle_off { background-image: url("/icons/onoff.svg"); }
 #options  { background-image: url("/icons/settings.svg"); }
 #refresh  { background-image: url("/icons/refresh.svg"); }
 #clearlist { background-image: url("/icons/trashcan.svg"); }

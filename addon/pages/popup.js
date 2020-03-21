@@ -83,9 +83,9 @@ function append_link(history, link)
 
 async function populate_popup()
 {
-	document.querySelector('#title').prepend(document.createTextNode(title + ' v' + version));
+	document.querySelector('#title a').prepend(document.createTextNode(title + ' v' + version));
 	document.querySelector('#homepage').setAttribute('href', homepage);
-	document.querySelector('#homepage').setAttribute('title', title + ' homepage');
+	document.querySelector('#homepage').setAttribute('title', `${title} ${_('homepage')}`);
 
 	if (!Prefs.values.cltrack)
 	{
@@ -106,7 +106,11 @@ async function populate_popup()
 
 	await browser.runtime.sendMessage({action: 'check tab enabled', tab_id: tab_id}).then(answer =>
 	{
-		document.querySelector('input#enabled').checked = answer.enabled;
+		const enabled = document.querySelector('input#enabled');
+		enabled.checked = answer.enabled;
+		enabled.onchange = () => browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
+		document.querySelector('#toggle_off').onclick = () => enabled.checked = false;
+		document.querySelector('#toggle_on').onclick = () => enabled.checked = true;
 	})
 
 	await browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
@@ -120,12 +124,6 @@ async function populate_popup()
 
 		document.querySelector('button#clearlist').disabled = response.length === 0;
 	});
-
-	document.querySelector('#toggle').onclick = () =>
-	{
-		browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
-		document.querySelector('input#enabled').checked = !document.querySelector('input#enabled').checked;
-	}
 
 	document.querySelector('#refresh').onclick = () =>
 	{
