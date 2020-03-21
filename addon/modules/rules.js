@@ -18,6 +18,38 @@
 const default_actions = {'whitelist': [], 'remove': [], 'rewrite': [], 'whitelist_path': false}
 
 
+function split_suffix(hostname)
+{
+	if (hostname === undefined || hostname === '' || hostname === '*')
+		return ['*', '.*']
+
+	// use public domain instead of TLD
+	let suffix = hostname.endsWith('.*') ? '.*' : ('.' + PublicSuffixList.get_public_suffix(hostname));
+	let domain = hostname.substring(0, hostname.length - suffix.length)
+
+	return [domain, suffix];
+}
+
+
+function merge_rule_actions(actions, add)
+{
+	for (const [key, action] of Object.entries(add))
+	{
+		if (!(key in actions))
+			actions[key] = Array.isArray(action) ? [...action] : action;
+
+		else if (Array.isArray(action))
+			// NB: n² merging
+			actions[key] = actions[key].concat(action.filter(val => !actions[key].includes(val)))
+
+		else if (typeof action === 'boolean')
+			actions[key] = actions[key] || action
+	}
+
+	return actions;
+}
+
+
 function recursive_find(rules, domain_bits, path)
 {
 	let matches = []
@@ -48,38 +80,9 @@ function recursive_find(rules, domain_bits, path)
 }
 
 
-function split_suffix(hostname)
-{
-	if (hostname === undefined || hostname === '' || hostname === '*')
-		return ['.*', '*']
-
-	// use public domain instead of TLD
-	let suffix = hostname.endsWith('.*') ? '.*' : ('.' + PublicSuffixList.get_public_suffix(hostname));
-	let domain = hostname.substring(0, hostname.length - suffix.length)
-
-	return [suffix, domain];
-}
-
-
-function merge_rule_actions(actions, add)
-{
-	for (let [key, action] of Object.entries(add))
-	{
-		if (!(key in actions))
-			actions[key] = Array.isArray(action) ? [...action] : action;
-		else if (Array.isArray(action))
-			actions[key].push(...action.filter(val => !actions[key].includes(val)))
-		else if (typeof action === 'boolean')
-			actions[key] = actions[key] || action
-	}
-
-	return actions;
-}
-
-
 function find_rules(all_rules, url)
 {
-	let [suffix, domain] = split_suffix(url.hostname);
+	let [domain, suffix] = split_suffix(url.hostname);
 	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '.');
 
 	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
@@ -103,7 +106,7 @@ function unserialize_rule(serialized_rule)
 			actions[key] = serialized_rule[key];
 
 	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
-	let [suffix, domain] = split_suffix(serialized_rule.domain);
+	let [domain, suffix] = split_suffix(serialized_rule.domain);
 	let pos = [suffix].concat(domain.split('.').reverse().map(d => '.' + d));
 
 	while (pos.length && pos[pos.length - 1] === '.*')
