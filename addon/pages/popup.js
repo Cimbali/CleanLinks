@@ -174,8 +174,10 @@ function start_appending_new_links(tab_id)
 }
 
 
-function add_listeners()
+async function add_listeners()
 {
+	const android = (await browser.runtime.getPlatformInfo()).os === 'android';
+
 	document.querySelector('#open_editor').onclick = () =>
 	{
 		var selected = document.querySelector('#history .selected');
@@ -185,12 +187,16 @@ function add_listeners()
 		browser.runtime.sendMessage({action: 'set prepopulate', link: selected.firstChild.getAttribute('raw-url')}).then(() =>
 		{
 			browser.runtime.openOptionsPage();
+			if (!android)
+				window.close();
 		});
 	}
 
 	document.querySelector('#options').onclick = () =>
 	{
 		browser.runtime.openOptionsPage();
+		if (!android)
+			window.close();
 	}
 
 	document.querySelector('#clearlist').onclick = () =>
