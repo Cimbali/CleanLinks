@@ -41,7 +41,7 @@ body {
 	align-items: center;
 }
 #history {
-	max-height: calc(500px - 60px - 40px - 40px);
+	height: 450px;
 
 	display: block;
 	border-top: black thin solid;
