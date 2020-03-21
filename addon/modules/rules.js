@@ -31,11 +31,60 @@ function split_suffix(hostname)
 }
 
 
+function url_search_keys(url)
+{
+	const [domain, suffix] = split_suffix(url.hostname);
+	const domain_bits = [suffix, ...domain.split('.').map(d => '.' + d).reverse(), '.'];
+
+	return [domain_bits, url.pathname];
+}
+
+
+function serialized_rule_keys(serialized_rule)
+{
+	// keys is the hierarchical position in the JSON data, as the list of keys to follow from the root node
+	const [domain, suffix] = split_suffix(serialized_rule.domain);
+	const keys = [suffix, ...domain.split('.').reverse().map(d => '.' + d)];
+
+	while (keys.length && keys[keys.length - 1] === '.*')
+		keys.pop();
+
+	if ('path' in serialized_rule && serialized_rule.path)
+		keys.push(serialized_rule.path)
+
+	return keys;
+}
+
+
+function serialized_rule_actions(serialized_rule)
+{
+	const actions = {}
+
+	for (const [key, default_val] of Object.entries(default_actions))
+	{
+		if (!(key in serialized_rule))
+			continue;
+
+		else if (Array.isArray(default_val) && serialized_rule[key].length !== 0)
+			actions[key] = [...serialized_rule[key]];
+
+		else if (typeof default_val === 'boolean' && default_val !== serialized_rule[key])
+			actions[key] = serialized_rule[key];
+	}
+
+	return actions;
+}
+
+
 function merge_rule_actions(actions, add)
 {
 	for (const [key, action] of Object.entries(add))
 	{
-		if (!(key in actions))
+		// only copy valid actions
+		if (!(key in default_actions))
+			continue;
+
+		else if (!(key in actions))
 			actions[key] = Array.isArray(action) ? [...action] : action;
 
 		else if (Array.isArray(action))
@@ -52,7 +101,7 @@ function merge_rule_actions(actions, add)
 
 function recursive_find(rules, domain_bits, path)
 {
-	let matches = []
+	const matches = []
 	if ('actions' in rules)
 		matches.push(rules.actions)
 
@@ -69,105 +118,93 @@ function recursive_find(rules, domain_bits, path)
 			matches.push(...recursive_find(rules[bit], domain_bits.slice(1), path))
 	}
 
-	if (path === undefined)
-		return matches
+	if (path !== undefined)
+	{
+		// normal (regexp) path match
+		const path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
+											   .filter(key => path.match(new RegExp(key)))
 
-	// normal (regexp) path match
-	let path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
-										 .filter(key => path.match(new RegExp(key)))
+		for (const matching_key of path_matches)
+			matches.push(...recursive_find(rules[matching_key], [], undefined))
+	}
 
-	return path_matches.reduce((list, matching_key) => list.concat(recursive_find(rules[matching_key], [])), matches)
+	return matches
 }
 
 
-function find_rules(all_rules, url)
+function recursive_serialize(rules, serialized_rule, domain_bits, path)
 {
-	let [domain, suffix] = split_suffix(url.hostname);
-	let domain_bits = [suffix].concat(...domain.split('.').map(d => '.' + d).reverse(), '.');
-
-	let aggregated = {}, action_list = recursive_find(all_rules, domain_bits, url.pathname)
-
-	merge_rule_actions(aggregated, default_actions)
-	for (let actions of action_list)
-		merge_rule_actions(aggregated, actions)
-
-	return aggregated;
-}
-
-
-function unserialize_rule(serialized_rule)
-{
-	let actions = {}
-	for (let [key, default_val] of Object.entries(default_actions))
-		if (serialized_rule.hasOwnProperty(key) && (
-			(Array.isArray(default_val) && serialized_rule[key].length !== 0) ||
-			(typeof default_val === 'boolean' && default_val !== serialized_rule[key])
-		))
-			actions[key] = serialized_rule[key];
-
-	// pos is the hierarchical position in the JSON data, as the list of keys to follow from the root node
-	let [domain, suffix] = split_suffix(serialized_rule.domain);
-	let pos = [suffix].concat(domain.split('.').reverse().map(d => '.' + d));
-
-	while (pos.length && pos[pos.length - 1] === '.*')
-		pos.pop();
-
-	if ('path' in serialized_rule && serialized_rule.path)
-		pos.push(serialized_rule.path)
-
-	return [pos, actions];
-}
-
-
-function serialize_rules(rules, serialized_rule)
-{
-	if (serialized_rule === undefined)
-		serialized_rule = {domain: [], inherited: {...default_actions}, parents: []}
-
-	let list = []
+	const matches = []
 
 	if ('actions' in rules)
 	{
-		let obj = {...serialized_rule, ...rules.actions};
+		let rule = {...serialized_rule, ...rules.actions};
 		if (serialized_rule.domain.length === 0)
-			obj.domain = '*.*';
+			rule.domain = '*.*';
 		else if (serialized_rule.domain.length === 1)
-			obj.domain = '*' + serialized_rule.domain[0];
+			rule.domain = '*' + serialized_rule.domain[0];
 		else
-			obj.domain = serialized_rule.domain.join('').substr(1) // remove leding .
-		if (!('path' in obj)) obj.path = ''
-		list.push(obj)
+			rule.domain = serialized_rule.domain.join('').substr(1) // remove leading .
+
+		if (!('path' in rule))
+			rule.path = ''
+
+		matches.push(rule)
 
 		// Add the actions to the set of inherited actions to pass on to the children
-		serialized_rule.inherited = Object.assign({}, serialized_rule.inherited)
-		for (let [key, value] of Object.entries(rules.actions))
-		{
-			if (Array.isArray(value))
-				serialized_rule.inherited[key] = serialized_rule.inherited[key].concat(value)
-			else if (typeof value === 'boolean')
-				serialized_rule.inherited[key] = serialized_rule.inherited[key] || value
-		}
-		serialized_rule.parents = [obj].concat(serialized_rule.parents)
+		serialized_rule.inherited = merge_rule_actions({...serialized_rule.inherited}, rules.actions)
+		serialized_rule.parents = [{domain: rule.domain, path: rule.path, ...rules.actions}, ...serialized_rule.parents]
 	}
 
-	for (let [key, value] of Object.entries(rules))
+
+	// No matching: recursively apply to all keys
+	if (domain_bits === undefined && path === undefined)
 	{
-		if (key[0] === '.')
-			list.push(...serialize_rules(value, {...serialized_rule, domain: [key].concat(serialized_rule.domain)}))
-		else if (key !== 'actions')
-			list.push(...serialize_rules(value, {...serialized_rule, path: key}))
+		for (const [key, value] of Object.entries(rules))
+		{
+			if (key[0] === '.')
+				matches.push(...recursive_serialize(value, {...serialized_rule, domain: [key].concat(serialized_rule.domain)}))
+			else if (key !== 'actions')
+				matches.push(...recursive_serialize(value, {...serialized_rule, path: key}))
+		}
 	}
 
-	return list
+	// Recursive domain match
+	if (domain_bits !== undefined && domain_bits.length !== 0)
+	{
+		const bit = domain_bits[0];
+
+		// wildcard domain match
+		if (bit !== '.' && '.*' in rules)
+			matches.push(...recursive_serialize(rules['.*'], {...serialized_rule, domain: ['.*'].concat(serialized_rule.domain)},
+												domain_bits.slice(1), path))
+
+		// normal (exact) domain match
+		if (bit in rules)
+			matches.push(...recursive_serialize(rules[bit], {...serialized_rule, domain: [bit].concat(serialized_rule.domain)},
+												domain_bits.slice(1), path))
+	}
+
+	// Recursive path match
+	if (path !== undefined && path !== null)
+	{
+		// normal (regexp) path match
+		const path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
+											 .filter(key => path.match(new RegExp(key)))
+
+		for (const matching_key of path_matches)
+			matches.push(...recursive_serialize(rules[matching_key], {...serialized_rule, path: matching_key}, [], null))
+	}
+
+	return matches
 }
 
 
 function pop_rule(all_rules, serialized_rule)
 {
-	let [keys, expected_actions] = unserialize_rule(serialized_rule)
-
-	let node = all_rules, stack = [];
-	for (let key of keys)
+	const stack = [];
+	let node = all_rules;
+	for (const key of serialized_rule_keys(serialized_rule))
 	{
 		if (!(key in node))
 			return;
@@ -179,19 +216,19 @@ function pop_rule(all_rules, serialized_rule)
 	}
 
 	// keep actions and backtrack removing all empty nodes
-	let found_actions = {...node.actions}
+	const found_actions = {...node.actions}
 	delete node.actions;
 
 	while (stack.length !== 0 && Object.entries(node).length === 0)
 	{
-		let [parent_node, key] = stack.pop()
+		const [parent_node, key] = stack.pop()
 		delete parent_node[key]
 
 		node = parent_node;
 	}
 
 	// return actions that were found but not expected
-	for (let [action, expected_value] of Object.entries(expected_actions))
+	for (const [action, expected_value] of Object.entries(serialized_rule_actions(serialized_rule)))
 	{
 		if (!(action in found_actions))
 			continue;
@@ -210,10 +247,8 @@ function pop_rule(all_rules, serialized_rule)
 
 function push_rule(all_rules, serialized_rule)
 {
-	let [keys, actions] = unserialize_rule(serialized_rule)
-
 	let node = all_rules;
-	for (let key of keys)
+	for (const key of serialized_rule_keys(serialized_rule))
 	{
 		if (!(key in node))
 			node[key] = {}
@@ -222,18 +257,16 @@ function push_rule(all_rules, serialized_rule)
 	}
 
 	if (!('actions' in node))
-		node.actions = {...actions}
+		node.actions = {...serialized_rule_actions(serialized_rule)}
 	else
-		node.actions = merge_rule_actions(node.actions, actions)
+		node.actions = merge_rule_actions(node.actions, serialized_rule)
 }
 
 
 function rule_exists(all_rules, serialized_rule)
 {
-	let [keys, actions] = unserialize_rule(serialized_rule)
-
 	let node = all_rules;
-	for (let key of keys)
+	for (const key of serialized_rule_keys(serialized_rule))
 	{
 		if (!(key in node))
 			return false;
@@ -245,10 +278,31 @@ function rule_exists(all_rules, serialized_rule)
 }
 
 
+function find_rules(all_rules, url)
+{
+	const aggregated = merge_rule_actions({}, default_actions)
+
+	for (const actions of recursive_find(all_rules, ...url_search_keys(url)))
+		merge_rule_actions(aggregated, actions)
+
+	return aggregated;
+}
+
+
+function serialize_rules(all_rules, url)
+{
+	const empty_serialized_rule = {domain: [], inherited: {...default_actions}, parents: []};
+	const search_keys = url ? url_search_keys(url) : [];
+
+	return recursive_serialize(all_rules, empty_serialized_rule, ...search_keys);
+}
+
+
 function clear_rules()
 {
 	return browser.storage.sync.remove('rules');
 }
+
 
 function save_rules(all_rules)
 {
@@ -290,6 +344,7 @@ let Rules = {
 	all_rules: {},
 	find: url => find_rules(Rules.all_rules, url),
 	serialize: () => serialize_rules(Rules.all_rules),
+	serialize_matching: url => serialize_rules(Rules.all_rules, url),
 	add: (new_rule) =>
 	{
 		push_rule(Rules.all_rules, new_rule)
