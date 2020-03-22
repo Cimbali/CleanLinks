@@ -29,6 +29,11 @@ describe('clean_link', function() {
 		let link = 'https://www.laas.fr/public/sites/www.laas.fr.public/files/logos/LAAS-2016.png'
 		return Rules.loaded.then(() => expect(clean_link(link)).to.equal('https://www.laas.fr.public/files/logos/LAAS-2016.png'));
 	});
+	it('should clean an encoded www-link in the query', () =>
+	{
+		let link = 'https://www.somerandom.site/some/path?redir=www.foobar2000.org%2Fdownload&garbage=ignored'
+		return Rules.loaded.then(() => expect(clean_link(link)).to.equal('https://www.foobar2000.org/download'));
+	});
 	it('should manage fb mobile URLs with all the path in the hash', () =>
 	{
 		let link = 'https://m.facebook.com/home.php#!/photo.php?fbid=1234567890&id=1234567890&set=a.1234567890&source=1234567890&refid=1234567890&_ft_=qid.1234567890%1234567890Amf_story_key.1234567890%1234567890Aog_action_id.1234567890%1234567890Atop_level_post_id.1234567890%1234567890Asrc.1234567890%1234567890Aphoto_id.1234567890&__tn__=EH-R'
@@ -126,7 +131,12 @@ describe('clean_link', function() {
 		expect(clean_link('https://trackmail.alumnforce.net/?tm_u=https%253A%252F%252Fax.polytechnique.org%252F%2523%252Fgroup%252Fx-alternative%252F211%252Fcalendar%252Fconference-frederic-lordon%252F2020%252F02%252F06%252F724&tm_h=68404220dbcf676445ae9f32a208f6bc'))
 		.to.equal('https://ax.polytechnique.org/#/group/x-alternative/211/calendar/conference-frederic-lordon/2020/02/06/724')
 	);
+	it('should manage double slashes in URLs', () =>
+		expect(clean_link('https://maps.google.com/maps/api/staticmap?__markers=icon:http%3A%2F%2Fc1.tacdn.com%2F%2Fimg2%2Fmaps%2Ficons%2Fcomponent_map_pins_v1%2FR_Pin_Small.png|28.549650,77.250137&signature=somebase64='))
+		.to.equal('http://c1.tacdn.com//img2/maps/icons/component_map_pins_v1/R_Pin_Small.png')
+	);
 });
+
 describe('extract_javascript_link', function() {
 	it('should clean the link to the simple javascript function argument', done =>
 	{

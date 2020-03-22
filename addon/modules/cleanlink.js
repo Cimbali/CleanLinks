@@ -188,10 +188,12 @@ function decode_embedded_uri(link, rules, original_string)
 		// but only for properly encoded URLs, and in the (path + search params + hash) part.
 		let prefix_length = embedded_link.origin.length;
 		if (!capture.startsWith(embedded_link.protocol))
-			prefix_length -= embedded_link.protocol.length;
+			prefix_length -= embedded_link.protocol.length + 2;
 
-		return new URL(capture.substring(prefix_length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'),
-						embedded_link.origin);
+			log(`decoded URI Component = ${capture.substring(0, prefix_length)} → ${embedded_link.origin} + `
+				+ capture.substring(prefix_length))
+		return new URL(embedded_link.origin +
+						capture.substring(prefix_length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'));
 	}
 	else
 		log('raw url:', raw_url)
