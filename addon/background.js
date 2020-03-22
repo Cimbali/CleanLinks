@@ -116,7 +116,7 @@ function clean_redirect_headers(details)
 			Object.keys(cleaning_notif).every(key => cleaning_notif[key] === historic_message[key])
 		))
 		{
-			log('Avoiding circular redirect ' + dest + ' -> ' + details.originUrl);
+			log(`Avoiding circular redirect ${dest} -> ${details.originUrl}` );
 			return {};
 		}
 	}

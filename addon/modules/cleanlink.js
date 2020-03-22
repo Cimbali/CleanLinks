@@ -153,7 +153,7 @@ function decode_embedded_uri(link, rules, original_string)
 			}
 			catch (e)
 			{
-				log('Invalid base64 data in link ' + link + ' : '  + decoded + ' -- error is ' + e);
+				log(`Invalid base64 data in link ${link} : ${decoded} -- error is ${e}`);
 			}
 		}
 	}
@@ -168,8 +168,8 @@ function decode_embedded_uri(link, rules, original_string)
 		{
 			// got the new link!
 			embedded_link = new URL((capture.startsWith('www.') ? link.protocol + '//' : '') + capture);
-			log('decoded URI Component = ' + capture + ' → ' + embedded_link.origin +
-				' + ' + embedded_link.href.slice(embedded_link.origin.length))
+			log(`decoded URI Component = ${capture} → ${embedded_link.origin} + `
+				+ embedded_link.href.slice(embedded_link.origin.length))
 			matchedString = str;
 			break;
 		}
@@ -265,13 +265,13 @@ function clean_link(orig_link, base)
 {
 	if (!orig_link || skip_link_type(orig_link))
 	{
-		log('not cleaning ' + orig_link + ' : empty or ignored orig_link type');
+		log(`not cleaning ${orig_link} : empty or ignored orig_link type`);
 		return orig_link;
 	}
 
 	if (Prefs.values.ignhttp && !(/^https?:$/.test(orig_link.protocol)))
 	{
-		log('not cleaning ' + orig_link + ' : ignoring non-http(s) links');
+		log(`not cleaning ${orig_link} : ignoring non-http(s) links`);
 		return orig_link;
 	}
 
@@ -296,7 +296,7 @@ function clean_link(orig_link, base)
 
 	if (link.href == new URL(orig_link, base).href)
 	{
-		log('cleaning ' + orig_link + ' : unchanged')
+		log(`cleaning ${orig_link} : unchanged`)
 		return orig_link;
 	}
 

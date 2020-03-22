@@ -54,8 +54,8 @@ function sorted_stringify(val)
 	else if (Array.isArray(val))
         return '[' + val.map(sorted_stringify).sort().join(',') + ']';
 
-    else
-        return '{' + Object.entries(val).map(([key, value]) => JSON.stringify(key) + ':' + sorted_stringify(value)).join(',') + '}';
+	const str_data = Object.entries(val).map(([key, value]) => `${JSON.stringify(key)}:${sorted_stringify(value)}`)
+	return '{' + str_data.sort().join(',') + '}';
 }
 
 

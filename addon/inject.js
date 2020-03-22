@@ -127,7 +127,7 @@ function on_click(evt)
 	if (!cleaned_link || cleaned_link === text_link)
 		return;
 
-	log('Cleaning javascript ' + text_link + ' to ' + cleaned_link)
+	log(`Cleaning javascript ${text_link} to ${cleaned_link}`)
 	if (event_do_click(cleaned_link, node, evt))
 	{
 		// instead of blinking the URL bar, tell the background to show a notification.

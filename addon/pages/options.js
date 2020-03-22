@@ -118,7 +118,7 @@ function populate_options()
 	let values = Prefs.serialize();
 	for (let [pref, value] of Object.entries(values))
 	{
-		let input = document.querySelector('[name=' + pref + ']');
+		let input = document.querySelector(`[name=${pref}]`);
 		if (!input)
 			continue;
 
@@ -166,7 +166,7 @@ function show_rule_item(list, element, elemtype)
 			span.remove()
 		}
 
-	document.getElementById(list + '_' + elemtype + 'list').appendChild(span)
+	document.getElementById(`${list}_${elemtype}list`).appendChild(span)
 }
 
 
@@ -194,7 +194,7 @@ function add_rule_item(list, element, replace, flags)
 function validate_item(list)
 {
 	let input_name = list !== 'rewrite' ? list + '_edit' : 'search_edit';
-	let input = document.querySelector('input[name="' + input_name + '"]');
+	let input = document.querySelector(`input[name="${input_name}"]`);
 	let error_span = document.getElementById(input_name + '_error');
 
 	if (!input.value)
@@ -556,9 +556,9 @@ function populate_rules()
 
 	for (const list of ['remove', 'whitelist', 'rewrite'])
 	{
-		let editor = document.querySelector('#' + list + '_editor');
+		let editor = document.querySelector(`#${list}_editor`);
 		let input_name = list !== 'rewrite' ? list + '_edit' : 'search_edit';
-		let input = document.querySelector('input[name="' + input_name + '"]');
+		let input = document.querySelector(`input[name="${input_name}"]`);
 
 		document.getElementById(list + '_add').onclick = () =>
 		{
