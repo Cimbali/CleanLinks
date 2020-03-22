@@ -10,8 +10,7 @@ add_placeholders='with_entries(
 		with_entries({key: .value, value: {"content": (.key + 1) | tostring | ("$" + .)}})) as $placeholders |
 		.value += if $placeholders | length != 0 then {placeholders: $placeholders} else {} end)'
 
-addon_msg='{"addon_description": {"message": "Converts obfuscated/nested links to genuine clean links"},
-			"no_cleaned_links": {"message": "No links have been cleaned yet"}}'
+addon_msg='{"addon_description": {"message": "Converts obfuscated/nested links to genuine clean links"}'
 to_poeditor='to_entries | map({term: .key, definition: .value.message})'
 from_poeditor='map({key: .term, value: {message: .definition}}) | map(.value.message = (.value.message // empty)) | from_entries'
 

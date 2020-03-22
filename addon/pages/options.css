@@ -245,6 +245,16 @@ dd {
 	visibility: visible;
 }
 
+#add_rule:before {
+	content: '➕ ';
+}
+#save_rule:before {
+	content: '💾 ';
+}
+#remove_rule:before {
+	content: '❌ ';
+}
+
 
 @media only screen and (max-device-width: 480px) {
 	.not-android, .not-android + input {

@@ -44,7 +44,7 @@ body {
 	align-items: center;
 }
 #history:empty::before {
-	content: '__MSG_no_cleaned_links__';
+	content: attr(placeholder);
 	color: grey;
 	font-size: 1.5em;
 	display: block;

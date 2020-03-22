@@ -83,7 +83,7 @@ function append_link(history, link)
 
 async function populate_popup()
 {
-	document.querySelector('#title a').prepend(document.createTextNode(title + ' v' + version));
+	document.querySelector('#title a').prepend(document.createTextNode(`${title} v${version} — `));
 	document.querySelector('#homepage').setAttribute('href', homepage);
 	document.querySelector('#homepage').setAttribute('title', `${title} ${_('homepage')}`);
 
