@@ -260,7 +260,6 @@ function no_rule_loaded()
 	document.querySelector('input[name="whitelist_path"]').disabled = true;
 
 	document.getElementById('remove_rule').disabled = true
-	document.getElementById('parents').style.display = 'none';
 }
 
 
@@ -306,13 +305,10 @@ function load_rule()
 
 	const list = document.getElementById('parents');
 	if (select[select.selectedIndex].hasAttribute('parents'))
-	{
-		list.style.display = 'block';
 		for (const ancestor of JSON.parse(select[select.selectedIndex].getAttribute('parents')))
 			insert_parent_rule(list, name_rule(ancestor), id_rule(ancestor));
-	}
 
-	list.appendChild(document.createTextNode(name_rule(rule)))
+	list.appendChild(document.createElement('span')).textContent = name_rule(rule);
 }
 
 
@@ -420,7 +416,7 @@ function insert_rule(new_rule, rule)
 	if (!new_rule)
 		opt.setAttribute('orig-rule', opt.getAttribute('rule'));
 
-	if (rule !== undefined && 'parents' in rule && rule.parents.length !== 0)
+	if (rule !== undefined && 'parents' in rule)
 		opt.setAttribute('parents', JSON.stringify(rule.parents));
 
 	document.getElementById('rule_selector').appendChild(opt);
@@ -459,7 +455,7 @@ function save_rule()
 	selected_opt.value = id_rule(rule);
 
 	const list = document.getElementById('parents');
-	list.replaceChild(document.createTextNode(name_rule(rule)), list.lastChild)
+	document.getElementById('parents').lastChild.textContent = name_rule(rule);
 
 	let replacing = null;
 	if (selected_opt.hasAttribute('orig-rule'))

@@ -25,19 +25,23 @@ p.editor > label > span:first-child {
 #parents {
 	border: grey thin solid;
 	background: #eef;
-	width: calc(100% - 2em);
 	margin: 0 1em;
-	padding: .4em 1em .4em 3em;
-	text-indent: -2em;
+	padding: .4em 1em .4em 2.5em;
+	text-indent: -1.5em;
 	border-radius: 1px;
 }
-#parents > span {
-	display: inline;
-	white-space: nowrap;
-	word-break: keep-all;
+#parents:empty::before {
+	content: attr(placeholder);
+	color: grey;
+	display: block;
+	text-align: center;
 }
-#parents span::after {
-	content: ' ❭ '
+#parents > span {
+	display: inline-block;
+	text-indent: 0;
+}
+#parents span:not(:first-child)::before {
+	content: ' ❭ '
 }
 #matching {
 	margin-top: 1em;
@@ -111,11 +115,13 @@ p.replace_editor > input[type="text"] {
 	width: 30%;
 	margin-left: .5ch;
 }
-fieldset {
-	width: 100%;
+body > fieldset {
 	margin: 0 0 2em;
 }
-fieldset fieldset, #rule_selector {
+fieldset {
+	margin: 0 1em;
+}
+#rule_selector {
 	width: calc(100% - 2em);
 	margin: 0 1em;
 }
@@ -277,10 +283,9 @@ dd {
 		height: 5em;
 	}
 	#parents {
-		width: calc(100% - 4.5em) !important;
 		margin: 0 !important;
 	}
-	.URL {
+	#parents > span, .URL {
 		white-space: normal !important;
 		word-break: break-all;
 	}
