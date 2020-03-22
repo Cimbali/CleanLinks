@@ -84,10 +84,10 @@ body {
 	word-break: break-all;
 }
 #history p > span.cleaned::before {
-	content: " ⯮ "
+	content: " ► "
 }
 #history p.dropped > span.cleaned::before {
-	content: " ❌ ";
+	content: " ❌ ";
 }
 #history p .del {
 	text-decoration: line-through;
@@ -219,6 +219,10 @@ input#enabled:not(:checked) ~ * .when_enabled {
 	#history {
 		max-height: calc(100vh - 25vw - 120px) !important;
 		height: auto !important;
+	}
+	#history p.selected > span {
+		border-left: #38c 10px solid;
+		padding-left: 5px;
 	}
 	.filters label {
 		flex: 14% 1 1;
