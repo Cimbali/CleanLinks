@@ -489,26 +489,59 @@ async function upgrade_options(prev_version)
 	}
 	else if (num_prev_version[0] >= 4)
 	{
-		const default_rules = serialize_rules(await new Promise(load_default_rules)).map(sorted_stringify).sort();
-		const current_rules = Rules.serialize().map(sorted_stringify).sort();
+		// fetch the default rules from before the upgrade, from storage if version is 4.1.x otherwise from the web
+		const old_storage = await browser.storage.sync.get({'default_rules': null});
+		let get_old_rules;
 
-		for (let i = 0, j = 0; i < default_rules.length; )
+		if (old_storage.default_rules)
+			get_old_rules = Promise.resolve(old_storage.default_rules);
+		else
 		{
-			if (j === current_rules.length || default_rules[i] < current_rules[j])
+			const previous_rules_url = `https://github.com/Cimbali/CleanLinks/raw/v${prev_version}/addon/data/rules.json`;
+			get_old_rules = fetch(new Request(previous_rules_url)).then(r => r.text()).then(data => JSON.parse(data));
+		}
+
+		// fall back to the user’s current rules
+		let fallback = false;
+		get_old_rules.catch(() =>
+		{
+			fallback = true;
+			console.log('Falling back')
+			return Rules.all_rules;
+		});
+
+		// serialize deterministically both the previous rules and the new default rules
+		const old_defaults = serialize_rules(await get_old_rules).map(sorted_stringify).sort();
+		const new_defaults = serialize_rules(await load_default_rules()).map(sorted_stringify).sort();
+
+		let i = 0, j = 0;
+		while (i < new_defaults.length)
+		{
+			if (j === old_defaults.length || new_defaults[i] < old_defaults[j])
 			{
 				// NB: adding does not replace but merge with an existing rule
-				Rules.add(JSON.parse(default_rules[i]));
+				Rules.add(JSON.parse(new_defaults[i]));
 				i++;
 			}
-			else if (default_rules[i] > current_rules[j])
+			else if (new_defaults[i] > old_defaults[j])
 			{
+				// NB: removing only removes the parameters passed in, not additional ones
+				if (!fallback)
+					Rules.remove(JSON.parse(old_defaults[j]));
 				j++;
 			}
 			else
 				i++, j++;
 		}
+
+		while (!fallback && j < old_defaults.length)
+		{
+			Rules.remove(JSON.parse(old_defaults[j]));
+			j++;
+		}
 	}
 
+	await load_default_rules().then(data => browser.storage.sync.set({default_rules: data}));
 	await browser.storage.sync.set({configuration: options});
 	await Prefs.reload();
 
@@ -521,4 +554,6 @@ browser.runtime.onInstalled.addListener(details =>
 {
 	if (details.reason === 'update')
 		return upgrade_options(details.previousVersion);
+	else if (details.reason === 'install')
+		load_default_rules().then(data => browser.storage.sync.set({default_rules: data}));
 });

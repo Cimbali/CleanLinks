@@ -605,39 +605,22 @@ const PublicSuffixList = {
 	get_domain: getDomain,
 	get_public_suffix: getPublicSuffix,
 	suffix_in_psl: suffixInPSL,
-	loaded: new Promise(done =>
+	loaded: Promise.resolve().then(async  () =>
 	{
-		let populate = (response) =>
-		{
-			response.text().then(data =>
-			{
-				parse(data, punycode.toASCII);
-				browser.storage.local.set({PSL: toSelfie(Base64Encoder), PSLdate: Date.now()})
-				done();
-			})
-		}
+		const cached = await browser.storage.local.get({'PSL': null})
 
-		let refresh = () =>
-		{
-			const world_url = 'https://publicsuffix.org/list/public_suffix_list.dat'
-			const local_url = browser.runtime.getURL('/data/public_suffix_list.dat')
-			fetch(new Request(world_url)).then(populate).catch(err =>
-			{
-				fetch(new Request(local_url)).then(populate)
-			});
-		}
+		if (cached.PSL)
+			return fromSelfie(cached.PSL, Base64Encoder)
 
-		var cached = browser.storage.local.get({'PSL': null})
-		cached.then(data =>
-		{
-			if (data.PSL)
-			{
-				fromSelfie(data.PSL, Base64Encoder)
-				done();
-			}
-			else
-				refresh();
-		})
+		const world_url = 'https://publicsuffix.org/list/public_suffix_list.dat'
+		const local_url = browser.runtime.getURL('/data/public_suffix_list.dat')
+
+		const data = await fetch(new Request(world_url)).then(response => response.text()).catch(err =>
+			fetch(new Request(local_url)).then(response => response.text())
+		);
+
+		parse(data, punycode.toASCII);
+		await browser.storage.local.set({PSL: toSelfie(Base64Encoder), PSLdate: Date.now()})
 	})
 }
 

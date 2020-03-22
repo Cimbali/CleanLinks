@@ -364,7 +364,7 @@ let Rules = {
 	reset: () => clear_rules().then(() => load_default_rules()).then(loaded =>
 	{
 		Rules.all_rules = loaded;
-		browser.storage.sync.set({rules: loaded});
+		browser.storage.sync.set({rules: loaded, default_rules: loaded});
 		return loaded;
 	}),
 }
