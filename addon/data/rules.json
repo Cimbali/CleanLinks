@@ -137,6 +137,33 @@
           ]
         }
       },
+      ".contacts": {
+        "^/widget/hovercard/": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        }
+      },
+      ".mail": {
+        "^/accounts/SetOSID$": {
+          "actions": {
+            "whitelist": [
+              "continue"
+            ]
+          }
+        }
+      },
+      ".ogs": {
+        "^/u/0/widget/app$": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        }
+      },
       ".translate": {
         "/translate.*": {
           "actions": {
@@ -160,6 +187,13 @@
           "actions": {
             "whitelist": [
               "image_url"
+            ]
+          }
+        },
+        "^/recaptcha/api2/anchor$": {
+          "actions": {
+            "whitelist": [
+              "co"
             ]
           }
         }
@@ -358,7 +392,7 @@
       }
     },
     ".bandcamp": {
-      "^/EmbeddedPlayer.html/": {
+      "^/EmbeddedPlayer.html": {
         "actions": {
           "rewrite": [
             {
@@ -419,6 +453,13 @@
         }
       }
     },
+    ".duckduckgo": {
+      "actions": {
+        "whitelist": [
+          "q"
+        ]
+      }
+    },
     ".firefox": {
       ".": {
         "actions": {
@@ -463,44 +504,6 @@
           "email_token",
           "email_source"
         ]
-      }
-    },
-    ".google": {
-      ".contacts": {
-        "^/widget/hovercard/": {
-          "actions": {
-            "remove": [
-              "origin"
-            ]
-          }
-        }
-      },
-      ".mail": {
-        "^/accounts/SetOSID$": {
-          "actions": {
-            "whitelist": [
-              "continue"
-            ]
-          }
-        }
-      },
-      ".ogs": {
-        "^/u/0/widget/app$": {
-          "actions": {
-            "remove": [
-              "origin"
-            ]
-          }
-        }
-      },
-      ".www": {
-        "^/recaptcha/api2/anchor$": {
-          "actions": {
-            "whitelist": [
-              "co"
-            ]
-          }
-        }
       }
     },
     ".googleusercontent": {
@@ -643,6 +646,13 @@
       }
     },
     ".medium": {
+      "^/m/global-identity$": {
+        "actions": {
+          "whitelist": [
+            "redirectUrl"
+          ]
+        }
+      },
       "actions": {
         "remove": [
           "source"
