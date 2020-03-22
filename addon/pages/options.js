@@ -274,7 +274,7 @@ function load_rule()
 		return no_rule_loaded();
 
 	const rule_defaults = {domain: '*.*', path: '', inherited: {...default_actions}}
-	const rule = {rule_defaults, ...JSON.parse(select[select.selectedIndex].getAttribute('rule'))}
+	const rule = {...rule_defaults, ...JSON.parse(select[select.selectedIndex].getAttribute('rule'))}
 
 	const subdomains = !rule.domain.startsWith('.');
 	document.querySelector('input[name="domain"]').value = rule.domain.substring(subdomains ? 0 : 1)
@@ -410,7 +410,7 @@ function insert_rule(new_rule, rule)
 {
 	const rule_with_defaults = {...default_actions, ...rule};
 	const opt = new Option(name_rule(rule_with_defaults), id_rule(rule_with_defaults), false, new_rule);
-	opt.setAttribute('name', id_rule(rule))
+	opt.setAttribute('name', id_rule(rule_with_defaults))
 
 	opt.setAttribute('rule', sorted_stringify(rule_with_defaults));
 	if (!new_rule)
