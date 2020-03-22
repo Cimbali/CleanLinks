@@ -25,7 +25,8 @@ p.editor > label > span:first-child {
 #parents {
 	border: grey thin solid;
 	background: #eef;
-	width: calc(100% - 4.5em);
+	width: calc(100% - 2em);
+	margin: 0 1em;
 	padding: .4em 1em .4em 3em;
 	text-indent: -2em;
 	border-radius: 1px;
@@ -264,6 +265,10 @@ dd {
 	}
 	#rule_selector {
 		height: 5em;
+	}
+	#parents {
+		width: calc(100% - 4.5em) !important;
+		margin: 0 !important;
 	}
 	.URL {
 		white-space: normal !important;
