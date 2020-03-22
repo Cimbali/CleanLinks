@@ -125,6 +125,15 @@ async function populate_popup()
 		document.querySelector('button#clearlist').disabled = response.length === 0;
 	});
 
+	document.querySelector('#clearlist').onclick = () =>
+	{
+		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
+		// remove cleared (all) elements (should be in sendMessage.then())
+		const history = document.getElementById('history');
+		while (history.lastChild)
+			history.lastChild.remove();
+	}
+
 	document.querySelector('#refresh').onclick = () =>
 	{
 		browser.tabs.reload(tab_id);
@@ -197,15 +206,6 @@ async function add_listeners()
 		browser.runtime.openOptionsPage();
 		if (!android)
 			window.close();
-	}
-
-	document.querySelector('#clearlist').onclick = () =>
-	{
-		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
-		// remove cleared (all) elements (should be in sendMessage.then())
-		const history = document.getElementById('history');
-		while (history.lastChild)
-			history.lastChild.remove();
 	}
 
 	document.addEventListener('keyup', e =>

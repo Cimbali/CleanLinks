@@ -53,6 +53,7 @@ body {
 }
 #history {
 	height: 450px;
+	background: #eef;
 
 	display: block;
 	border-top: black thin solid;
@@ -62,14 +63,12 @@ body {
 	padding-right: 1px;
 }
 #history p {
+	background: white;
 	margin: 0;
 	padding: 0;
 	width: 100%;
 	border: black thin solid;
 	cursor: pointer;
-}
-#history p.dropped {
-	background: rgb(255, 128, 128)
 }
 #history p > span {
 	display: block;
@@ -79,16 +78,20 @@ body {
 	border-left: black thin solid;
 }
 #history p.selected > span {
-	background: #CCF;
+	background: #fcfcfc;
+	border-left: #38c 5px solid;
 	white-space: normal;
 	word-break: break-all;
 }
 #history p > span.cleaned::before {
-	content: " → ";
+	content: " ⯮ "
+}
+#history p.dropped > span.cleaned::before {
+	content: " ❌ ";
 }
 #history p .del {
 	text-decoration: line-through;
-	color: red;
+	color: #c11;
 }
 #history p .ins {
 	text-decoration: underline;
@@ -99,7 +102,7 @@ body {
 }
 #history p .url {
 	text-decoration: underline overline;
-	color: #339;
+	color: #38c;
 }
 
 #filters {
