@@ -109,8 +109,8 @@ async function populate_popup()
 		const enabled = document.querySelector('input#enabled');
 		enabled.checked = answer.enabled;
 		enabled.onchange = () => browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
-		document.querySelector('#toggle_off').onclick = () => enabled.checked = false;
-		document.querySelector('#toggle_on').onclick = () => enabled.checked = true;
+		document.querySelector('#toggle_off').onclick = () => { enabled.checked = false; enabled.onchange(); }
+		document.querySelector('#toggle_on').onclick = () => { enabled.checked = true; enabled.onchange(); }
 	})
 
 	await browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
