@@ -2,6 +2,9 @@
   "addon_description": {
     "message": "Converts obfuscated/nested links to genuine clean links"
   },
+  "no_cleaned_links": {
+    "message": "No links have been cleaned yet"
+  },
   "(usually same as top-level domain)": {
     "message": "(usually same as top-level domain)"
   },

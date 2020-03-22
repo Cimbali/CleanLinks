@@ -43,6 +43,14 @@ body {
 	display: flex;
 	align-items: center;
 }
+#history:empty::before {
+	content: '__MSG_no_cleaned_links__';
+	color: grey;
+	font-size: 1.5em;
+	display: block;
+	text-align: center;
+	margin-top: 1em;
+}
 #history {
 	height: 450px;
 
