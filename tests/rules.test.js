@@ -54,9 +54,6 @@ describe('Rules', function() {
 		{
 			let url = new URL('https://addons.mozilla.org/en-GB-firefox/addon/clean-links-webext/reviews?score=5');
 			let serialized_rule = {domain: url.host, path: '^' + url.pathname + '$', whitelist_path: true};
-			console.log(serialized_rule);
-			console.log(Rules.all_rules)
-			console.log(browser.storage.sync.contents.rules)
 
 			expect(Rules.exists(serialized_rule)).to.equal(false)
 			Rules.add(serialized_rule)
