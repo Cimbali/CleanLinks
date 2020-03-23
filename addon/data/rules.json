@@ -448,6 +448,9 @@
     ".disqus": {
       "/embed/comments": {
         "actions": {
+          "remove": [
+            "t_i"
+            ],
           "whitelist": [
             "t_u"
           ]
