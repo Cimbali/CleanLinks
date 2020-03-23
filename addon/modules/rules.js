@@ -88,8 +88,14 @@ function merge_rule_actions(actions, add)
 			actions[key] = Array.isArray(action) ? [...action] : action;
 
 		else if (Array.isArray(action))
-			// NB: n² merging
-			actions[key] = actions[key].concat(action.filter(val => !actions[key].includes(val)))
+		{
+			const cmp_as_string = action.length !== 0 && typeof action[0] === 'object';
+			const cmp_actions = cmp_as_string ? actions[key].map(sorted_stringify) : actions[key];
+
+			actions[key] = actions[key].concat(action.filter(val =>
+				!cmp_actions.includes(cmp_as_string ? sorted_stringify(val) : val)
+			))
+		}
 
 		else if (typeof action === 'boolean')
 			actions[key] = actions[key] || action
