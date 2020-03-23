@@ -424,6 +424,18 @@
         ]
       }
     },
+    ".dailymotion": {
+      ".www": {
+        "^/player/metadata/video/": {
+          "actions": {
+            "remove": [
+              "embedder",
+              "referer"
+            ]
+          }
+        }
+      }
+    },
     ".diepresse": {
       "actions": {
         "remove": [
