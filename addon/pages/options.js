@@ -263,6 +263,20 @@ function no_rule_loaded()
 }
 
 
+function sorted_actions(arr, is_rewrite)
+{
+	const strip = s => s.replace(/[^A-Za-z0-9]+/g, '')
+	const cmp_str = (a, b) => strip(a || '').localeCompare(strip(b || ''));
+
+	if (!is_rewrite)
+		return arr.slice().sort(cmp_str)
+
+	return arr.slice().sort((a, b) =>
+		cmp_str(a.search, b.search) || cmp_str(a.replace, b.replace) || cmp_str(a.flags, b.flags)
+	)
+}
+
+
 function load_rule()
 {
 	for (const list of document.querySelectorAll('span.itemlist, span.inheritlist, #parents'))
@@ -292,9 +306,9 @@ function load_rule()
 		if (!Array.isArray(action))
 			continue;
 
-		for (const val of rule[list])
+		for (const val of sorted_actions(rule[list], list === 'rewrite'))
 			show_rule_item(list, val, 'item');
-		for (const val of rule.inherited[list])
+		for (const val of sorted_actions(rule.inherited[list], list === 'rewrite'))
 			show_rule_item(list, val, 'inherit');
 	}
 
