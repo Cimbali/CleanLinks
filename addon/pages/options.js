@@ -328,7 +328,9 @@ function load_rule()
 
 function filter_rules()
 {
-	let search = document.getElementById('rule_filter').value;
+	const search = new RegExp(document.getElementById('rule_filter').value.replace(/\s+/, '')
+								.split('').map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*'), 'i');
+
 	for (const opt of document.querySelectorAll('#rule_selector option'))
 		opt.style.display = !search || opt.text.match(search) ? 'block' : 'none';
 }
@@ -493,7 +495,7 @@ function save_rule()
 
 function import_rules()
 {
-	let get_json = this.files[0].text();
+	const get_json = this.files[0].text();
 	return get_json.then(data => Rules.replace(JSON.parse(data))).catch(err => console.error('Error importing rules', err))
 			.then(() => window.location.reload());
 }
@@ -503,9 +505,9 @@ function export_rules()
 {
 	return Rules.loaded.then(() =>
 	{
-		let blob = new Blob([JSON.stringify(Rules.all_rules, null, 2)], {type : 'data:application/json;charset=utf-8'})
+		const blob = new Blob([JSON.stringify(Rules.all_rules, null, 2)], {type : 'data:application/json;charset=utf-8'})
 
-		let a = document.createElement('a');
+		const a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
 		a.download = 'clean_links_rules.json';
 		a.click();
