@@ -481,15 +481,19 @@ function save_rule()
 	selected_opt.setAttribute('rule', rule_str);
 	selected_opt.setAttribute('orig-rule', rule_str);
 
+	rule_pristine();
+	filter_rules();
+
 	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
 	if (replacing === null)
 		Queue.add(() => Rules.add(rule));
 	else
 		Queue.add(() => Rules.update(replacing, rule));
-	Queue.add(() => browser.runtime.sendMessage({action: 'rules'}));
-
-	rule_pristine();
-	filter_rules();
+	Queue.add(() =>
+	{
+		populate_rules();
+		browser.runtime.sendMessage({action: 'rules'}).catch(console.error);
+	});
 }
 
 
@@ -528,7 +532,7 @@ function reset_rules()
 }
 
 
-function prepopulate_rule(link)
+function fetch_rule(link)
 {
 	let url = new URL(link);
 	let rule = {...default_actions, domain: url.hostname, path: '^' + url.pathname + '$'};
@@ -551,14 +555,13 @@ function prepopulate_rule(link)
 		merge_rule_actions(rule.inherited, p)
 	}
 
-	insert_rule(true, rule);
+	return rule;
 }
 
 
 function populate_rules()
 {
-	let select = document.getElementById('rule_selector'), restore_selection = select.value;
-	select.onchange = null;
+	const select = document.getElementById('rule_selector'), restore_selection = select.value;
 
 	while (select.lastChild)
 		select.lastChild.remove();
@@ -603,13 +606,15 @@ function populate_rules()
 		input.onkeyup = delayed_save(check_val);
 	}
 
+	filter_rules();
+
 	if (restore_selection === '')
 		no_rule_loaded();
 	else
+	{
 		select.value = restore_selection;
-
-	filter_rules();
-	select.onchange = load_rule
+		load_rule();
+	}
 }
 
 
@@ -622,6 +627,7 @@ function add_listeners()
 	document.querySelector('input[name="subdomains"]').onchange = rule_changed
 	document.querySelector('input[name="whitelist_path"]').onchange = rule_changed
 
+	document.getElementById('rule_selector').onchange = load_rule
 	document.getElementById('rule_filter').onchange = filter_rules
 	document.getElementById('rule_filter').onkeyup = delayed_save(filter_rules)
 	document.getElementById('remove_rule').onclick = erase_rule
@@ -656,7 +662,7 @@ function add_listeners()
 	{
 		if (message.action === 'set prepopulate')
 		{
-			prepopulate_rule(message.link);
+			insert_rule(true, fetch_rule(message.link));
 			return browser.runtime.sendMessage({action: 'get prepopulate'}).catch(() => {});
 		}
 		else if (message.action === 'rules')
@@ -675,7 +681,7 @@ Prefs.loaded.then(populate_options).then(() =>
 	browser.runtime.sendMessage({action: 'get prepopulate'}).then(answer =>
 	{
 		if ('link' in answer)
-			prepopulate_rule(answer.link)
+			insert_rule(true, fetch_rule(answer.link));
 	})
 );
 Rules.loaded.then(populate_rules);
