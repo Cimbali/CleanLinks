@@ -90,6 +90,15 @@
       }
     },
     ".facebook": {
+      ".m": {
+        "^/comment/edit/": {
+          "actions": {
+            "whitelist": [
+              "redirect"
+            ]
+          }
+        }
+      },
       "actions": {
         "remove": [
           "hc_[a-zA-Z_%\\[\\]0-9]*",
