@@ -174,14 +174,14 @@ body {
 
 	left: 50%;
 	width: 20em;
-	bottom: 100%;
+	bottom: 50%;
 
 	background: white;
 	border:thin solid black;
 	padding: 5px;
 	border-radius: 6px;
 
-	text-align: center;
+	text-align: justify;
 }
 .help:hover .tooltiptext {
 	visibility: visible;

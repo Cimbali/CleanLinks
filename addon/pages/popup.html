@@ -57,7 +57,7 @@
 
 			<label i18n_title="Path elements replaced">
 				<input type="checkbox" name="rewrite" checked="checked" />
-				<img src="/icons/replace.png" />
+				<img src="/icons/replace.svg" />
 			</label>
 
 			<label i18n_title="Javascript link">
@@ -73,7 +73,11 @@
 	<p id="bottom">
 		<span class="help">
 			<span class="tooltip"></span>
-			<span i18n_text="This is a list of the last links cleaned in this tab: original version above cleaned version. Redirected links are marked ►, whereas ❌ marks links whose loading was denied. Whitelisting a link will prevent cleaning any further links originating from that domain." class="tooltiptext"></span>
+			<span i18n_html="This popup shows the last links cleaned in this tab: original version followed by cleaned version.
+				Cleaned links are prefixed with ► when redirected end ❌ when their loading was denied. &lt;br /&gt;
+				Refer to the &lt;a href=&quot;https://github.com/Cimbali/CleanLinks/wiki&quot;&gt;CleanLinks wiki page&lt;/a&gt;
+				for more details.
+			" class="tooltiptext"></span>
 		</span>
 		<span class="spacer"></span>
 
