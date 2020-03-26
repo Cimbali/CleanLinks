@@ -54,8 +54,9 @@
     ".bbc": {
       "actions": {
         "remove": [
-          "ocid",
-          "ns_\\w+"
+          "at_\\w+",
+          "ns_\\w+",
+          "ocid"
         ]
       }
     },
@@ -459,7 +460,7 @@
         "actions": {
           "remove": [
             "t_i"
-            ],
+          ],
           "whitelist": [
             "t_u"
           ]
@@ -478,6 +479,13 @@
       }
     },
     ".duckduckgo": {
+      "^/mapkit/$": {
+        "actions": {
+          "whitelist": [
+            "https.+"
+          ]
+        }
+      },
       "actions": {
         "whitelist": [
           "q"
@@ -523,6 +531,22 @@
       }
     },
     ".github": {
+      ".gist": {
+        "^/auth/github$": {
+          "actions": {
+            "whitelist": [
+              "return_to"
+            ]
+          }
+        },
+        "^/auth/github/callback$": {
+          "actions": {
+            "whitelist": [
+              "return_to"
+            ]
+          }
+        }
+      },
       "actions": {
         "remove": [
           "email_token",
@@ -1168,6 +1192,17 @@
         "remove": [
           "cuid"
         ]
+      }
+    },
+    ".zoom": {
+      ".us04web": {
+        "^/signup$": {
+          "actions": {
+            "whitelist": [
+              "pre"
+            ]
+          }
+        }
       }
     }
   },
