@@ -7,12 +7,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="512"
-   height="512"
-   viewBox="0 0 512 512"
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
    version="1.1"
    id="svg4"
-   sodipodi:docname="sync.svg"
+   sodipodi:docname="refresh.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
      id="metadata10">
@@ -37,20 +37,24 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="956"
+     inkscape:window-width="1920"
      inkscape:window-height="1015"
      id="namedview6"
      showgrid="false"
      inkscape:zoom="0.16296602"
-     inkscape:cx="648.53662"
+     inkscape:cx="-1121.9315"
      inkscape:cy="725.8383"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg4" />
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <path
-     d="M 436.88895,230.40001 A 177.06667,177.06667 0 0 1 385.68895,384 185.42933,185.42933 0 0 1 154.86228,407.04 l 49.92,-48.63999 L 21.315618,332.8 46.915619,512 102.80895,458.24 c 100.69333,74.24 243.2,66.98667 334.50667,-23.04 a 250.70934,250.70934 0 0 0 74.24,-190.29334 z M 126.27562,128 a 185.42933,185.42933 0 0 1 230.82667,-23.04 l -49.92,48.64 183.46666,25.6 -25.6,-179.200005 -55.89333,53.76 c -100.69333,-74.24 -243.2,-66.98666 -334.933335,23.04 C 21.315618,129.28001 -2.5777157,198.40001 0.40895104,267.09334 L 75.075619,282.02667 A 177.92,177.92 0 0 1 126.27562,128 Z"
+     d="m 27.295532,14.4 a 11.066667,11.066667 0 0 1 -3.2,9.6 11.589333,11.589333 0 0 1 -14.4266662,1.44 L 12.788865,22.4 1.3221995,20.8 l 1.6,11.2 3.4933332,-3.36 C 12.708865,33.28 21.615532,32.82667 27.322199,27.2 a 15.669334,15.669334 0 0 0 4.64,-11.89333 z M 7.8821995,8 A 11.589333,11.589333 0 0 1 22.308866,6.56 l -3.12,3.04 11.466666,1.6 -1.6,-11.2 -3.493333,3.36 c -6.293333,-4.64 -15.2,-4.18667 -20.9333329,1.44 -3.3066666,3.28 -4.8,7.6 -4.61333333,11.89333 L 4.6821995,17.62667 A 11.12,11.12 0 0 1 7.8821995,8 Z"
      id="path2"
      inkscape:connector-curvature="0"
-     style="fill-rule:evenodd;stroke-width:1" />
+     style="fill-rule:evenodd;stroke-width:0.0625" />
 </svg>

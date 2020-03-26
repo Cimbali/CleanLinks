@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="512"
-   height="512"
-   viewBox="0 0 512 512"
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
    version="1.1"
    id="svg4"
    sodipodi:docname="shield-x.svg"
@@ -41,16 +41,20 @@
      inkscape:window-height="1015"
      id="namedview6"
      showgrid="false"
-     inkscape:zoom="0.65186407"
-     inkscape:cx="-366.60732"
-     inkscape:cy="24.198833"
+     inkscape:zoom="0.92187501"
+     inkscape:cx="-302.66796"
+     inkscape:cy="-12.803709"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg4" />
+     inkscape:current-layer="svg4"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <path
-     d="M 216.64,16 8.64,76 V 256.608 C 8.64,396.704 166.4,496 216.64,496 c 20.16,0 57.6,-16 95.232,-44.16 L 290.656,430.624 C 261.088,452 232.512,464 216.64,464 c -42.496,0 -176,-86.08 -176,-207.488 V 100 l 176,-52 176,52 V 235.36 L 408,250.72 424.64,234.08 V 76 Z M 408,296 l -56,-56 -47.36,47.36 56,56 -56,56 47.36,47.36 56,-56 56,56 47.36,-47.36 -56,-56 56,-56 L 464,240 Z M 72.64,124 l 144,-44 v 352 c -34.752,0 -144,-72.832 -144,-175.552 z"
+     d="m 13.3442,1.3000002 -12.74,3.675 V 16.03724 c 0,8.58088 9.6628,14.66276 12.74,14.66276 1.2348,0 3.528,-0.98 5.83296,-2.7048 L 17.87768,26.69572 C 16.06664,28.005 14.31636,28.74 13.3442,28.74 c -2.60288,0 -10.78,-5.2724 -10.78,-12.70864 V 6.4450002 l 10.78,-3.185 10.78,3.185 V 14.7358 l 0.9408,0.9408 1.0192,-1.0192 V 4.9750002 Z M 25.065,18.45 l -3.43,-3.43 -2.9008,2.9008 3.43,3.43 -3.43,3.43 2.9008,2.9008 3.43,-3.43 3.43,3.43 2.9008,-2.9008 -3.43,-3.43 3.43,-3.43 L 28.495,15.02 Z M 4.5242,7.9150002 l 8.82,-2.695 V 26.78 c -2.12856,0 -8.82,-4.46096 -8.82,-10.75256 z"
      id="path2"
      inkscape:connector-curvature="0"
-     style="stroke-width:1" />
+     style="stroke-width:0.06125" />
 </svg>

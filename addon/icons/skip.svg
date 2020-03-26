@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="512"
-   height="512"
-   viewBox="0 0 135.46666 135.46667"
+   width="32"
+   height="32"
+   viewBox="0 0 2.1166667 2.1166667"
    version="1.1"
    id="svg836"
    sodipodi:docname="skip.svg"
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="-352.4989"
-     inkscape:cy="261.09066"
+     inkscape:zoom="0.64"
+     inkscape:cx="240.13206"
+     inkscape:cy="43.078195"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,7 +36,11 @@
      inkscape:window-height="1015"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <metadata
      id="metadata833">
     <rdf:RDF>
@@ -53,12 +57,12 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-161.53332)">
+     transform="translate(2.9416667,-193.93387)">
     <path
        inkscape:connector-curvature="0"
-       d="m 55.190128,258.20376 v -19.2914 H 3.3333333e-7 v -19.2914 H 55.190128 v -19.29141 l 34.404438,21.70284 v -21.70284 l 45.872104,28.93711 -45.872104,28.9371 v -21.70282 z"
+       d="m -2.079321,195.44434 v -0.30143 h -0.8623457 v -0.30143 h 0.8623457 v -0.30142 l 0.5375694,0.3391 v -0.3391 l 0.71675159,0.45214 -0.71675159,0.45214 v -0.33911 z"
        id="path819"
-       style="stroke-width:0.26458326"
+       style="stroke-width:0.00413411"
        sodipodi:nodetypes="cccccccccccc" />
   </g>
 </svg>

@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="512"
-   height="512"
-   viewBox="0 0 512.00001 511.99999"
+   width="32"
+   height="32"
+   viewBox="0 0 32.000001 31.999999"
    version="1.1"
    id="svg4"
    sodipodi:docname="shield-1.svg"
@@ -41,9 +41,9 @@
      inkscape:window-height="1015"
      id="namedview6"
      showgrid="false"
-     inkscape:zoom="32.000001"
-     inkscape:cx="247.99805"
-     inkscape:cy="195.57987"
+     inkscape:zoom="0.5"
+     inkscape:cx="276"
+     inkscape:cy="256"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -54,7 +54,7 @@
      fit-margin-bottom="0" />
   <g
      id="g825"
-     transform="translate(21.127868,-16)">
+     transform="matrix(0.06125,0,0,0.06125,0.38908194,-0.66)">
     <path
        style="stroke-width:1"
        inkscape:connector-curvature="0"
