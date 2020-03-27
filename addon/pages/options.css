@@ -5,362 +5,40 @@ label {
 	display: block;
 	margin: 1ex 0;
 }
-
-p.editor > label > span:first-child {
-	display:inline-block;
-	min-width: 20em;
-}
-.editor {
-	background: #F8F8F8;
-	border: black 2px solid;
-	display: none;
-	position: absolute;
-	width: 80%;
-	left: 10%;
-	right: 10%;
-	text-align: center;
-	padding: 1em 2em;
-	border-radius: 1em;
-}
-#parents {
-	border: grey thin solid;
-	background: #eef;
-	margin: 0 1em;
-	padding: .4em 1em .4em 2.5em;
-	text-indent: -1.5em;
-	border-radius: 1px;
-}
-#parents:empty::before {
-	content: attr(placeholder);
-	color: grey;
-	display: block;
-	text-align: center;
-}
-#parents > span {
-	display: inline-block;
-	text-indent: 0;
-}
-#parents span:not(:first-child)::before {
-	content: ' ❭ '
-}
-#matching {
-	margin-top: 1em;
-}
-p.editor > label > span:first-child {
-	margin-bottom: .5em;
-}
-.editor_fields {
-	text-align: left;
-}
-.editor button.ok,
-.editor button.cancel {
-	margin: 1em;
-}
-label[for="show_URL_legend"] {
-	display: inline-block;
-	position: relative;
-	top: -0.5em;
-	font-size: 80%;
-	background: #eee;
-	border: black thin solid;
-	padding: 1px 4px;
-	box-shadow: 2px 4px #aaa;
-	border-radius: 5px;
-}
-span.parsing_error {
-	float: right;
-	color: red;
-	font-weight:bold;
-}
-span.itemlist, span.inheritlist {
-	display: inline;
-}
-span.itemlist > span,
-span.inheritlist > span {
-	display: inline-block;
-	border: black thin solid;
-	padding: 5px;
-	margin: 2px 5px 2px 0px;
-	border-radius: 5px;
-}
-span.inheritlist > span {
-	background: #eee;
-}
-span.itemlist > span::after {
-	content: ' ❌';
-	padding: 0 2px;
-}
-
-/* Any siblings having or containing .enabled or .disabled will be visible based on the .toggle input value */
-input.toggle:not(:checked) ~ .enabled, input.toggle:not(:checked) ~ * .enabled {
-	display: none;
-}
-input.toggle:checked ~ .disabled, input.toggle:checked ~ * .disabled {
-	display: none;
-}
-
-input[type=number] {
-	width: 5em;
-}
-p.replace_editor > label {
-	display: inline-block;
-	width: calc(50% - 2ch - 2.5em);
-}
-p.replace_editor > input[type="text"] {
-	display: inline-block;
-	width: calc(50% - 4em);
-}
-#suffix_edit, label[for=suffix_edit] {
-	display: inline-block;
-	width: 30%;
-	margin-left: .5ch;
-}
-body > fieldset {
-	margin: 0 0 2em;
-}
 fieldset {
-	margin: 0 1em;
-}
-#rule_selector {
-	width: calc(100% - 2em);
-	margin: 0 1em;
-}
-fieldset fieldset legend {
-	font-size: 1.0em;
-}
-fieldset.example legend {
-	margin: 0 0 -1em 0;
-}
-#rule_legend {
-	margin-left: 1em;
-}
-#rule_buttons, #rule_legend {
-	display: flex;
-	align-items: flex-end;
-}
-#rule_buttons button {
-	flex-grow: 1;
-	text-align: center;
-	margin: 0 1em;
-}
-#rule_filter {
-	flex-grow: 1;
-	width: auto;
-	margin-left: 1em;
-}
-#user_rule_hide, #default_rule_hide {
-	display: none;
-}
-#rule_legend fieldset legend {
-	font-weight: normal;
-}
-#rule_legend fieldset {
-	border-radius: 5px;
-}
-.rule_filter_toggle {
-	padding: .25em;
-	border-radius: 3px;
-	display: inline !important;
-	cursor: pointer;
-}
-#rule_legend label[for="default_rule_hide"], #rule_selector option.default-rule {
-	color: darkblue;
-}
-#rule_legend label[for="user_rule_hide"], #rule_selector option.user-rule {
-	color: darkred;
-}
-#user_rule_hide:checked ~ #rule_legend label[for="user_rule_hide"],
-#default_rule_hide:checked ~ #rule_legend label[for="default_rule_hide"] {
-	opacity: 0.2;
-}
-#user_rule_hide:checked ~ #rule_selector option.user-rule,
-#default_rule_hide:checked ~ #rule_selector option.default-rule {
-	display: none !important;
-}
-#rule_selector {
-	height: 15em;
+	margin: 0 0 2em;
 }
 legend {
 	font-weight: bold;
 	font-size: 1.2em;
 }
-.URL {
-	font-size: 80%;
-	white-space: nowrap;
-	font-family: monospace;
-}
-.protocol { color: palevioletred; }
-.subdomain { color: cornflowerblue; }
-.domain { color: blue; }
-.suffix { color: indigo; }
-.fqdn { color: darkslateblue; }
-.path { color: green; }
-.query { color: orange; }
-.parameter { color: red; }
-
-#show_URL_legend {
-	display: none;
-}
-
-dl {
+#features, #display {
 	display: grid;
-	grid-template-columns: 25ch auto;
-}
-dt {
-	font-family: monospace;
-	grid-column-start: 1;
-}
-dd {
-	grid-column-start: 2;
-	margin: auto 0;
-}
-
-#matching, #cleaning, .editor_fields, #features, #display {
-	display: grid;
-	grid-template-columns: minmax(20%, max-content) auto;
+	grid-template-columns: max-content auto;
 	align-items: center;
 }
-#cleaning input[type="checkbox"],
-#matching input[type="checkbox"],
-.editor_fields input[type="checkbox"],
-#features input[type="checkbox"],
-#display input[type="checkbox"] {
-	grid-column: 2 / 3;
+input[type="checkbox"] {
+	grid-column-start: 2;
 	justify-self: start;
 }
-#cleaning p,
-#matching input[type="text"],
-.editor_fields input[type="text"],
-#display input[type="text"] {
-    grid-column: 1 / 3;
+input[type="text"] {
+    grid-column-start: 1;
+    grid-column-end: 3;
 }
-
-#reset_buttons {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+#reset button {
+	display: block;
+	margin: 0 auto .75em;
 }
-#reset_buttons button {
-	margin: 0 .5em;
-	white-space: nowrap;
-}
-#import_rules {
-	display: none;
-}
-
-.help {
-	position: relative;
-	font-weight: normal;
-}
-.tooltip {
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	cursor: help;
-	background: url("/icons/question.svg") center no-repeat;
-	background-size: 20px 20px;
-}
-
-.help .tooltiptext {
-	font-size: .8em;
-	visibility: hidden;
-	position: absolute;
-	z-index: 1;
-
-	left: 50%;
-	width: 20em;
-	bottom: 50%;
-
-	background: white;
-	border:thin solid black;
-	padding: 5px;
-	border-radius: 6px;
-
-	text-align: justify;
-}
-.help .tooltiptext.bottom {
-	top: 50%;
-	bottom: auto;
-}
-
-.help:hover .tooltiptext {
-	visibility: visible;
-}
-
-#add_rule:before {
-	content: '➕ ';
-}
-#save_rule:before {
-	content: '💾 ';
-}
-#remove_rule:before {
-	content: '❌ ';
-}
-
 
 @media only screen and (max-device-width: 480px) {
 	.not-android, .not-android + input {
 		display: none;
 	}
-	body > fieldset {
+	fieldset {
 		border: none;
 		padding: 0;
 	}
-	body > fieldset > fieldset {
-		margin: 0! important;
-	}
-	#rule_legend, #rule_selector {
-		margin: .5em 1em;
-	}
-	#rule_legend * {
-		margin: 0 !important;
-	}
-	#rule_selector {
-		height: 5em;
-	}
-	#parents {
-		margin: 0 !important;
-	}
-	#parents > span, .URL {
-		white-space: normal !important;
-		word-break: break-all;
-	}
 	#features, #display {
 		grid-template-columns: calc(100% - 2em) auto;
-	}
-	dl {
-		display: block;
-	}
-	dd {
-		margin: 0 0 0 3em;
-	}
-	#rule_buttons, #rule_legend, #reset_buttons {
-		flex-direction: column;
-		align-items: stretch !important;
-	}
-	#rule_buttons button, #rule_legend button, #reset_buttons button {
-		margin-top: .5ex;
-		margin-bottom: .5ex;
-	}
-	button {
-		min-width: 2em;
-		min-height: 2em;
-	}
-	.editor {
-		position: absolute;
-		width: auto !important;
-		left: 5px !important;
-		right: 5px !important;
-		padding: 1em 10px !important;
-	}
-	.help {
-		position: inherit !important;
-	}
-	.help .tooltiptext {
-		margin: 0 auto;
-		width: 80% !important;
-		bottom: auto !important;
-		left: 0 !important;
-		right: 0 !important;
 	}
 }

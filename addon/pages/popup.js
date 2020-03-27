@@ -259,6 +259,19 @@ async function add_tab_listeners(tab_id)
 		}
 	});
 
+	/* Add a button to open the rules editor?
+	const browser_version = await browser.runtime.getBrowserInfo().then(info => parseFloat(info.version)).catch(() => NaN);
+
+	document.querySelector('#options').onclick = () =>
+	{
+		const extra = browser_version > 57 ? { openerTabId: tab_id } : {};
+		browser.tabs.create({...extra, url: browser.runtime.getURL('/pages/rules.html'),  active: true });
+
+		if (!android)
+			window.close();
+	}
+	*/
+
 	// last one: start appending newly cleaned links
 	browser.runtime.onMessage.addListener(message =>
 	{
@@ -267,6 +280,8 @@ async function add_tab_listeners(tab_id)
 		else
 			return Promise.resolve('Popup page ignored unknown message ' + message.action)
 	});
+
+	return tab_id
 }
 
 

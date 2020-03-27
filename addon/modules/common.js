@@ -46,6 +46,18 @@ const pref_values = {
 const log = (...args) => { if (pref_values.debug) console.debug(...args); }
 
 
+// for onKeyUp: save after 400ms of inactivity
+function delayed_call(callback, delay)
+{
+	browser.alarms.onAlarm.addListener(callback);
+	return function()
+	{
+		browser.alarms.clear('save');
+		browser.alarms.create('save', {when: Date.now() + (delay || 400)});
+	}
+}
+
+
 // does DFS be able to sort array of objects (JSON.stringify does BFS)
 function sorted_stringify(val)
 {

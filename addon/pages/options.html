@@ -7,185 +7,12 @@
 </head>
 
 <body>
-	<fieldset id="rule_editor">
-		<legend i18n_text="Link cleaning rules">
-				<span class="help">
-					<span class="tooltip"></span>
-					<span class="tooltiptext bottom" i18n_html="
-						In this section, you can find and edit all the rules on which CleanLinks relies to whitelist embedded
-						URLs and clean other tracking parameters.
-						You can read more on &lt;a href=&quot;https://github.com/Cimbali/CleanLinks/wiki&quot;&gt;the
-						CleanLinks wiki&lt;/a&gt;.
-					">
-					</span>
-				</span>
-		</legend>
+	<fieldset id="rules">
+		<legend i18n_text="Rules"></legend>
 
-
-		<fieldset class="example">
-			<input type="checkbox" id="show_URL_legend" class="toggle noautosave" />
-
-			<legend i18n_text="URL example"> <label for="show_URL_legend">
-					<span class="enabled" i18n_text="Hide legend"></span>
-					<span class="disabled" i18n_text="Show legend"></span>
-			</label></legend>
-			<p class="URL">
-				<span class="protocol" i18n_title="Protocol">https</span>://<span class="subdomain" i18n_title="Subdomain">addons.</span><span class="domain" i18n_title="Domain name">mozilla.<span class="suffix" i18n_title="Public suffix">org</span></span><span class="path" i18n_title="Path">/en-GB/firefox/addon/clean-links-webext/reviews/</span><span class="query" i18n_title="Query">?<span class="parameter" i18n_title="Parameter">score</span>=5</span>
-			</p>
-
-			<dl class="enabled">
-				<dt class="protocol">https</dt> <dd i18n_text="Protocol"></dd>
-				<dt class="suffix">org</dt> <dd>
-					<a i18n_text="Public suffix" href="https://publicsuffix.org/"></a>
-					<span i18n_text="(usually same as top-level domain)"></span>
-				</dd>
-				<dt class="domain">mozilla.org</dt> <dd i18n_text="Domain name"></dd>
-				<dt class="subdomain">addons.</dt> <dd i18n_text="Subdomain"></dd>
-				<dt class="fqdn">addons.mozilla.org</dt> <dd i18n_text="Fully-Qualified Domain Name (FQDN)"></dd>
-				<dt class="path">/en-GB/firefox/addon/clean-links-webext/reviews/</dt> <dd i18n_text="Path"></dd>
-				<dt class="query">?score=5</dt> <dd i18n_text="Query"></dd>
-				<dt class="parameter">score</dt> <dd i18n_text="Parameter"></dd>
-			</dl>
-		</fieldset>
-
-		<input type="checkbox" id="default_rule_hide" class="noautosave" />
-		<input type="checkbox" id="user_rule_hide" class="noautosave" />
-
-		<h4 id="rule_legend">
-			<label for="rule_selector" i18n_text="Rule to edit:"></label>
-			<input type="text" id="rule_filter" i18n_placeholder="filter rules" class="noautosave" />
-			<fieldset><legend i18n_text="Rule origin"></legend>
-				<label class="rule_filter_toggle" for="default_rule_hide" i18n_text="Defaults"></label>
-				<label class="rule_filter_toggle" for="user_rule_hide" i18n_text="Modified"></label>
-			</fieldset>
-		</h4>
-
-		<select id="rule_selector" name="rule" size="2"></select>
-
-		<p id="rule_buttons">
-			<button id="add_rule" i18n_text="Add rule"></button>
-			<button id="save_rule" disabled="disabled" i18n_text="Save rule"></button>
-			<button id="remove_rule" disabled="disabled" i18n_text="Delete rule"></button>
+		<p i18n_text="CleanLinks Rules can be edited on">
+			<a href="/pages/rules.html" target="_blank" i18n_text="the CleanLinks rule editing page"></a>.
 		</p>
-
-		<p id="parents" i18n_placeholder="No rule selected"></p>
-
-		<fieldset id="matching">
-			<legend><span i18n_text="URLs matched"></span>
-				<span class="help">
-					<span class="tooltip"></span>
-					<span class="tooltiptext" i18n_html="
-						Defines for which URLs cleaning actions are taken or prevented. &lt;br /&gt;
-						The &lt;strong&gt;domain suffix&lt;/strong&gt; (see legend) can be either a domain or *
-						to catch domains with multiple TLDs such as google or amazon.
-						The rest of the &lt;strong&gt;domain&lt;/strong&gt; must match exactly,
-						except for the optional inclusion of subdomains. &lt;br /&gt;
-						The &lt;strong&gt;path&lt;/strong&gt; is matched as a &lt;a
-							href=&quot;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions&quot;
-						&gt;Regular Expression&lt;/a&gt;.
-						Leave empty to match all paths, and set to ^/$ to match an empty path.
-					">
-					</span>
-				</span>
-			</legend>
-
-			<label for="domain_edit" i18n_text="Domain"></label>
-			<span class="parsing_error" id="rule_error"></span>
-			<input type="text" name="domain" id="domain_edit" value="" i18n_placeholder="subdomain.domain.suffix" />
-
-			<label for="subdomains" i18n_text="Match subdomains"></label>
-			<input type="checkbox" name="subdomains" id="subdomains" checked="checked" />
-
-			<label for="path" i18n_text="Path"></label>
-			<span class="parsing_error" id="path_error"></span>
-			<input type="text" name="path" id="path" value="" i18n_placeholder="/path/in/link" />
-		</fieldset>
-
-		<fieldset id="cleaning">
-			<legend><span i18n_text="Cleaning actions"></span>
-				<span class="help">
-					<span class="tooltip"></span>
-					<span class="tooltiptext" i18n_html="
-						CleanLinks directly redirects URLs to any embedded URL inside the path, and also supports removing
-						tracking data from URLs.&lt;br /&gt;
-						Here we display the rules for the matched URL, as well as inherited rules from broader matches
-						(on a greyed background).
-					">
-					</span>
-				</span>
-			</legend>
-
-			<p class="editor" id="rewrite_editor">
-				<span class="parsing_error" id="search_edit_error"></span>
-
-				<span class="editor_fields">
-					<label for="search_edit" i18n_text="Remove from path:"></label>
-					<input type="text" name="search_edit" id="search_edit" value="" />
-
-					<label for="replace_edit" i18n_text="Replace with:"></label>
-					<input type="text" name="replace_edit" id="replace_edit" value="" />
-
-					<label for="rewrite_repeat" i18n_text="Replace all occurrences"></label>
-					<input type="checkbox" name="rewrite_repeat" id="rewrite_repeat" checked="checked" />
-
-					<label for="rewrite_icase" i18n_text="Ignore case"></label>
-					<input type="checkbox" name="rewrite_icase" id="rewrite_icase" checked="checked" />
-				</span>
-
-				<button class="ok" i18n_text="Add"></button><button class="cancel" i18n_text="Cancel"></button>
-			</p>
-
-			<p class="editor" id="remove_editor">
-				<span class="parsing_error" id="remove_edit_error"></span>
-
-				<span class="editor_fields">
-					<label for="remove_edit" i18n_text="Add to removed query parameters:"></label>
-					<input type="text" name="remove_edit" id="remove_edit" value="" />
-				</span>
-
-				<button class="ok" i18n_text="Add"></button><button class="cancel" i18n_text="Cancel"></button>
-			</p>
-
-			<p class="editor" id="whitelist_editor">
-				<span class="parsing_error" id="whitelist_edit_error"></span>
-
-				<span class="editor_fields">
-					<label for="whitelist_edit" i18n_text="Add to whitelisted query parameters:"></label>
-					<input type="text" name="whitelist_edit" id="whitelist_edit" value="" />
-				</span>
-
-				<button class="ok" i18n_text="Add"></button><button class="cancel" i18n_text="Cancel"></button>
-			</p>
-
-
-			<p>
-				<label for="remove_add" i18n_text="Remove query parameters:"></label>
-				<span id="remove_itemlist" class="itemlist"></span>
-				<span id="remove_inheritlist" class="inheritlist"></span>
-				<button id="remove_add" class="add_to_list" i18n_title="Add to the list">+</button>
-			</p>
-
-			<p>
-				<label for="whitelist_add" i18n_text="Whitelist query parameters (prevent removing and allow embedded URL):"></label>
-				<span id="whitelist_itemlist" class="itemlist"></span>
-				<span id="whitelist_inheritlist" class="inheritlist"></span>
-				<button id="whitelist_add" class="add_to_list" i18n_title="Add to the list">+</button>
-			</p>
-
-			<label i18n_text="Allow URL embedded inside path" for="whitelist_path"></label>
-			<input type="checkbox" name="whitelist_path" id="whitelist_path" value="" />
-
-			<label i18n_text="Allow javascript to modify links" for="allow_js"></label>
-			<input type="checkbox" name="allow_js" id="allow_js" value="" />
-
-			<p>
-				<label for="rewrite_add" i18n_text="Remove or replace in path:"></label>
-				<span id="rewrite_itemlist" class="itemlist"></span>
-				<span id="rewrite_inheritlist" class="inheritlist"></span>
-				<button id="rewrite_add" class="add_to_list" i18n_title="Add to the list">+</button>
-			</p>
-
-		</fieldset>
 	</fieldset>
 
 	<fieldset id="features">
@@ -250,11 +77,8 @@
 		<input type="checkbox" name="show_clean_count" id="show_clean_count" value="" />
 	</fieldset>
 
-	<fieldset id="reset_buttons">
-		<legend i18n_text="Rules"></legend>
-		<button name="export_rules" i18n_text="Export rules"></button>
-		<button name="import_rules" i18n_text="Import rules"></button><input type="file" accept="application/json" id="import_rules" />
-		<button name="reset_rules" i18n_text="Reset Rules" i18n_title="Reset rules to their default values."></button>
+	<fieldset id="reset">
+		<legend i18n_text="Reset"></legend>
 		<button name="reset_options" i18n_text="Reset Options" i18n_title="Reset options to their default values."></button>
 	</fieldset>
 

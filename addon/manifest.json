@@ -53,7 +53,8 @@
 
 	"options_ui":
 	{
-		"page": "pages/options.html"
+		"page": "pages/options.html",
+		"browser_style": true
 	},
 
 	"browser_action":
