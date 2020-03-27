@@ -276,9 +276,8 @@ function handle_message(message, sender)
 			return browser.windows.create({ url: message.link });
 		else if (message.target == new_tab)
 		{
-			return get_browser_version.then(v =>
-				browser.tabs.create(Object.assign({ url: message.link, active: Prefs.values.switch_to_tab },
-												  isNaN(v) || v < 57 ? {} : { openerTabId: tab_id })))
+			const extra = browser_version > 57 ? { openerTabId: tab_id } : {};
+			browser.tabs.create({...extra, url: message.link, active: Prefs.values.switch_to_tab })
 		}
 		else
 			return browser.tabs.update(tab_id, { url: message.link });
