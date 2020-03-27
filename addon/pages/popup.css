@@ -13,6 +13,18 @@ html, body {
 }
 body {
 	font-size: .8em;
+	/* do not set width directly to avoid scrollbars when in overflow menu */
+	max-width: 800px;
+}
+hr {
+	/* nasty hack to negociate a popup as big as possible */
+	min-width: 800px;
+	height: 0px;
+	margin: 0;
+	visibility: hidden;
+}
+#title:after {
+	content: 'ok';
 }
 #title a {
     color: #bbb;
@@ -202,6 +214,9 @@ input#enabled:not(:checked) ~ * .when_enabled {
 @media only screen and (max-device-width: 480px) {
 	body {
 		font-size: 2em !important;
+	}
+	hr {
+		display: none;
 	}
 	#icon {
 		text-align: center !important;
