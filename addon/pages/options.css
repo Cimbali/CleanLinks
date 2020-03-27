@@ -132,21 +132,43 @@ fieldset.example legend {
 	margin: 0 0 -1em 0;
 }
 #rule_legend {
-	margin: 1em 0 1em 1em;
+	margin-left: 1em;
 }
 #rule_buttons, #rule_legend {
 	display: flex;
-	align-items: baseline;
+	align-items: flex-end;
 }
 #rule_buttons button {
 	flex-grow: 1;
 	text-align: center;
 	margin: 0 1em;
 }
-#rule_legend input {
+#rule_filter {
 	flex-grow: 1;
 	width: auto;
-	margin: 0 1em;
+	margin-left: 1em;
+}
+#user_rule_hide, #default_rule_hide {
+	display: none;
+}
+#rule_legend fieldset legend {
+	font-weight: normal;
+}
+#rule_legend fieldset {
+	border-radius: 5px;
+}
+.rule_filter_toggle {
+	margin-left: .5em;
+	display: inline !important;
+}
+#user_rule_hide:checked ~ #rule_legend label[for="user_rule_hide"],
+#default_rule_hide:checked ~ #rule_legend label[for="default_rule_hide"] {
+	text-decoration: line-through;
+	opacity: 0.2;
+}
+#user_rule_hide:checked ~ #rule_selector option.user-rule,
+#default_rule_hide:checked ~ #rule_selector option.default-rule {
+	display: none !important;
 }
 #rule_selector {
 	height: 15em;

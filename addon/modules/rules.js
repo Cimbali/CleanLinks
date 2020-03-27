@@ -18,6 +18,28 @@
 const default_actions = {'whitelist': [], 'remove': [], 'rewrite': [], 'whitelist_path': false}
 
 
+function name_rule(rule)
+{
+	let domain = rule.domain || '*.*', path = rule.path || '';
+
+	if (domain.startsWith('.'))
+		domain = domain.substring(1)
+	else if (domain !== '*.*')
+		domain = '*.' + domain
+
+	if (path && !path.startsWith('/'))
+		path = '/' + path
+
+	return domain + path;
+}
+
+
+function id_rule(rule)
+{
+	return `${rule.domain || '*.*'}/${rule.path || ''}`;
+}
+
+
 function split_suffix(hostname)
 {
 	if (hostname === undefined || hostname === '' || hostname === '*')
@@ -331,8 +353,20 @@ function load_rules()
 
 let Rules = {
 	all_rules: {},
+	default_rules: {},
 	find: url => find_rules(Rules.all_rules, url),
 	serialize: () => serialize_rules(Rules.all_rules),
+	is_default: rule =>
+	{
+		const id = id_rule(rule);
+		if (!(id in Rules.default_rules))
+			return false;
+
+		const ref = Rules.default_rules[id];
+		return Object.keys(default_actions).reduce((same, actions) =>
+			same && sorted_stringify(rule[actions] || null) === sorted_stringify(ref[actions] || null),
+		true);
+	},
 	serialize_matching: url => serialize_rules(Rules.all_rules, url),
 	add: (new_rule) =>
 	{
@@ -355,7 +389,16 @@ let Rules = {
 		push_rule(Rules.all_rules, new_rule)
 		return save_rules(Rules.all_rules)
 	},
-	reload: () => PublicSuffixList.loaded.then(() => load_rules()).then(loaded => Rules.all_rules = loaded),
+	reload: () => Promise.all([
+		PublicSuffixList.loaded,
+		load_rules().then(loaded => Rules.all_rules = loaded),
+		load_default_rules().then(loaded =>
+		{
+			Rules.default_rules = {}
+			for (const rule of serialize_rules(loaded))
+				Rules.default_rules[id_rule(rule)] = rule;
+		}),
+	]),
 	replace: new_data => clear_rules().then(() =>
 	{
 		Rules.all_rules = new_data;

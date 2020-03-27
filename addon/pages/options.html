@@ -36,8 +36,16 @@
 			</dl>
 		</fieldset>
 
-		<h4 id="rule_legend"><label for="rule_selector" i18n_text="Rule to edit:"></label>
+		<input type="checkbox" id="default_rule_hide" class="noautosave" />
+		<input type="checkbox" id="user_rule_hide" class="noautosave" />
+
+		<h4 id="rule_legend">
+			<label for="rule_selector" i18n_text="Rule to edit:"></label>
 			<input type="text" id="rule_filter" i18n_placeholder="filter rules" class="noautosave" />
+			<fieldset><legend i18n_text="Rule origin"></legend>
+				<label class="rule_filter_toggle" for="default_rule_hide" i18n_text="Defaults"></label>
+				<label class="rule_filter_toggle" for="user_rule_hide" i18n_text="Modified"></label>
+			</fieldset>
 		</h4>
 
 		<select id="rule_selector" name="rule" size="2"></select>

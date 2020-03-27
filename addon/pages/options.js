@@ -225,28 +225,6 @@ function validate_item(list)
 }
 
 
-function name_rule(rule)
-{
-	let domain = rule.domain || '*.*', path = rule.path || '';
-
-	if (domain.startsWith('.'))
-		domain = domain.substring(1)
-	else if (domain !== '*.*')
-		domain = '*.' + domain
-
-	if (path && !path.startsWith('/'))
-		path = '/' + path
-
-	return domain + path;
-}
-
-
-function id_rule(rule)
-{
-	return `${rule.domain || '*.*'}/${rule.path || ''}`;
-}
-
-
 function no_rule_loaded()
 {
 	document.querySelector('input[name="domain"]').value = '';
@@ -432,6 +410,11 @@ function insert_rule(new_rule, rule)
 	if (!new_rule)
 		opt.setAttribute('orig-rule', opt.getAttribute('rule'));
 
+	if (new_rule || !Rules.is_default(rule))
+		opt.classList.add('user-rule');
+	else
+		opt.classList.add('default-rule');
+
 	if (rule !== undefined && 'parents' in rule)
 		opt.setAttribute('parents', JSON.stringify(rule.parents));
 
@@ -566,7 +549,7 @@ function populate_rules()
 	while (select.lastChild)
 		select.lastChild.remove();
 
-	for (let rule of Rules.serialize())
+	for (const rule of Rules.serialize())
 		insert_rule(false, rule)
 
 	for (const list of ['remove', 'whitelist', 'rewrite'])

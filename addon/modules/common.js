@@ -48,7 +48,7 @@ const log = (...args) => { if (pref_values.debug) console.log(...args); }
 // does DFS be able to sort array of objects (JSON.stringify does BFS)
 function sorted_stringify(val)
 {
-	if (['string', 'number', 'boolean'].includes(typeof val))
+	if (['string', 'number', 'boolean'].includes(typeof val) || val === null)
 		return JSON.stringify(val);
 
 	else if (Array.isArray(val))
