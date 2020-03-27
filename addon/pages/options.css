@@ -158,12 +158,19 @@ fieldset.example legend {
 	border-radius: 5px;
 }
 .rule_filter_toggle {
-	margin-left: .5em;
+	padding: .25em;
+	border-radius: 3px;
 	display: inline !important;
+	cursor: pointer;
+}
+#rule_legend label[for="default_rule_hide"], #rule_selector option.default-rule {
+	color: darkblue;
+}
+#rule_legend label[for="user_rule_hide"], #rule_selector option.user-rule {
+	color: darkred;
 }
 #user_rule_hide:checked ~ #rule_legend label[for="user_rule_hide"],
 #default_rule_hide:checked ~ #rule_legend label[for="default_rule_hide"] {
-	text-decoration: line-through;
 	opacity: 0.2;
 }
 #user_rule_hide:checked ~ #rule_selector option.user-rule,
