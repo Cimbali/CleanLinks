@@ -554,6 +554,15 @@
         ]
       }
     },
+    ".gog": {
+      "^/auth$": {
+        "actions": {
+          "whitelist": [
+            "redirect_uri"
+          ]
+        }
+      }
+    },
     ".googleusercontent": {
       ".translate": {
         "/translate.*": {
