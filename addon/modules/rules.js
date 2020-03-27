@@ -316,33 +316,16 @@ function save_rules(all_rules)
 }
 
 
-function load_default_rules(done)
+function load_default_rules()
 {
-	fetch(new Request(browser.runtime.getURL('/data/rules.json'))).then((response) =>
-	{
-		response.text().then(data =>
-		{
-			let rules = JSON.parse(data);
-			browser.storage.sync.set({rules: rules})
-			PublicSuffixList.loaded.then(() => done(rules));
-		})
-	})
+	return fetch(new Request(browser.runtime.getURL('/data/rules.json'))).then(response => response.text())
+		.then(data => JSON.parse(data));
 }
 
 
 function load_rules()
 {
-	return new Promise(done =>
-	{
-		let cached = browser.storage.sync.get({'rules': null})
-		cached.then(data =>
-		{
-			if (data.rules)
-				PublicSuffixList.loaded.then(() => done(data.rules));
-			else
-				load_default_rules(done);
-		})
-	});
+	return browser.storage.sync.get({'rules': null}).then(data => data.rules || load_default_rules());
 }
 
 
@@ -372,12 +355,17 @@ let Rules = {
 		push_rule(Rules.all_rules, new_rule)
 		return save_rules(Rules.all_rules)
 	},
-	reload: () => load_rules().then(loaded => Rules.all_rules = loaded),
+	reload: () => PublicSuffixList.loaded.then(() => load_rules()).then(loaded => Rules.all_rules = loaded),
 	replace: new_data => clear_rules().then(() =>
 	{
 		Rules.all_rules = new_data;
 		return save_rules(Rules.all_rules);
 	}),
-	reset: () => clear_rules().then(() => load_rules().then(loaded => Rules.all_rules = loaded)),
+	reset: () => clear_rules().then(() => load_default_rules()).then(loaded =>
+	{
+		Rules.all_rules = loaded;
+		browser.storage.sync.set({rules: loaded});
+		return loaded;
+	}),
 }
 Rules.loaded = Rules.reload()
