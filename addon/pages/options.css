@@ -261,6 +261,7 @@ dd {
 }
 
 .help .tooltiptext {
+	font-size: .8em;
 	visibility: hidden;
 	position: absolute;
 	z-index: 1;
@@ -276,6 +277,11 @@ dd {
 
 	text-align: justify;
 }
+.help .tooltiptext.bottom {
+	top: 50%;
+	bottom: auto;
+}
+
 .help:hover .tooltiptext {
 	visibility: visible;
 }
