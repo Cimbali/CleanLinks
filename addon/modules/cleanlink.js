@@ -21,11 +21,11 @@ const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComp
 
 function skip_link_type(link)
 {
-	return link.startsWith("view-source:") || link.startsWith("blob:") || link.startsWith("data:") || link.startsWith("magnet:")
+	return ['view-source:', 'blob:', 'data:', 'magnet:'].includes(link.protocol)
 }
 
 
-function getSimpleLinkSearchStrings(link, skip, whitelist_path)
+function get_simple_link_search_strings(link, skip, whitelist_path)
 {
 	let arr = [], vals = [];
 
@@ -57,20 +57,26 @@ function getSimpleLinkSearchStrings(link, skip, whitelist_path)
 }
 
 
-function getLinkSearchStrings(link, skip, whitelist_path)
+function no_hash_url(url)
 {
-	let arr = getSimpleLinkSearchStrings(link, skip, whitelist_path)
+	url = new URL(url.href);
+	url.hash = '';
+	return url;
+}
+
+
+function get_link_search_strings(link, skip, whitelist_path)
+{
+	let arr = get_simple_link_search_strings(link, skip, whitelist_path)
 
 	if (link.hash.startsWith('#!'))
 	{
-		let noHashLink = new URL(link.href), hashLink = null;
-		noHashLink.hash = '';
 		try
 		{
-			hashLink = new URL(link.hash.slice(2), noHashLink.href);
-			log('Parsing from hash-bang type URL: ' + hashLink.href);
+			const hash_link = new URL(link.hash.slice(2), no_hash_url(link).href);
+			log('Parsing from hash-bang type URL: ' + hash_link.href);
 
-			arr.push(...getSimpleLinkSearchStrings(hashLink, skip));
+			arr.push(...get_simple_link_search_strings(hash_link, skip));
 		}
 		catch (e)
 		{
@@ -83,26 +89,22 @@ function getLinkSearchStrings(link, skip, whitelist_path)
 	return arr
 }
 
-function get_base_url(base)
+
+function get_base_href(base)
 {
-	if (typeof base === 'string')
+	if (base instanceof URL)
+		return no_hash_url(base);
+
+	try
 	{
-		try
-		{
-			base = new URL(base);
-			base.hash = '';
-			return base.href;
-		}
-		catch (e) {}
+		if (base)
+			return no_hash_url(new URL(base));
 	}
+	catch (e) {}
 
 	// fall back on window.location if it exists
 	if (typeof window !== 'undefined')
-	{
-		base = new URL(window.location);
-		base.hash = '';
-		return base.href
-	}
+		return no_hash_url(new URL(window.location));
 
 	return undefined;
 }
@@ -134,7 +136,7 @@ function decode_embedded_uri(link, rules, original_string)
 	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$') : null;
 
 	// first try to find a base64-encoded link
-	for (let str of getLinkSearchStrings(link, skip, rules.whitelist_path))
+	for (let str of get_link_search_strings(link, skip, rules.whitelist_path))
 	{
 		let [base64match] = str.match(base64_encoded_url) || [], decoded;
 		if (base64match)
@@ -161,7 +163,7 @@ function decode_embedded_uri(link, rules, original_string)
 	let capture = undefined, matchedString, embedded_link;
 
 	// check every parsed (URL-decoded) substring in the URL
-	for (let str of getLinkSearchStrings(link, skip, rules.whitelist_path))
+	for (let str of get_link_search_strings(link, skip, rules.whitelist_path))
 	{
 		[, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
 		if (capture)
@@ -263,46 +265,43 @@ function filter_params_and_path(link, rules)
 }
 
 
-function clean_link(orig_link, base)
+function clean_link(link)
 {
-	if (!orig_link || skip_link_type(orig_link))
+	if (!link || skip_link_type(link))
 	{
-		log(`not cleaning ${orig_link} : empty or ignored orig_link type`);
-		return orig_link;
+		log(`not cleaning ${link.href}: empty or ignored link type`);
+		return {};
 	}
 
-	if (Prefs.values.ignhttp && !(/^https?:$/.test(orig_link.protocol)))
+	if (Prefs.values.ignhttp && link.protocol !== 'http:' && link.protocol !== 'https:')
 	{
-		log(`not cleaning ${orig_link} : ignoring non-http(s) links`);
-		return orig_link;
+		log(`not cleaning ${link.href} : ignoring non-http(s) links`);
+		return {};
 	}
 
-	base = get_base_url(base);
-	let link = new URL(orig_link, base)
-
-	let rules = Rules.find(link)
+	let cleaned_link = new URL(link.href), rules = Rules.find(cleaned_link), nesting = -1;
 
 	// first remove parameters or rewrite
-	link = filter_params_and_path(link, rules);
+	cleaned_link = filter_params_and_path(cleaned_link, rules);
 
-	for (let lmt = 4; lmt > 0; --lmt)
+	while (++nesting !== 4)
 	{
-		let embedded_link = decode_embedded_uri(link, rules, orig_link)
-		if (embedded_link.href === link.href)
+		const embedded_link = decode_embedded_uri(cleaned_link, rules, link.href)
+		if (embedded_link.href === cleaned_link.href)
 			break;
 
 		// remove parameters or rewrite again, if we redirected on an embedded URL
 		rules = Rules.find(embedded_link)
-		link = filter_params_and_path(embedded_link, rules);
+		cleaned_link = filter_params_and_path(embedded_link, rules);
 	}
 
-	if (link.href == new URL(orig_link, base).href)
+	if (cleaned_link.href === link.href)
 	{
-		log(`cleaning ${orig_link} : unchanged`)
-		return orig_link;
+		log(`cleaning ${link} : unchanged`)
+		return {};
 	}
 
-	log('cleaning ' + new URL(orig_link, base).href + ' : ' + link.href)
+	log('cleaning ' + link.href + ' : ' + cleaned_link.href)
 
-	return link.href;
+	return { cleaned_link, nesting };
 }

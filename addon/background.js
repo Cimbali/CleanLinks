@@ -88,109 +88,97 @@ function update_action(tab_id)
 }
 
 
-function clean_redirect_headers(details)
+function clean_redirect_headers({ documentUrl, originUrl, responseHeaders, statusCode, tabId, url })
 {
-	if (30 != parseInt(details.statusCode / 10) || 304 == details.statusCode)
+	if (30 !== parseInt(statusCode / 10) || 304 === statusCode)
 		return {};
 
-	let loc = details.responseHeaders.find(element => element.name.toLowerCase() == 'location')
+	let loc = responseHeaders.find(element => element.name.toLowerCase() === 'location')
 	if (!loc || !loc.value)
 		return {};
 
-	if (disabled_tabs.is_disabled(details.tabId))
+	if (disabled_tabs.is_disabled(tabId))
 		return {}
 
-	let dest = new URL(loc.value, details.url).href, clean_dest = clean_link(dest, details.url);
+	const link = new URL(loc.value, url), { cleaned_link } = clean_link(link);
 
-	if (clean_dest == dest)
+	if (!cleaned_link)
 		return {};
 
-	let cleaning_notif = { action: 'notify', url: clean_dest, orig: dest, type: 'header', tab_id: details.tabId };
+	let cleaning_notif = { action: 'notify', url: cleaned_link, orig: link.href, type: 'header', tab_id: tabId };
 
-	if (details.originUrl && clean_dest == new URL(details.originUrl).href ||
-			details.originUrl != details.documentUrl && clean_dest == new URL(details.documentUrl).href)
+	if (originUrl && cleaned_link.href === new URL(originUrl).href ||
+			originUrl !== documentUrl && cleaned_link.href === new URL(documentUrl).href)
 	{
 		/* Risking an infinite loop of redirects here.
 		 * Try it once (i.e. it's not in history yet), but if we already tried then allow it. */
-		if (cleaned_per_tab.get(details.tabId).history.some(historic_message =>
+		if (cleaned_per_tab.get(tabId).history.some(historic_message =>
 			Object.keys(cleaning_notif).every(key => cleaning_notif[key] === historic_message[key])
 		))
 		{
-			log(`Avoiding circular redirect ${dest} -> ${details.originUrl}` );
+			log(`Avoiding circular redirect ${link.href} -> ${originUrl}` );
 			return {};
 		}
 	}
 
 	handle_message(cleaning_notif);
-	return {redirectUrl: clean_dest};
+	return { redirectUrl: cleaned_link.href };
 }
 
 
-function on_request(details)
+function on_request({ documentUrl, frameAncestors, frameId, tabId, type, originUrl, url })
 {
-	let dest = details.url, current_page = details.originUrl;
-
-	if (!Prefs.values.httpall && (details.frameId !== 0 || typeof details.documentUrl !== 'undefined'))
+	if (!Prefs.values.httpall && frameId !== 0)
 	{
-		log('Disabled CleanLinks for tab ' + details.tabId);
+		log('CleanLinks enabled only for top-level requests');
 		return {};
 	}
 
-	else if (disabled_tabs.is_disabled(details.tabId))
+	if (disabled_tabs.is_disabled(tabId))
 	{
-		log('Disabled CleanLinks for tab ' + details.tabId);
+		log('Disabled CleanLinks for tab ' + tabId);
 		return {}
 	}
 
-	let urlpos = temporary_whitelist.indexOf(dest);
-	if (urlpos >= 0)
+	const current_url = new URL(documentUrl || originUrl), link = new URL(url, current_url.href);
+
+	const url_pos = temporary_whitelist.indexOf(link.href);
+	if (url_pos !== -1)
 	{
-		log('One-time whitelist for ' + JSON.stringify(dest));
-		temporary_whitelist.splice(urlpos, 1);
+		log('One-time whitelist for ' + JSON.stringify(link));
+		temporary_whitelist.splice(url_pos, 1);
 		return {};
 	}
 
-	let clean_dest = clean_link(dest, current_page);
+	const { cleaned_link, nesting } = clean_link(link);
 
-	if (!clean_dest || clean_dest === dest)
+	if (!cleaned_link)
 		return {};
 
-	let clean_url = new URL(clean_dest), contains_parent_url = false;
-	try
-	{
-		let current_url = new URL(current_page);
-		contains_parent_url = (clean_url.host + clean_url.pathname) === (current_url.host + current_url.pathname);
-	} catch(e) {
-		contains_parent_url = false;
-	}
-
-	for (let frame of details.frameAncestors)
-		if (!contains_parent_url)
-		{
-			let parent_url = new URL(frame.url);
-			contains_parent_url = (clean_url.host + clean_url.pathname) === (parent_url.host + parent_url.pathname);
-		}
+	// Check whether we have found an embedded link that is the current document
+	const contains_parent_url = nesting !== 0 &&
+								(cleaned_link.host + cleaned_link.pathname) === (current_url.host + current_url.pathname);
 
 
-	let cleaning_notif = { action: 'notify', url: clean_dest, orig: dest, tab_id: details.tabId };
-	if (details.type === 'main_frame')
+	let cleaning_notif = { action: 'notify', url: cleaned_link.href, orig: link.href, tab_id: tabId };
+	if (type === 'main_frame')
 		cleaning_notif.type = 'clicked';
 	// Google opens some-tab redirects in an iframe in the current document, so simple redirection is not enough.
 	// We need to cancel this request and direct the current tab to the cleaned destination URL.
-	else if (dest.match(/^https:\/\/www.google.[a-z.]+\/url\?/))
+	else if (link.hostname.startsWith('www.google.') && link.pathname.startsWith('/url'))
 		cleaning_notif.type = 'promoted';
 	else
 		cleaning_notif.type = 'request';
 
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
-	if (contains_parent_url && details.type != 'main_frame')
+	if (contains_parent_url && type !== 'main_frame')
 	{
 		handle_message({dropped: true, ...cleaning_notif});
 		return {cancel: true};
 	}
 
 	// Allowed requests when destination is self, to protect against infinite loops (see 42106fd).
-	else if (clean_dest == current_page)
+	else if (cleaned_link.href === current_url.href)
 		return {}
 
 
@@ -200,14 +188,14 @@ function on_request(details)
 	{
 		handle_message({
 			action: 'open url',
-			link: clean_dest,
+			link: cleaned_link.href,
 			target: same_tab,
-			tab_id: details.tabId
+			tab_id: tabId
 		})
 		return {cancel: true}
 	}
 	else
-		return {redirectUrl: clean_dest};
+		return {redirectUrl: cleaned_link.href};
 }
 
 
@@ -248,11 +236,13 @@ function handle_message(message, sender)
 		if (Prefs.values.show_clean_count && tab_id !== -1)
 			update_action(tab_id);
 
-		if (Prefs.values.highlight && tab_id !== -1)
+		if (Prefs.values.highlight && tab_id !== -1, message.orig)
 		{
 			let orig_tab = tab_id;
 			if (cleaned_per_tab.get(orig_tab).pending_highlight !== message.orig)
-				[orig_tab, ] = Object.entries(cleaned_per_tab).find(pair => typeof pair[1] !== 'function' && pair[1].pending_highlight === message.orig) || [];
+				[orig_tab, ] = Object.entries(cleaned_per_tab).find(([tab, data]) =>
+									typeof data !== 'function' && data.pending_highlight === message.orig
+								) || [];
 
 			if (orig_tab !== undefined)
 			{
@@ -263,18 +253,18 @@ function handle_message(message, sender)
 
 		// if the message was not broadcasted, do so (we won’t get it here) to alert open popups
 		if (sender === undefined)
-			browser.runtime.sendMessage(message)
+			browser.runtime.sendMessage(message).catch(() => {})
 
 		return Promise.resolve({});
 
 	case 'open bypass':
-		temporary_whitelist.push(message.link);
+		temporary_whitelist.push(new URL(message.link).href);
 		return Promise.resolve({});
 
 	case 'open url':
-		if (message.target == new_window)
+		if (message.target === new_window)
 			return browser.windows.create({ url: message.link });
-		else if (message.target == new_tab)
+		else if (message.target === new_tab)
 		{
 			const extra = browser_version > 57 ? { openerTabId: tab_id } : {};
 			browser.tabs.create({...extra, url: message.link, active: Prefs.values.switch_to_tab })
@@ -323,7 +313,7 @@ function handle_message(message, sender)
 				});
 			else if (changes.context_menu < 0)
 				browser.contextMenus.remove('copy-clean-link')
-			else if (changes.textcl != 0)
+			else if (changes.textcl !== 0)
 				browser.contextMenus.update('copy-clean-link',
 				{
 					title: 'Copy clean link',
@@ -371,13 +361,35 @@ function handle_message(message, sender)
 }
 
 
+function copy_clean_link({ linkUrl, selectionText }, { url })
+{
+	let link = linkUrl || selectionText;
+	if (!link)
+		return;
+
+	try
+	{
+		link = extract_javascript_link(link, url) || new URL(link, url);
+	}
+	catch (e)
+	{
+		return;
+	}
+
+	// Clean & copy
+	const { cleaned_link } = clean_link(link);
+	navigator.clipboard.writeText(cleaned_link ? cleaned_link.href : link.href);
+}
+
+
 Promise.all([Prefs.loaded, Rules.loaded, ...load_metadata()]).then(() =>
 {
 	browser.runtime.onMessage.addListener(handle_message);
 	browser.webRequest.onBeforeRequest.addListener(on_request, { urls: ['<all_urls>'] }, ['blocking']);
 
 	if (Prefs.values.progltr)
-		browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders']);
+		browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, { urls: ['<all_urls>'] },
+														 ['blocking', 'responseHeaders']);
 
 	// Auto update badge text for pages when loading is complete
 	browser.tabs.onCreated.addListener(info => { update_action(info.id); });
@@ -398,18 +410,7 @@ Promise.all([Prefs.loaded, Rules.loaded, ...load_metadata()]).then(() =>
 	browser.browserAction.setBadgeTextColor({color: '#FFFFFF'});
 
 	// Always add the listener, even if CleanLinks is disabled. Only add the menu item on enabled.
-	browser.contextMenus.onClicked.addListener((info, tab) =>
-	{
-		let link;
-		if ('linkUrl' in info && info.linkUrl)
-			link = info.linkUrl;
-		else if ('selectionText' in info && info.selectionText)
-			link = info.selectionText;
-
-		// Clean & copy
-		let clean_url = clean_link(extract_javascript_link(link, tab.url) || link, tab.url);
-		navigator.clipboard.writeText(clean_url);
-	});
+	browser.contextMenus.onClicked.addListener(copy_clean_link);
 
 	if (Prefs.values.context_menu)
 		browser.contextMenus.create({
@@ -429,7 +430,7 @@ function import_domain_whitelist(domains_list)
 		for (let fqdn of domains_list)
 			await Rules.add({domain: fqdn, ...actions})
 	});
-};
+}
 
 
 async function upgrade_options(prev_version)
@@ -550,10 +551,10 @@ async function upgrade_options(prev_version)
 }
 
 
-browser.runtime.onInstalled.addListener(details =>
+browser.runtime.onInstalled.addListener(({ reason, previousVersion }) =>
 {
-	if (details.reason === 'update')
-		return upgrade_options(details.previousVersion);
-	else if (details.reason === 'install')
+	if (reason === 'update')
+		return upgrade_options(previousVersion);
+	else if (reason === 'install')
 		load_default_rules().then(data => browser.storage.sync.set({default_rules: data}));
 });
