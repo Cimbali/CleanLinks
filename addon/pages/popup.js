@@ -34,7 +34,6 @@ function set_selected(evt)
 
 function filter_from_input(opt_iterable)
 {
-
 	let filter_cat = {}, filter_act = {};
 	for (let input of document.querySelectorAll('#filter_categories input'))
 		filter_cat[input.name] = input.checked;
@@ -109,8 +108,8 @@ async function populate_popup()
 		const enabled = document.querySelector('input#enabled');
 		enabled.checked = answer.enabled;
 		enabled.onchange = () => browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
-		document.querySelector('#toggle_off').onclick = () => { enabled.checked = false; enabled.onchange(); }
-		document.querySelector('#toggle_on').onclick = () => { enabled.checked = true; enabled.onchange(); }
+		document.querySelector('#toggle_off').addEventListener('click', e => { enabled.checked = false; enabled.onchange(); })
+		document.querySelector('#toggle_on').addEventListener('click', e => { enabled.checked = true; enabled.onchange(); })
 	})
 
 	await browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
@@ -125,28 +124,37 @@ async function populate_popup()
 		document.querySelector('button#clearlist').disabled = response.length === 0;
 	});
 
-	document.querySelector('#clearlist').onclick = () =>
-	{
-		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id});
-		// remove cleared (all) elements (should be in sendMessage.then())
-		const history = document.getElementById('history');
-		while (history.lastChild)
-			history.lastChild.remove();
-	}
+	return tab_id
+}
 
-	document.querySelector('#refresh').onclick = () =>
+
+async function add_tab_listeners(tab_id)
+{
+	document.querySelector('#clearlist').addEventListener('click', e =>
+	{
+		const history = document.getElementById('history');
+		const count = history.children.length;
+
+		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id}).catch(() => {}).then(() =>
+		{
+			for (let i = 0; i < count; i++)
+				history.firstChild.remove();
+		});
+	});
+
+	document.querySelector('#refresh').addEventListener('click', e =>
 	{
 		browser.tabs.reload(tab_id);
-	}
+	});
 
-	document.querySelector('#whitelist').onclick = () =>
+	document.querySelector('#whitelist').addEventListener('click', e =>
 	{
 		Rules.add(JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'))).then(() =>
 			browser.runtime.sendMessage({action: 'rules'})
 		)
-	}
+	});
 
-	document.querySelector('#blacklist').onclick = () =>
+	document.querySelector('#blacklist').addEventListener('click', e =>
 	{
 		let rules = JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'));
 
@@ -154,9 +162,9 @@ async function populate_popup()
 		delete rules.whitelist;
 
 		Rules.add(rules).then(() => browser.runtime.sendMessage({action: 'rules'}))
-	}
+	});
 
-	document.querySelector('#openonce').onclick = () =>
+	document.querySelector('#openonce').addEventListener('click', e =>
 	{
 		var selected = document.querySelector('#history .selected');
 		if (selected)
@@ -165,14 +173,9 @@ async function populate_popup()
 			browser.runtime.sendMessage({action: 'open bypass', link: url})
 							.then(() => browser.tabs.update(tab_id, {url: url}));
 		}
-	}
+	});
 
-	return tab_id
-}
-
-
-function start_appending_new_links(tab_id)
-{
+	// last one: start appending newly cleaned links
 	browser.runtime.onMessage.addListener(message =>
 	{
 		if (message.action === 'notify' && message.tab_id === tab_id)
@@ -187,26 +190,24 @@ async function add_listeners()
 {
 	const android = (await browser.runtime.getPlatformInfo()).os === 'android';
 
-	document.querySelector('#open_editor').onclick = () =>
+	document.querySelector('#open_editor').addEventListener('click', e =>
 	{
-		var selected = document.querySelector('#history .selected');
+		const selected = document.querySelector('#history .selected');
 		if (!selected)
 			return;
 
-		browser.runtime.sendMessage({action: 'set prepopulate', link: selected.firstChild.getAttribute('raw-url')}).then(() =>
-		{
-			browser.runtime.openOptionsPage();
-			if (!android)
-				window.close();
-		});
-	}
+		const link = selected.firstChild.getAttribute('raw-url');
+		browser.runtime.sendMessage({action: 'set prepopulate', link })
+			.then(() => browser.runtime.openOptionsPage())
+			.then(() => { if (!android) window.close(); });
+	});
 
-	document.querySelector('#options').onclick = () =>
+	document.querySelector('#options').addEventListener('click', e =>
 	{
 		browser.runtime.openOptionsPage();
 		if (!android)
 			window.close();
-	}
+	});
 
 	document.addEventListener('keyup', e =>
 	{
@@ -249,4 +250,4 @@ async function add_listeners()
 
 apply_i18n();
 add_listeners()
-Prefs.loaded.then(populate_popup).then(start_appending_new_links);
+Prefs.loaded.then(populate_popup).then(add_tab_listeners);
