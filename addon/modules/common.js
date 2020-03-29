@@ -42,7 +42,7 @@ const pref_values = {
 }
 
 
-const log = (...args) => { if (pref_values.debug) console.log(...args); }
+const log = (...args) => { if (pref_values.debug) console.debug(...args); }
 
 
 // does DFS be able to sort array of objects (JSON.stringify does BFS)
