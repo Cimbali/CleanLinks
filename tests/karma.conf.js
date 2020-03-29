@@ -1,6 +1,6 @@
 module.exports = config => Object.assign(config,
 {
-	basePath: '../addon/',
+	basePath: '../',
 	frameworks: [
 		'mocha',
 		'chai',
@@ -16,27 +16,26 @@ module.exports = config => Object.assign(config,
 
 	files: [
 		// Help setup shim environments
-		'../tests/setup.js',
+		'tests/setup.js',
 
 		// The files to be tested have to be served
-		"modules/common.js",
-		"modules/punycode.js",
-		"modules/publicsuffixlist.js",
-		"modules/rules.js",
-		"modules/cleanlink.js",
+		"addon/modules/common.js",
+		"addon/modules/punycode.js",
+		"addon/modules/publicsuffixlist.js",
+		"addon/modules/rules.js",
+		"addon/modules/cleanlink.js",
 
-		{type: 'css', included: false, served: true, nocache: true, pattern: "data/*"},
-		{type: 'css', included: false, served: true, nocache: false, pattern: "manifest.json"},
+		{type: 'css', included: false, served: true, nocache: true, pattern: "addon/data/*"},
+		{type: 'html', included: false, served: true, nocache: true, pattern: "addon/pages/*.html"},
+		{type: 'css', included: false, served: true, nocache: false, pattern: "addon/manifest.json"},
 
 		// The tests, finally
-		'../tests/*.test.js',
+		'tests/*.test.js',
 	],
 
 	proxies: {
-		'/modules/': 'http://localhost:9876/base/modules/',
-		'/icons/': 'http://localhost:9876/base/icons/',
-		'/data/': 'http://localhost:9876/base/data/',
-		'/manifest.json': 'http://localhost:9876/base/manifest.json',
+		// css URLs don’t get rewritten
+		'/icons/': 'http://localhost:9876/base/addon/icons/',
 	},
 
 	reporters: ['progress'],

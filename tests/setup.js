@@ -5,7 +5,7 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined')
 	var browser = chrome;
 
 // sinon-chrome does not get the manifest
-browser.runtime = Object.assign({
+browser.runtime = {
 	getManifest: () => ({
 		"name": "Clean Links",
 		"description": "Converts obfuscated/nested links to genuine clean links",
@@ -13,9 +13,10 @@ browser.runtime = Object.assign({
 		"version": "tests",
 		"homepage_url": "https://github.com/Cimbali/CleanLinks",
 	}),
-	getURL: url => ('/' + url.replace(/^\/+/, '')),
-	onMessage: {addListener: () => {}}
-}, browser.runtime)
+	getURL: url => ('/base/addon/' + url.replace(/^\/+/, '')),
+	onMessage: {addListener: () => {}},
+	...browser.runtime
+}
 
 // sinon-chrome also does not handle storage
 browser.storage.sync = browser.storage.local = {
@@ -38,23 +39,23 @@ browser.storage.sync = browser.storage.local = {
 		else
 			return Promise.reject('Unknown type of key ' + keys)
 
-		let result = Object.entries(this.contents).filter(pair => key_filter(pair[0]))
-												 .reduce((obj, pair) => ({...obj, [pair[0]]: JSON.parse(pair[1])}),
-														 defaults);
+		const result = Object.entries(this.contents)
+			.filter(pair => key_filter(pair[0]))
+			.reduce((obj, pair) => ({...obj, [pair[0]]: JSON.parse(pair[1])}), defaults);
+
 		return Promise.resolve(result);
 	},
 	set: function(keys)
 	{
 		try
 		{
-			for (let [key, val] of Object.entries(keys))
+			for (const [key, val] of Object.entries(keys))
 				this.contents[key] = JSON.stringify(val)
 		}
 		catch(e)
 		{
 			return Promise.reject(e);
 		}
-		console.log('Save OK')
 		return Promise.resolve();
 	},
 	remove: function(keys)

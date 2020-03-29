@@ -79,8 +79,8 @@ function update_action(tab_id)
 		{
 			path:
 			{
-				16: 'icons/16' + (enabled ? '' : '-off') + '.png',
-				32: 'icons/32' + (enabled ? '' : '-off') + '.png'
+				16: browser.runtime.getURL('/icons/16' + (enabled ? '' : '-off') + '.png'),
+				32: browser.runtime.getURL('/icons/32' + (enabled ? '' : '-off') + '.png')
 			},
 			tabId: tab_id
 		})
