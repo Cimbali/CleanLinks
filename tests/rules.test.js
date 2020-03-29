@@ -10,7 +10,6 @@ describe('find_rules', function() {
 		Rules.loaded.then(() =>
 		{
 			let result = Rules.find(so_login)
-			console.log(so_login.href + '\nfound: ' + JSON.stringify(result))
 			expect(result.whitelist).to.have.members(['returnurl'])
 		})
 	);
@@ -18,7 +17,6 @@ describe('find_rules', function() {
 		Rules.loaded.then(() =>
 		{
 			let result = Rules.find(google_search)
-			console.log(google_search.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
 			expect(result.whitelist).to.have.members(['q'])
 		})
 	);
@@ -26,7 +24,6 @@ describe('find_rules', function() {
 		Rules.loaded.then(() =>
 		{
 			let result = Rules.find(amazon_url)
-			console.log(amazon_url.href + '\nrewrites found: ' + JSON.stringify(result.rewrite))
 			expect(result.rewrite).to.deep.equal([{search: '/ref=[^/]*', replace: '', flags: ''}])
 		})
 	);
@@ -34,7 +31,6 @@ describe('find_rules', function() {
 		Rules.loaded.then(() =>
 		{
 			let result = Rules.find(cdn9gag_url)
-			console.log(cdn9gag_url.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
 			expect(result.whitelist).to.have.members(['url', 'ref'])
 		})
 	);
@@ -42,7 +38,6 @@ describe('find_rules', function() {
 		Rules.loaded.then(() =>
 		{
 			let result = Rules.find(wayback)
-			console.log(wayback.href + '\nfound: ' + JSON.stringify(Object.keys(result)))
 			expect(result.whitelist_path).to.equal(true)
 		})
 	);
@@ -59,14 +54,12 @@ describe('Rules', function() {
 			Rules.add(serialized_rule)
 			expect(Rules.exists(serialized_rule)).to.equal(true)
 
-			console.log('Rule added, reloading')
 			await Rules.reload()
 
 			expect(Rules.exists(serialized_rule)).to.equal(true)
 			Rules.remove(serialized_rule)
 			expect(Rules.exists(serialized_rule)).to.equal(false)
 
-			console.log('Rule popped, reloading')
 			await Rules.reload()
 
 			expect(Rules.exists(serialized_rule)).to.equal(false)

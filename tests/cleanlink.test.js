@@ -160,7 +160,6 @@ describe('extract_javascript_link + wrapped_cl', function() {
 	{
 		let rel_url = "javascript:displayWindowzdjecie('/_misc/zdj_wym.php?url_zdjecie=https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg',1100,778);";
 		let unjs_url = extract_javascript_link(rel_url, 'http://somedomain.com/a/page.html?foo=qux')
-		console.log('After cleaning JS link: ', unjs_url)
 		return Rules.loaded.then(() => expect(wrapped_cl(unjs_url, 'http://somedomain.com/a/page.html?foo=qux')).to
 			.equal('https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg')
 		)

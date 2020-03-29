@@ -507,7 +507,6 @@ async function upgrade_options(prev_version)
 		get_old_rules.catch(() =>
 		{
 			fallback = true;
-			console.log('Falling back')
 			return Rules.all_rules;
 		});
 
