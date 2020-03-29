@@ -436,6 +436,13 @@
     },
     ".dailymotion": {
       ".www": {
+        "^/embed/video/\\w+": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        },
         "^/player/metadata/video/": {
           "actions": {
             "remove": [
