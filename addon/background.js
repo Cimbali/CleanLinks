@@ -352,14 +352,15 @@ function handle_message(message, sender)
 		return Rules.reload()
 
 	case 'set prepopulate':
-		return Promise.resolve(prepopulate_link = message.link);
+		prepopulate_link = message.link;
+		return Promise.resolve({});
 
 	case 'get prepopulate':
 		if (prepopulate_link)
 		{
 			let link = prepopulate_link;
 			prepopulate_link = undefined;
-			return Promise.resolve({link: link});
+			return Promise.resolve({ link });
 		}
 		else
 			return Promise.resolve({})
