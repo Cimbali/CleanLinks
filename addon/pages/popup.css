@@ -65,7 +65,6 @@ hr {
 }
 #history {
 	height: 450px;
-	background: #eef;
 
 	display: block;
 	border-top: black thin solid;
@@ -75,7 +74,6 @@ hr {
 	padding-right: 1px;
 }
 #history p {
-	background: white;
 	margin: 0;
 	padding: 0;
 	width: 100%;
@@ -90,13 +88,16 @@ hr {
 	border-left: black thin solid;
 }
 #history p.selected > span {
-	background: #fcfcfc;
+	background-color: #eef;
 	border-left: #38c 5px solid;
 	white-space: normal;
 	word-break: break-all;
 }
 #history p > span.cleaned::before {
 	content: " ► "
+}
+#history p.dropped {
+	background-color: #f031;
 }
 #history p.dropped > span.cleaned::before {
 	content: " ❌ ";
