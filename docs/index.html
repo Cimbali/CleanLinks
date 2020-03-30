@@ -39,10 +39,13 @@
 		if (link)
 			Rules.loaded.then(() =>
 			{
-				const li = cleaned_link_item(document.createElement('li'), link, clean_link(link), []);
+				const url = new URL(link);
+				const clean = (clean_link(url).cleaned_link || url).href;
+				const li = cleaned_link_item(document.createElement('li'), link, clean, []);
 				document.querySelector('ul#clean_history').prepend(li);
 				document.querySelector('#paste_link input').value = '';
 			})
+			.catch(console.error)
 	}
 
 	window.addEventListener('load', () =>
