@@ -140,19 +140,17 @@
     },
     ".google": {
       ".accounts": {
-        "/signin/.+/identifier(/.+)?|/ServiceLogin": {
-          "actions": {
-            "whitelist": [
-              "continue"
-            ]
-          }
-        },
         "\\boauth2\\b": {
           "actions": {
             "whitelist": [
               "parent"
             ]
           }
+        },
+        "actions": {
+          "whitelist": [
+            "continue"
+          ]
         }
       },
       ".consent": {
@@ -179,6 +177,13 @@
               "continue"
             ]
           }
+        }
+      },
+      ".myaccount": {
+        "actions": {
+          "whitelist": [
+            "continue"
+          ]
         }
       },
       ".ogs": {
@@ -594,6 +599,13 @@
           }
         }
       },
+      "^/login$": {
+        "actions": {
+          "whitelist": [
+            "return_to"
+          ]
+        }
+      },
       "actions": {
         "remove": [
           "email_token",
@@ -956,11 +968,28 @@
       }
     },
     ".youtube": {
+      ".accounts": {
+        "^/accounts/": {
+          "actions": {
+            "whitelist": [
+              "continue",
+              "pmpo"
+            ]
+          }
+        }
+      },
       ".www": {
         "^/get_video_info$": {
           "actions": {
             "remove": [
               "eurl"
+            ]
+          }
+        },
+        "^/signin$": {
+          "actions": {
+            "whitelist": [
+              "next"
             ]
           }
         }
