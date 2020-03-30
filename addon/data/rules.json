@@ -65,11 +65,14 @@
         "remove": [
           "cvid",
           "form",
-          "sk",
-          "sp",
-          "sc",
+          "qp",
           "qs",
-          "qp"
+          "sc",
+          "sk",
+          "sp"
+        ],
+        "whitelist": [
+          "q"
         ]
       }
     },
@@ -193,19 +196,19 @@
             ]
           }
         },
-        "/searchbyimage": {
-          "actions": {
-            "whitelist": [
-              "image_url"
-            ]
-          }
-        },
         "^/recaptcha/api2/anchor$": {
           "actions": {
             "whitelist": [
               "co"
             ]
           }
+        }
+      },
+      "/searchbyimage": {
+        "actions": {
+          "whitelist": [
+            "image_url"
+          ]
         }
       },
       "actions": {
@@ -301,10 +304,20 @@
       }
     },
     ".yandex": {
+      "^/images/search$": {
+        "actions": {
+          "whitelist": [
+            "url"
+          ]
+        }
+      },
       "actions": {
         "remove": [
           "lr",
           "redircnt"
+        ],
+        "whitelist": [
+          "text"
         ]
       }
     },
@@ -824,6 +837,15 @@
           "sr",
           "sr_share"
         ]
+      }
+    },
+    ".tineye": {
+      "^/search$": {
+        "actions": {
+          "whitelist": [
+            "url"
+          ]
+        }
       }
     },
     ".vitamix": {
