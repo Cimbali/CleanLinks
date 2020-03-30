@@ -512,6 +512,20 @@
       }
     },
     ".duckduckgo": {
+      ".external-content": {
+        "^/ip\\d+/": {
+          "actions": {
+            "whitelist_path": true
+          }
+        },
+        "^/iu/$": {
+          "actions": {
+            "whitelist": [
+              "u"
+            ]
+          }
+        }
+      },
       "^/mapkit/$": {
         "actions": {
           "whitelist": [
