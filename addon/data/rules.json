@@ -1,5 +1,18 @@
 {
   ".*": {
+    ".*": {
+      ".proxy": {
+        ".": {
+          "^/$": {
+            "actions": {
+              "whitelist": [
+                "mortyurl"
+              ]
+            }
+          }
+        }
+      }
+    },
     ".amazon": {
       "/ap/signin": {
         "actions": {
@@ -1255,6 +1268,20 @@
     "actions": {
       "whitelist": [
         "SigAlg"
+      ]
+    }
+  },
+  "^/autocompleter$": {
+    "actions": {
+      "whitelist": [
+        "url"
+      ]
+    }
+  },
+  "^/image_proxy$": {
+    "actions": {
+      "whitelist": [
+        "url"
       ]
     }
   },
