@@ -68,8 +68,8 @@ function embed_url_pos(haystack, clean_url)
 
 function remove_js(orig)
 {
-	let js_cleaned_link = extract_javascript_link(orig), prefix = null, suffix = null;
-	if (js_cleaned_link && js_cleaned_link !== orig)
+	let js_cleaned_link = extract_javascript_link(orig);
+	if (js_cleaned_link)
 	{
 		let start = orig.indexOf(js_cleaned_link);
 		let end = start + js_cleaned_link.length;
