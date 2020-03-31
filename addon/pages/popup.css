@@ -23,9 +23,6 @@ hr {
 	margin: 0;
 	visibility: hidden;
 }
-#title:after {
-	content: 'ok';
-}
 #title a {
     color: #bbb;
 	text-decoration: none;
