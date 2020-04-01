@@ -149,11 +149,16 @@ function on_click(evt)
 	const base = (node.ownerDocument.defaultView || window).location.href;
 	let cleaned_link = extract_javascript_link(text_link, base);
 
+	// report that we cleaned the javascript from the node’s href
+	if (cleaned_link && href)
+		event_type = 'href';
+
 	try
 	{
-		// NB: if event_type is not undefined, we need to prevent the click event,
+		// NB: if there is an identified javascript event (i.e. event_type defined), or if we
+		// need to override the link’s target attribute, we need to prevent the click event,
 		// and perform the action of activating the link manually, even if the link is clean.
-		if (event_type && href && !cleaned_link)
+		if (href && !cleaned_link && (event_type || !Prefs.values.gotarget))
 			cleaned_link = new URL(href, base);
 	}
 	catch(e) {}
@@ -162,18 +167,16 @@ function on_click(evt)
 		return;
 
 	log(`Cleaning javascript ${text_link} to ${cleaned_link}`)
-	if (event_do_click(cleaned_link, node, evt))
-	{
-		// instead of blinking the URL bar, tell the background to show a notification.
+	if (event_do_click(cleaned_link, node, evt) && event_type)
+		// Only notify if we managed to clean, and we did not come here only to override target
 		browser.runtime.sendMessage({
 			action: 'notify',
 			url: cleaned_link,
 			orig: text_link,
 			type: 'clicked',
 			parent: base,
-			cleaned: {javascript: event_type || 'href'}
+			cleaned: {javascript: event_type}
 		}).catch(() => {});
-	}
 }
 
 
