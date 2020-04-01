@@ -140,7 +140,8 @@ function on_request({ documentUrl, frameAncestors, frameId, tabId, type, originU
 		return {}
 	}
 
-	const current_url = new URL(documentUrl || originUrl), link = new URL(url, current_url.href);
+	const current_url = (documentUrl || originUrl) ? new URL(documentUrl || originUrl) : {};
+	const link = new URL(url, current_url.href);
 
 	const url_pos = temporary_whitelist.indexOf(link.href);
 	if (url_pos !== -1)
