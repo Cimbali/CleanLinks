@@ -52,7 +52,7 @@ function event_do_click(url, node, evt)
 				case '_self':
 					break;
 				default:
-					wnd = Array.from(frames).find(f => f.name == target);
+					wnd = Array.from(frames).find(f => f.name === target);
 			}
 
 			if (wnd)
@@ -86,27 +86,39 @@ function event_do_click(url, node, evt)
 }
 
 
-function on_click(evt)
+function find_click_target(node, searchevents)
 {
-	let node = evt.target, text_link = '', url;
-
 	do
 	{
 		if (node.nodeName === 'A')
-		{
-			text_link = node.href
-			break;
-		}
+			return { node, link: node.href };
 
 		for (let evttype of ['onclick', 'onmouseup', 'onmousedown'])
-			if (node[evttype] !== null)
-			{
-				text_link = node[evttype].toString();
-				text_link = text_link.slice(text_link.indexOf('{') + 1, text_link.lastIndexOf('}'))
-				break;
-			}
+			if (searchevents && node[evttype] !== null)
+				return { node, link: node[evttype].toString().slice(text_link.indexOf('{') + 1, text_link.lastIndexOf('}')) }
 
-	} while (!text_link && ['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
+	} while (['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
+
+	return {}
+}
+
+
+function on_pre_click(evt)
+{
+	const { link, node } = find_click_target(evt.target, false);
+
+	// This is a valid link: cancel onmousedown trickeries by stopping the event.
+	if (link)
+	{
+		evt.stopPropagation();
+		evt.preventDefault();
+	}
+}
+
+
+function on_click(evt)
+{
+	const { link : text_link, node } = find_click_target(evt.target, true);
 
 	if (!text_link)
 		return;
@@ -147,9 +159,15 @@ function toggle_active(enabled)
 	tab_enabled = enabled;
 
 	if (enabled)
+	{
 		window.addEventListener('click', on_click, {capture: true});
+		window.addEventListener('mousedown', on_pre_click, {capture: true});
+	}
 	else
+	{
 		window.removeEventListener('click', on_click, {capture: true});
+		window.removeEventListener('mousedown', on_pre_click, {capture: true});
+	}
 }
 
 browser.runtime.sendMessage({action: 'check tab enabled'})
