@@ -1,5 +1,6 @@
 .disabled, button:disabled {
-	 background-color: #ddd;
+	opacity: .4;
+	background-color: #666;
 }
 button {
 	padding: 0 5px;
