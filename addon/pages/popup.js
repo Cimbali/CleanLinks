@@ -15,16 +15,17 @@
 
 function set_selected(evt)
 {
-	var selected = document.querySelector('#history .selected');
+	const selected = document.querySelector('#history .selected');
 	if (selected) selected.classList.remove('selected');
 
-	var target = evt.target;
+	let target = evt.target;
 	while (target && target.tagName !== 'P')
 		target = target.parentNode;
 
 	if (target)
 		target.classList.add('selected');
 
+	document.querySelector('#copy').disabled = !target;
 	document.querySelector('#openonce').disabled = !target;
 	document.querySelector('#whitelist').disabled = !target || !target.hasAttribute('actions');
 	document.querySelector('#blacklist').disabled = !target || !target.hasAttribute('actions');
@@ -166,7 +167,7 @@ async function add_tab_listeners(tab_id)
 
 	document.querySelector('#openonce').addEventListener('click', e =>
 	{
-		var selected = document.querySelector('#history .selected');
+		const selected = document.querySelector('#history .selected');
 		if (selected)
 		{
 			const url = selected.querySelector('.original').getAttribute('raw-url');
@@ -211,7 +212,7 @@ async function add_listeners()
 
 	document.addEventListener('keyup', e =>
 	{
-		var selected = document.querySelector('#history .selected');
+		const selected = document.querySelector('#history .selected');
 		if (e.key === 'ArrowUp')
 		{
 			if (selected === null)
@@ -235,14 +236,25 @@ async function add_listeners()
 		e.preventDefault();
 	});
 
+	document.querySelector('#copy').addEventListener('click', e =>
+	{
+		const selected = document.querySelector('#history .selected');
+		if (selected)
+		{
+			const text = selected.querySelector('.original').getAttribute('raw-url') + '\n'
+						+ selected.querySelector('.cleaned').getAttribute('raw-url');
+			navigator.clipboard.writeText(text);
+		}
+	});
+
 	document.addEventListener('copy', e =>
 	{
-		var selected = document.querySelector('#history .selected');
+		const selected = document.querySelector('#history .selected');
 
 		if (selected)
 		{
-			e.clipboardData.setData('text/plain', selected.childNodes[0].getAttribute('raw-url') + '\n'
-												+ selected.childNodes[1].getAttribute('raw-url'));
+			e.clipboardData.setData('text/plain', selected.querySelector('.original').getAttribute('raw-url') + '\n'
+												+ selected.querySelector('.cleaned').getAttribute('raw-url'));
 			e.preventDefault();
 		}
 	});

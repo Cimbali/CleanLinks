@@ -163,6 +163,7 @@ hr {
 #options  { background-image: url("/icons/settings.svg"); }
 #refresh  { background-image: url("/icons/refresh.svg"); }
 #clearlist { background-image: url("/icons/trashcan.svg"); }
+#copy { background-image: url("/icons/copy.svg"); }
 #openonce { background-image: url("/icons/shield-1.svg"); }
 #whitelist { background-image: url("/icons/shield-check.svg"); }
 #blacklist { background-image: url("/icons/shield-x.svg"); }
