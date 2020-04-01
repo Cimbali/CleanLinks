@@ -71,10 +71,10 @@ function remove_js(orig)
 	let js_cleaned_link = extract_javascript_link(orig);
 	if (js_cleaned_link)
 	{
-		let start = orig.indexOf(js_cleaned_link);
-		let end = start + js_cleaned_link.length;
+		let start = orig.indexOf(js_cleaned_link.href);
+		let end = start + js_cleaned_link.href.length;
 
-		return [new URL(js_cleaned_link), orig.slice(0, start), orig.slice(end)];
+		return [js_cleaned_link, orig.slice(0, start), orig.slice(end)];
 	}
 	else
 		return [new URL(orig)];

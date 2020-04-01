@@ -109,8 +109,7 @@ function extract_javascript_link(text_link, base_url)
 	log('matched javascript link: ' + cleaned_link)
 	try
 	{
-		let url = new URL(cleaned_link, base_url)
-		return cleaned_link;
+		return new URL(cleaned_link, base_url)
 	}
 	catch (e)
 	{

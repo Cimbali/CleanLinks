@@ -145,12 +145,12 @@ describe('wrapped_cl', function() {
 describe('extract_javascript_link', function() {
 	it('should clean the link to the simple javascript function argument', done =>
 	{
-		expect(extract_javascript_link("javascript:window.open('http://somesite.com/')")).to.equal('http://somesite.com/');
+		expect(extract_javascript_link("javascript:window.open('http://somesite.com/')").href).to.equal('http://somesite.com/');
 		done();
 	});
 	it('should clean the link to the complex javascript function argument', done =>
 	{
-		expect(extract_javascript_link("javascript:func(\"arg1\", 'arg2', 'http://somesite.com/', 'target=\"_self\"')")).to.equal('http://somesite.com/');
+		expect(extract_javascript_link("javascript:func(\"arg1\", 'arg2', 'http://somesite.com/', 'target=\"_self\"')").href).to.equal('http://somesite.com/');
 		done();
 	});
 });
@@ -159,7 +159,7 @@ describe('extract_javascript_link + wrapped_cl', function() {
 	it('should clean the link to the javascript function relative path argument', () =>
 	{
 		let rel_url = "javascript:displayWindowzdjecie('/_misc/zdj_wym.php?url_zdjecie=https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg',1100,778);";
-		let unjs_url = extract_javascript_link(rel_url, 'http://somedomain.com/a/page.html?foo=qux')
+		let unjs_url = extract_javascript_link(rel_url, 'http://somedomain.com/a/page.html?foo=qux').href
 		return Rules.loaded.then(() => expect(wrapped_cl(unjs_url, 'http://somedomain.com/a/page.html?foo=qux')).to
 			.equal('https://static2.s-trojmiasto.pl/zdj/c/n/9/2079/1100x0/2079199-Wizualizacja-obrotowej-kladki-Sw-Ducha.jpg')
 		)

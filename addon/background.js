@@ -268,7 +268,7 @@ function handle_message(message, sender)
 		else if (message.target === new_tab)
 		{
 			const extra = browser_version > 57 ? { openerTabId: tab_id } : {};
-			browser.tabs.create({...extra, url: message.link, active: Prefs.values.switch_to_tab })
+			return browser.tabs.create({...extra, url: message.link, active: Prefs.values.switch_to_tab })
 		}
 		else
 			return browser.tabs.update(tab_id, { url: message.link });
