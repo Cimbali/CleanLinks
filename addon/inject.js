@@ -170,6 +170,7 @@ function on_click(evt)
 			url: cleaned_link,
 			orig: text_link,
 			type: 'clicked',
+			parent: base,
 			cleaned: {javascript: event_type || 'href'}
 		}).catch(() => {});
 	}

@@ -100,20 +100,28 @@ function clean_redirect_headers({ documentUrl, originUrl, responseHeaders, statu
 	if (disabled_tabs.is_disabled(tabId))
 		return {}
 
-	const link = new URL(loc.value, url), { cleaned_link } = clean_link(link);
+	const current_url = (documentUrl || originUrl) ? new URL(documentUrl || originUrl) : {};
+	const link = new URL(loc.value, url), { cleaned_link, ...cleaning_info } = clean_link(link);
 
 	if (!cleaned_link)
 		return {};
 
-	let cleaning_notif = { action: 'notify', url: cleaned_link, orig: link.href, type: 'header', tab_id: tabId };
+	let cleaning_notif = {
+		action: 'notify',
+		url: cleaned_link,
+		orig: link.href,
+		type: 'header',
+		parent: current_url.href,
+		tab_id: tabId
+	};
 
-	if (originUrl && cleaned_link.href === new URL(originUrl).href ||
-			originUrl !== documentUrl && cleaned_link.href === new URL(documentUrl).href)
+	if (cleaned_link.href === current_url.href)
 	{
-		/* Risking an infinite loop of redirects here.
+		/* Same origin and destination, e.g. pageA redirects to pageB?info=pageA
+		 * Risking an infinite loop of redirects here.
 		 * Try it once (i.e. it's not in history yet), but if we already tried then allow it. */
 		if (cleaned_per_tab.get(tabId).history.some(historic_message =>
-			Object.keys(cleaning_notif).every(key => cleaning_notif[key] === historic_message[key])
+			['url', 'orig', 'type'].every(key => cleaning_notif[key] === historic_message[key])
 		))
 		{
 			log(`Avoiding circular redirect ${link.href} -> ${originUrl}` );
@@ -161,7 +169,15 @@ function on_request({ documentUrl, frameAncestors, frameId, tabId, type, originU
 								(cleaned_link.host + cleaned_link.pathname) === (current_url.host + current_url.pathname);
 
 
-	let cleaning_notif = { action: 'notify', url: cleaned_link.href, orig: link.href, tab_id: tabId, cleaned: cleaning_info };
+	let cleaning_notif = {
+		action: 'notify',
+		url: cleaned_link.href,
+		orig: link.href,
+		tab_id: tabId,
+		parent: current_url.href,
+		cleaned: cleaning_info
+	};
+
 	if (type === 'main_frame')
 		cleaning_notif.type = 'clicked';
 	// Google opens some-tab redirects in an iframe in the current document, so simple redirection is not enough.
