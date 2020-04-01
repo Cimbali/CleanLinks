@@ -67,6 +67,26 @@ function filter_from_input(opt_iterable)
 function add_cleaning_action(link_elem, action)
 {
 	link_elem.classList.add(action);
+	const cleaned = link_elem.querySelector('.cleaned');
+	const span = cleaned.insertBefore(document.createElement('span'), cleaned.firstChild);
+	span.classList.add('icon')
+	span.classList.add(action)
+}
+
+
+function link_parent(history, url)
+{
+	const last_parent = history.lastChild;
+	if (last_parent && last_parent.querySelector('p').textContent === url)
+		return history.lastChild;
+
+	const item = document.createElement('div');
+	if (url !== undefined)
+	{
+		item.appendChild(document.createElement('p')).appendChild(document.createTextNode(url));
+		item.firstChild.classList.add('noclean-parent');
+	}
+	return history.appendChild(item);
 }
 
 
@@ -75,10 +95,11 @@ function append_link(history, link)
 	const link_elem = cleaned_link_item(document.createElement('p'), link.orig, link.url);
 
 	link_elem.classList.add(link.type);
-	if ('dropped' in link)
-		link_elem.classList.add('dropped')
-	else if (link.type === 'promoted')
+	if (link.type === 'promoted')
 		link_elem.classList.add('clicked')
+
+	if ('dropped' in link)
+		add_cleaning_action(link_elem, 'dropped');
 
 	const { embed, remove, rewrite, javascript } = link.cleaned;
 	if (embed)
@@ -93,7 +114,7 @@ function append_link(history, link)
 	link_elem.addEventListener('click', set_selected);
 	filter_from_input([link_elem])
 
-	history.appendChild(link_elem);
+	link_parent(history, link.parent).appendChild(link_elem);
 	document.querySelector('button#clearlist').disabled = false;
 }
 
@@ -229,26 +250,18 @@ async function add_listeners()
 
 	document.addEventListener('keyup', e =>
 	{
-		const selected = document.querySelector('#history .selected');
+		const selected = document.querySelector('#history p.selected span.original');
+		const cleaned = document.querySelectorAll('#history span.original');
+		const pos = selected ? Array.from(cleaned).findIndex(p => selected.isSameNode(p)) : -1;
+
 		if (e.key === 'ArrowUp')
-		{
-			if (selected === null)
-				document.querySelector('#history').lastChild.click()
-			else if (selected.previousSibling)
-				selected.previousSibling.click()
-			document.querySelector('#history .selected').scrollIntoView(true)
-		}
+			cleaned[pos < 1 ? cleaned.length - 1 : pos - 1].parentNode.click();
 		else if (e.key === 'ArrowDown')
-		{
-			if (selected === null)
-				document.querySelector('#history').firstChild.click()
-			else if (selected.nextSibling)
-				selected.nextSibling.click()
-			document.querySelector('#history .selected').scrollIntoView(false)
-		}
+			cleaned[(pos + 1) % cleaned.length].parentNode.click();
 		else
 			return;
 
+		document.querySelector('#history .selected').scrollIntoView(false)
 		e.stopPropagation();
 		e.preventDefault();
 	});

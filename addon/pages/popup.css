@@ -62,6 +62,7 @@ hr {
 	margin-top: 1em;
 }
 #history {
+	position: relative;
 	height: 450px;
 
 	display: block;
@@ -69,21 +70,88 @@ hr {
 	border-bottom: black thin solid;
 	overflow-y: scroll;
 	overflow-x: hidden;
-	padding-right: 1px;
+	padding: 0 1px 0 .5em;
 }
+
 #history p {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	border: black thin solid;
+	display: block;
+    position: relative;
+	left: 2em;
+	margin: .25em 0;
+	width: calc(100% - 2em);
 	cursor: pointer;
+	padding-left: .25em;
 }
+
+#history div p:first-child {
+	left: 1em;
+	width: calc(100% - 1em);
+}
+
+#history div {
+    border-left: .25em solid gray;
+    border-bottom: black thin solid;
+	margin-bottom: -1px;
+	position: relative;
+}
+
+#history div p:not(:first-child) {
+    border-top: black thin solid;
+}
+
+#history div:before {
+    content: '';
+    display: block;
+    width: 1em;
+    height: 1em;
+    position: absolute;
+    background: grey;
+    border: .25em solid white;
+    left: -.8em;
+}
+
+#history div p:not(:first-child):before {
+    content: "";
+    display: block;
+    width: 2em;
+    height: 0;
+    position: relative;
+	top: .5em;
+    left: -2.25em;
+    border-top: .25em solid gray;
+}
+
+#history div p:last-child:after {
+    content: '';
+    display: block;
+    width: 1em;
+    position: absolute;
+	border: none;
+	background: white;
+}
+
+#history div p:not(:only-child):last-child:after {
+    top: .75em;
+    bottom: -.25em;
+    left: -2.5em;
+}
+
+#history div p:only-child:after {
+    top: 1.25em;
+    bottom: -.25em;
+    left: -1.5em;
+}
+
 #history p > span {
 	display: block;
 	padding: 2px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	border-left: black thin solid;
+}
+
+#history div p.noclean-parent {
+	background-color: #eee;
+	cursor: auto;
 }
 #history p.selected > span {
 	background-color: #eef;
@@ -91,14 +159,8 @@ hr {
 	white-space: normal;
 	word-break: break-all;
 }
-#history p > span.cleaned::before {
-	content: " ► "
-}
-#history p.dropped {
+#history p.dropped > span {
 	background-color: #f031;
-}
-#history p.dropped > span.cleaned::before {
-	content: " ❌ ";
 }
 #history p .del {
 	text-decoration: line-through;
@@ -169,6 +231,34 @@ hr {
 #whitelist { background-image: url("/icons/shield-check.svg"); }
 #blacklist { background-image: url("/icons/shield-x.svg"); }
 #open_editor { background-image: url("/icons/shield-edit.svg"); }
+
+#history p span.original {
+	background-image: url("/icons/clicked.svg");
+	padding-left: 1.2em;
+	background-size: 1em;
+	background-position: left top .25em;
+	background-repeat: no-repeat;
+}
+#history p.clicked span.original { background-image: url("/icons/clicked.svg"); }
+#history p.request span.original { background-image: url("/icons/request.svg"); }
+#history p.header span.original { background-image: url("/icons/header.svg"); }
+
+#history p span.cleaned span.icon {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	margin-right: .2em;
+	background-size: 1em;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+#history p span.cleaned span.icon.dropped { background-image: url("/icons/stop.svg"); }
+#history p span.cleaned span.icon.embed { background-image: url("/icons/skip.svg"); }
+#history p span.cleaned span.icon.remove { background-image: url("/icons/remove.svg"); }
+#history p span.cleaned span.icon.rewrite { background-image: url("/icons/replace.svg"); }
+#history p span.cleaned span.icon.javascript { background-image: url("/icons/javascript.svg"); }
+
+
 .spacer {
 	flex-grow: 1;
 }
