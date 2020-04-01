@@ -64,16 +64,33 @@ function filter_from_input(opt_iterable)
 }
 
 
+function add_cleaning_action(link_elem, action)
+{
+	link_elem.classList.add(action);
+}
+
+
 function append_link(history, link)
 {
-	let classes = [link.type];
-	if ('dropped' in link)
-		classes.push('dropped')
-	else if (link.type === 'promoted')
-		classes.push('clicked')
+	const link_elem = cleaned_link_item(document.createElement('p'), link.orig, link.url);
 
-	const link_elem = cleaned_link_item(document.createElement('p'), link.orig, link.url, classes);
-	link_elem.onclick = set_selected
+	link_elem.classList.add(link.type);
+	if ('dropped' in link)
+		link_elem.classList.add('dropped')
+	else if (link.type === 'promoted')
+		link_elem.classList.add('clicked')
+
+	const { embed, remove, rewrite, javascript } = link.cleaned;
+	if (embed)
+		add_cleaning_action(link_elem, 'embed');
+	if (remove && remove.length !== 0)
+		add_cleaning_action(link_elem, 'remove');
+	if (rewrite)
+		add_cleaning_action(link_elem, 'rewrite');
+	if (javascript)
+		add_cleaning_action(link_elem, 'javascript');
+
+	link_elem.addEventListener('click', set_selected);
 	filter_from_input([link_elem])
 
 	history.appendChild(link_elem);

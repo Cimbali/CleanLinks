@@ -213,10 +213,9 @@ function append_query_param(link_elem, keyval, clean, keep, strip, actions_to_wh
 }
 
 
-function cleaned_link_item(link_elem, raw_orig, raw_clean, classes)
+function cleaned_link_item(link_elem, raw_orig, raw_clean)
 {
 	link_elem.setAttribute('title', '');
-	link_elem.classList.add(...classes);
 
 	const [orig, prefix, suffix] = remove_js(raw_orig), clean = new URL(raw_clean);
 	const rules = Rules.find(orig);
@@ -225,9 +224,6 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean, classes)
 	let origin_node = link_elem.appendChild(document.createElement('span'));
 	origin_node.setAttribute('raw-url', orig.href);
 	origin_node.classList.add('original');
-
-	if (prefix || suffix)
-		link_elem.classList.add('javascript');
 
 	if (prefix)
 		append_decorated_text(link_elem, prefix, 'deleted')
