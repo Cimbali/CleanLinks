@@ -151,17 +151,17 @@ function on_request({ documentUrl, frameAncestors, frameId, tabId, type, originU
 		return {};
 	}
 
-	const { cleaned_link, nesting } = clean_link(link);
+	const { cleaned_link, ...cleaning_info } = clean_link(link);
 
 	if (!cleaned_link)
 		return {};
 
 	// Check whether we have found an embedded link that is the current document
-	const contains_parent_url = nesting !== 0 &&
+	const contains_parent_url = cleaning_info.embed !== 0 &&
 								(cleaned_link.host + cleaned_link.pathname) === (current_url.host + current_url.pathname);
 
 
-	let cleaning_notif = { action: 'notify', url: cleaned_link.href, orig: link.href, tab_id: tabId };
+	let cleaning_notif = { action: 'notify', url: cleaned_link.href, orig: link.href, tab_id: tabId, cleaned: cleaning_info };
 	if (type === 'main_frame')
 		cleaning_notif.type = 'clicked';
 	// Google opens some-tab redirects in an iframe in the current document, so simple redirection is not enough.

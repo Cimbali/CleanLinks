@@ -230,12 +230,21 @@ function decode_embedded_uri(link, rules, original_string)
 }
 
 
-function filter_params_and_path(link, rules)
+function filter_params_and_path(link, rules, actions_taken)
 {
+	let { rewrite, remove } = { rewrite: false, remove: [], ...actions_taken };
+
 	if ('rewrite' in rules && rules.rewrite.length)
 	{
+		let pathname = link.pathname;
 		for (let {search, replace, flags} of rules.rewrite)
-			link.pathname = link.pathname.replace(new RegExp(search, flags), replace)
+			pathname = pathname.replace(new RegExp(search, flags), replace)
+
+		if (link.pathname !== pathname)
+		{
+			link.pathname = pathname;
+			rewrite = true;
+		}
 	}
 
 	if ('remove' in rules && rules.remove.length && link.search.length > 1)
@@ -246,22 +255,21 @@ function filter_params_and_path(link, rules)
 		if ('whitelist' in rules && rules.whitelist.length)
 			keep = new RegExp('^(' + rules.whitelist.join('|') + ')$')
 
-		let changes = 0;
 		for (let [key, val] of link.searchParams.entries())
 			if ((!keep || !key.match(keep)) && key.match(strip))
 			{
+				remove.push(key);
 				params.delete(key)
-				changes++;
 			}
 
 		// encoding is sometimes inconsistent:
 		// - URL() uses + for spaces while we might encounter %20 in the wild
 		// - some keys without values might get changed from &key=& to &key&
-		if (changes !== 0)
+		if (remove.length !== 0)
 			link.search = params.toString();
 	}
 
-	return link;
+	return { ...actions_taken, link, rewrite, remove };
 }
 
 
@@ -279,10 +287,10 @@ function clean_link(link)
 		return {};
 	}
 
-	let cleaned_link = new URL(link.href), rules = Rules.find(cleaned_link), nesting = -1;
+	let cleaned_link = new URL(link.href), rules = Rules.find(cleaned_link), nesting = -1, meta = {};
 
 	// first remove parameters or rewrite
-	cleaned_link = filter_params_and_path(cleaned_link, rules);
+	({ link: cleaned_link, ...meta } = filter_params_and_path(cleaned_link, rules));
 
 	while (++nesting !== 4)
 	{
@@ -290,9 +298,11 @@ function clean_link(link)
 		if (embedded_link.href === cleaned_link.href)
 			break;
 
+		// NB/TODO: before fetching new rules, apply post-cleaning rules here?
+
 		// remove parameters or rewrite again, if we redirected on an embedded URL
-		rules = Rules.find(embedded_link)
-		cleaned_link = filter_params_and_path(embedded_link, rules);
+		rules = Rules.find(embedded_link);
+		({ link: cleaned_link, ...meta } = filter_params_and_path(embedded_link, rules, meta));
 	}
 
 	if (cleaned_link.href === link.href)
@@ -303,5 +313,5 @@ function clean_link(link)
 
 	log('cleaning ' + link.href + ' : ' + cleaned_link.href)
 
-	return { cleaned_link, nesting };
+	return { cleaned_link, embed: nesting, ...meta };
 }
