@@ -108,7 +108,7 @@ function clean_redirect_headers({ documentUrl, originUrl, responseHeaders, statu
 
 	let cleaning_notif = {
 		action: 'notify',
-		url: cleaned_link,
+		url: cleaned_link.href,
 		orig: link.href,
 		type: 'header',
 		parent: current_url.href,
