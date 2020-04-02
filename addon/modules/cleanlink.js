@@ -15,7 +15,7 @@
 const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or "="}[a-z]+://{more stuff}
 const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
 const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i					// {base64-encoded http or www.}{more valid base64 chars}
-const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),;@&=\/?%#]|%(?![0-9a-fA-F]{2})).*$/i
+const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),:;@&=\/?%#]|%(?![0-9a-fA-F]{2})).*$/i
 const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComponent('=')], ['&', encodeURIComponent('&')]];
 
 
