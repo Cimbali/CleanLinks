@@ -13,6 +13,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 
+const cleaned_items_list = [];
+
 function set_selected(evt)
 {
 	const selected = document.querySelector('#history .selected');
@@ -44,14 +46,15 @@ function filter_from_input(opt_iterable)
 
 	// By default, apply to all “opt”s in #history
 	if (opt_iterable === undefined || opt_iterable instanceof Event)
-		opt_iterable = document.querySelectorAll('#history p');
+		opt_iterable = cleaned_items_list;
 
-	for (let opt of opt_iterable)
+	for (let { page, link } of opt_iterable)
 	{
-		// There is a single category per item, that must be selected, and there are a number of actions of which any one can be selected
+		// There is a single category per item, that must be selected,
+		// and there are a number of actions of which any one can be selected
 		let category_selected = false, action_matched = false;
 
-		for (let class_name of opt.classList)
+		for (let class_name of link.classList)
 		{
 			if (class_name in filter_cat)
 				category_selected = filter_cat[class_name]
@@ -59,8 +62,26 @@ function filter_from_input(opt_iterable)
 				action_matched = action_matched || filter_act[class_name];
 		}
 
-		opt.style.display = category_selected && action_matched ? 'block' : 'none';
+		// Always remove when filtering to guarantee ordering
+		const is_first_link = page.children.length === 0 || page.firstChild.isSameNode(link);
+
+		if (link.parentNode)
+			page.removeChild(link);
+
+		if (is_first_link || category_selected && action_matched && !page.classList.contains('closed'))
+			page.appendChild(link);
 	}
+}
+
+
+function toggle_expand(evt)
+{
+	if (evt.target.classList.contains('closed'))
+		evt.target.classList.remove('closed');
+	else
+		evt.target.classList.add('closed');
+
+	filter_from_input();
 }
 
 
@@ -86,11 +107,12 @@ function link_parent(history, url)
 		item.appendChild(document.createElement('p')).appendChild(document.createTextNode(url));
 		item.firstChild.classList.add('noclean-parent');
 	}
+	item.addEventListener('click', toggle_expand);
 	return history.appendChild(item);
 }
 
 
-function append_link(history, link)
+function append_link(history, link, start_closed)
 {
 	const link_elem = cleaned_link_item(document.createElement('p'), link.orig, link.url);
 
@@ -112,9 +134,15 @@ function append_link(history, link)
 		add_cleaning_action(link_elem, 'javascript');
 
 	link_elem.addEventListener('click', set_selected);
-	filter_from_input([link_elem])
 
-	link_parent(history, link.parent).appendChild(link_elem);
+	const item = { page: link_parent(history, link.parent), link: link_elem };
+	cleaned_items_list.push(item);
+
+	if (start_closed)
+		item.page.classList.add('closed');
+
+	filter_from_input([item])
+
 	document.querySelector('button#clearlist').disabled = false;
 }
 
@@ -154,8 +182,11 @@ async function populate_popup()
 	await browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
 	{
 		const history = document.getElementById('history');
-		for (let clean of response)
-			append_link(history, clean);
+		for (const clean of response)
+			append_link(history, clean, true);
+
+		if (history.lastChild)
+			history.lastChild.classList.remove('closed');
 
 		for (input of document.querySelectorAll('.filters input'))
 			input.onchange = filter_from_input
@@ -172,12 +203,29 @@ async function add_tab_listeners(tab_id)
 	document.querySelector('#clearlist').addEventListener('click', e =>
 	{
 		const history = document.getElementById('history');
-		const count = history.children.length;
+		const count = cleaned_items_list.length;
 
 		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id}).catch(() => {}).then(() =>
 		{
-			for (let i = 0; i < count; i++)
-				history.firstChild.remove();
+			const page_removal = []
+			for (const { page, link } of cleaned_items_list.splice(0, count))
+				if (link.parentNode)
+				{
+					page.removeChild(link);
+					if (page_removal.findIndex(remove => page.isSameNode(remove)) === -1)
+						page_removal.push(page);
+				}
+
+			// Do not remove pages that still have links to show
+			for (const { page } of cleaned_items_list)
+			{
+				const pos = page_removal.findIndex(remove => page.isSameNode(remove))
+				if (pos !== -1)
+					page_removal.splice(pos, 1);
+			}
+
+			for (const page of parent_removal)
+				history.removeChild(page);
 		});
 	});
 

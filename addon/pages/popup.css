@@ -53,7 +53,8 @@ hr {
 	display: flex;
 	align-items: center;
 }
-#history:empty::before {
+
+#history:empty:before {
 	content: attr(placeholder);
 	color: grey;
 	font-size: 1.5em;
@@ -61,6 +62,7 @@ hr {
 	text-align: center;
 	margin-top: 1em;
 }
+
 #history {
 	position: relative;
 	height: 450px;
@@ -70,47 +72,70 @@ hr {
 	border-bottom: black thin solid;
 	overflow-y: scroll;
 	overflow-x: hidden;
-	padding: 0 1px 0 .5em;
-}
-
-#history p {
-	display: block;
-    position: relative;
-	left: 2em;
-	margin: .25em 0;
-	width: calc(100% - 2em);
-	cursor: pointer;
-	padding-left: .25em;
-}
-
-#history div p:first-child {
-	left: 1em;
-	width: calc(100% - 1em);
+	padding: 0 1px 0 0;
 }
 
 #history div {
-    border-left: .25em solid gray;
     border-bottom: black thin solid;
-	margin-bottom: -1px;
+	border-left: grey .25em solid;
+	margin: 0 1px 0 .5em;
+	padding: 0;
 	position: relative;
 }
 
-#history div p:not(:first-child) {
-    border-top: black thin solid;
+#history div:after {
+	content: '';
+	display: block;
+	background: grey;
+	width: .25em;
+	top: 0;
+	bottom: 0;
+}
+
+#history div:empty {
+	display: none;
 }
 
 #history div:before {
     content: '';
     display: block;
-    width: 1em;
-    height: 1em;
     position: absolute;
-    background: grey;
-    border: .25em solid white;
-    left: -.8em;
+    left: -.7em;
+
+	width: 1.2em;
+	height: 1.2em;
+	background-size: 1.2em 1.2em;
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
-#history div p:not(:first-child):before {
+#history div:before {
+	background-image: url('/icons/minus.svg');
+}
+
+#history div.closed:before {
+	background-image: url('/icons/plus.svg');
+}
+
+#history p {
+	display: block;
+	position: relative;
+	width: calc(100% - 2.25em);
+	margin: .25em 0 .25em 2em;
+	padding-left: .25em;
+	cursor: pointer;
+}
+
+#history p:first-child {
+	margin: .25em 0 .25em 1em;
+	width: calc(100% - 1em);
+}
+
+#history p:not(:first-child) {
+    border-top: black thin solid;
+}
+
+#history p:not(:first-child):before {
     content: "";
     display: block;
     width: 2em;
@@ -121,7 +146,7 @@ hr {
     border-top: .25em solid gray;
 }
 
-#history div p:last-child:after {
+#history p:last-child:after {
     content: '';
     display: block;
     width: 1em;
@@ -130,13 +155,13 @@ hr {
 	background: white;
 }
 
-#history div p:not(:only-child):last-child:after {
+#history p:not(:only-child):last-child:after {
     top: .75em;
     bottom: -.25em;
     left: -2.5em;
 }
 
-#history div p:only-child:after {
+#history p:only-child:after {
     top: 1.25em;
     bottom: -.25em;
     left: -1.5em;
@@ -151,7 +176,7 @@ hr {
 
 #history div p.noclean-parent {
 	background-color: #eee;
-	cursor: auto;
+	cursor: default;
 }
 #history p.selected > span {
 	background-color: #eef;
