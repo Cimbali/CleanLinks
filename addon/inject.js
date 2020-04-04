@@ -14,11 +14,16 @@
 
 'use strict'
 
+let tab_enabled = false;
+let highlight_node = null;
+let pre_cleaned_node = null;
+
+
 function highlight_link(node, remove)
 {
 	// parse and apply ;-separated list of key:val style properties
-	let css_property_list = ('' + Prefs.values.hlstyle).split(';').map(r => r.split(':').map(s => s.trim()));
-	for (let [prop, val] of css_property_list)
+	const css_property_list = ('' + Prefs.values.hlstyle).split(';').map(r => r.split(':').map(s => s.trim()));
+	for (const [prop, val] of css_property_list)
 		node.style.setProperty(prop, remove ? '' : val, 'important');
 }
 
@@ -38,15 +43,7 @@ function find_target_frame(wnd, target)
 
 function event_do_click(url, node, evt)
 {
-	if (evt.button == 0 && evt.altKey)
-		return false; // alt+click, do nothing
-
-	evt.stopPropagation();
-	evt.preventDefault();
-
-	// NB: use default _self target if we don’t want to follow target attributes
-	const target = Prefs.values.gotarget && node.hasAttribute('target') && node.getAttribute('target') || '_self';
-
+	const target = node.getAttribute('target') || '_self';
 	const open_new_tab = evt.ctrlKey || evt.button == 1 || evt.metaKey || target === '_blank';
 	const open_new_win = evt.shiftKey;
 
@@ -73,7 +70,6 @@ function find_click_target(node)
 	{
 		if (node.nodeName === 'A')
 			return { node, href: node.href };
-
 	}
 	while (['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
 
@@ -84,7 +80,8 @@ function find_click_target(node)
 // NB: this is not great to decode obfuscated javascript codes, but at least returns if there are events
 function find_click_event(node)
 {
-	const searched_events = ['click', 'mousedown', 'touchstart', 'mouseup']
+	const searched_events = ['click', 'mousedown', 'touchstart', 'mouseup', 'touchend'];
+
 	do
 	{
 		const actions = (node.hasAttribute('jsaction') && node.getAttribute('jsaction').split(';') || [])
@@ -116,96 +113,103 @@ function on_pre_click(evt)
 	const { href, node } = find_click_target(evt.target);
 
 	// This is a valid link: cancel onmousedown trickeries by stopping the event.
-	if (href)
+	if (tab_enabled && href)
 	{
+		console.log('Dropping mousedown event')
 		evt.stopPropagation();
 		evt.preventDefault();
+
+		pre_cleaned_node = node;
 	}
+}
+
+
+function on_post_click()
+{
+	if (pre_cleaned_node)
+		pre_cleaned_node = null;
 }
 
 
 function on_click(evt)
 {
+	if (evt.button == 0 && evt.altKey)
+		return; // alt+click, do nothing
+
 	const { href, func, node, event_type } = { ...find_click_event(evt.target), ...find_click_target(evt.target) };
 
 	const text_link = href || func;
 	log(`click on ${node.nodeName} ${node} with URL "${text_link}" and event ${event_type}`)
 
-	if (!text_link)
-		return;
+	if (node && !Prefs.values.gotarget && (node.getAttribute('target') || '_self') !== '_self')
+		node.removeAttribute('target');
 
-	last_clicked = node;
-	try
-	{
-		let url = new URL(text_link, window.location)
-		browser.runtime.sendMessage({action: 'highlight', link: url.href}).catch(() => {});
-	}
-	catch (e)
-	{
-		browser.runtime.sendMessage({action: 'highlight', link: text_link}).catch(() => {});
-	}
+	if (!tab_enabled || !text_link)
+		return;
 
 
 	const base = (node.ownerDocument.defaultView || window).location.href;
-	let cleaned_link = extract_javascript_link(text_link, base);
+	let cleaned_link = tab_enabled && extract_javascript_link(text_link, base);
 
 	// report that we cleaned the javascript from the node’s href
-	if (cleaned_link && href)
-		event_type = 'href';
-
-	try
+	if (href)
 	{
-		// NB: if there is an identified javascript event (i.e. event_type defined), or if we
-		// need to override the link’s target attribute, we need to prevent the click event,
-		// and perform the action of activating the link manually, even if the link is clean.
-		if (href && !cleaned_link && (event_type || !Prefs.values.gotarget))
-			cleaned_link = new URL(href, base);
+		if (cleaned_link)
+			event_type = 'href';
+
+		// If there is an identified javascript event (i.e. event_type defined) on a ckean link,
+		// still prevent the click event, and perform the action of activating the link manually.
+		else if (event_type)
+			try { cleaned_link = new URL(href, base); } catch {};
 	}
-	catch(e) {}
 
-	if (!cleaned_link)
-		return;
+	// report as cleaned links where we prevented a mousedown event
+	if (!cleaned_link && !event_type && node.isSameNode(pre_cleaned_node))
+		event_type = 'mousedown';
 
-	log(`Cleaning javascript ${text_link} to ${cleaned_link}`)
-	if (event_do_click(cleaned_link, node, evt) && event_type)
-		// Only notify if we managed to clean, and we did not come here only to override target
-		browser.runtime.sendMessage({
+
+	// Only notify if did not come here only to override target
+	let notify = Promise.resolve();
+	if (event_type)
+	{
+		log(`Cleaning javascript ${text_link} to ${cleaned_link} with event ${event_type}`)
+
+		notify = browser.runtime.sendMessage({
 			action: 'notify',
-			url: cleaned_link,
+			url: cleaned_link.href,
 			orig: text_link,
 			type: 'clicked',
 			parent: base,
 			cleaned: {javascript: event_type}
-		}).catch(() => {});
-}
+		});
 
-
-let tab_enabled = false;
-let last_clicked = null;
-
-function toggle_active(enabled)
-{
-	if (tab_enabled === enabled)
-		return;
-
-	tab_enabled = enabled;
-
-	if (enabled)
-	{
-		window.addEventListener('click', on_click, {capture: true});
-		window.addEventListener('mousedown', on_pre_click, {capture: true});
-		window.addEventListener('touchstart', on_pre_click, {capture: true});
+		if (Prefs.values.highlight)
+			highlight_link(node);
 	}
 	else
 	{
-		window.removeEventListener('click', on_click, {capture: true});
-		window.removeEventListener('mousedown', on_pre_click, {capture: true});
-		window.removeEventListener('touchstart', on_pre_click, {capture: true});
+		const url = (() => { try { return new URL(text_link, base).href; } catch { return text_link; } })();
+
+		log(`Notifying non-javascript link ${url} clicked`)
+
+		highlight_node = node;
+		notify = browser.runtime.sendMessage({action: 'highlight', link: url});
+	}
+
+	if (cleaned_link)
+	{
+		// Now we replace the click with our click function
+		evt.stopPropagation();
+		evt.preventDefault();
+
+		notify.catch(err => console.error('Notification failed:', err));
+		notify.then(() => event_do_click(cleaned_link.href, node, evt));
 	}
 }
 
+
 browser.runtime.sendMessage({action: 'check tab enabled'})
-	.then(answer => answer !== undefined && toggle_active(answer.enabled))
+	.then(answer => ({ enabled: tab_enabled } = answer || { enabled: false }))
 	.catch(() => {});
 
 
@@ -215,18 +219,24 @@ browser.runtime.onMessage.addListener(message =>
 		return Prefs.reload();
 	else if (message.action === 'toggle')
 	{
-		toggle_active(message.active);
+		tab_enabled = message.active;
 		return Promise.resolve({});
 	}
 	else if (message.action === 'highlight')
 	{
-		if (last_clicked !== null)
-			highlight_link(last_clicked, false);
+		if (highlight_node !== null)
+			highlight_link(highlight_node, false);
 
-		last_clicked = null;
+		highlight_node = null;
 		return Promise.resolve({});
 	}
 	else
 		return Promise.reject('Unexpected message: ' + String(message));
 });
-console.log('successfully injected');
+
+
+window.addEventListener('click', on_click, {capture: true});
+window.addEventListener('mousedown', on_pre_click, {capture: true});
+window.addEventListener('touchstart', on_pre_click, {capture: true});
+window.addEventListener('mouseup', on_post_click, {capture: true});
+window.addEventListener('touchend', on_post_click, {capture: true});
