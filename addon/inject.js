@@ -208,7 +208,7 @@ function on_click(evt)
 }
 
 
-browser.runtime.sendMessage({action: 'check tab enabled'})
+browser.runtime.sendMessage({action: 'check tab enabled', url: window.location.href})
 	.then(answer => ({ enabled: tab_enabled } = answer || { enabled: false }))
 	.catch(() => {});
 

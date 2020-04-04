@@ -231,11 +231,13 @@ function no_rule_loaded()
 	document.querySelector('input[name="path"]').value = '';
 	document.querySelector('input[name="subdomains"]').checked = true;
 	document.querySelector('input[name="whitelist_path"]').checked = false;
+	document.querySelector('input[name="allow_js"]').checked = false;
 
 	document.querySelector('input[name="domain"]').disabled = true;
 	document.querySelector('input[name="path"]').disabled = true;
 	document.querySelector('input[name="subdomains"]').disabled = true;
 	document.querySelector('input[name="whitelist_path"]').disabled = true;
+	document.querySelector('input[name="allow_js"]').disabled = true;
 
 	document.getElementById('remove_rule').disabled = true
 }
@@ -273,11 +275,13 @@ function load_rule()
 	document.querySelector('input[name="subdomains"]').checked = subdomains;
 	document.querySelector('input[name="path"]').value = rule.path;
 	document.querySelector('input[name="whitelist_path"]').checked = rule.whitelist_path
+	document.querySelector('input[name="allow_js"]').checked = rule.allow_js
 
 	document.querySelector('input[name="domain"]').disabled = false;
 	document.querySelector('input[name="path"]').disabled = false;
 	document.querySelector('input[name="subdomains"]').disabled = false;
 	document.querySelector('input[name="whitelist_path"]').disabled = false;
+	document.querySelector('input[name="allow_js"]').disabled = false;
 
 	for (const [list, action] of Object.entries(default_actions))
 	{
@@ -355,6 +359,7 @@ function parse_rule(select)
 			domain: document.querySelector('input[name="domain"]').value || '*.*',
 			path: document.querySelector('input[name="path"]').value || '',
 			whitelist_path: document.querySelector('input[name="whitelist_path"]').checked,
+			allow_js: document.querySelector('input[name="allow_js"]').checked,
 		}
 	};
 
@@ -609,6 +614,7 @@ function add_listeners()
 	document.querySelector('input[name="path"]').onkeyup = delayed_save(rule_changed)
 	document.querySelector('input[name="subdomains"]').onchange = rule_changed
 	document.querySelector('input[name="whitelist_path"]').onchange = rule_changed
+	document.querySelector('input[name="allow_js"]').onchange = rule_changed
 
 	document.getElementById('rule_selector').onchange = load_rule
 	document.getElementById('rule_filter').onchange = filter_rules

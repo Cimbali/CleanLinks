@@ -237,7 +237,15 @@ function handle_message(message, sender)
 		return Promise.resolve({});
 
 	case 'check tab enabled':
-		return Promise.resolve({enabled: disabled_tabs.is_enabled(tab_id)});
+		if (disabled_tabs.is_disabled(tab_id))
+			return Promise.resolve({enabled: false});
+		else if (!('url' in message))
+			return Promise.resolve({enabled: true});
+
+		const url = new URL(message.url);
+		const { allow_js } = Rules.find(url);
+
+		return Promise.resolve({enabled: !allow_js});
 
 	case 'notify':
 		if (Prefs.values.cltrack)
@@ -356,7 +364,7 @@ function handle_message(message, sender)
 		})
 
 	case 'rules':
-		return Rules.reload()
+		return Rules.reload();
 
 	case 'set prepopulate':
 		prepopulate_link = message.link;
