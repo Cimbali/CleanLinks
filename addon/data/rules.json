@@ -14,13 +14,6 @@
       }
     },
     ".amazon": {
-      "/ap/signin": {
-        "actions": {
-          "whitelist": [
-            "openid\\..+"
-          ]
-        }
-      },
       "actions": {
         "remove": [
           "pf_rd_[a-zA-Z]",
@@ -140,13 +133,6 @@
     },
     ".google": {
       ".accounts": {
-        "\\boauth2\\b": {
-          "actions": {
-            "whitelist": [
-              "parent"
-            ]
-          }
-        },
         "actions": {
           "whitelist": [
             "continue"
@@ -166,15 +152,6 @@
           "actions": {
             "remove": [
               "origin"
-            ]
-          }
-        }
-      },
-      ".mail": {
-        "^/accounts/SetOSID$": {
-          "actions": {
-            "whitelist": [
-              "continue"
             ]
           }
         }
@@ -398,21 +375,6 @@
         ]
       }
     },
-    ".amazon": {
-      ".aws": {
-        ".signin": {
-          ".": {
-            "/signin": {
-              "actions": {
-                "whitelist": [
-                  "redirect_uri"
-                ]
-              }
-            }
-          }
-        }
-      }
-    },
     ".backcountry": {
       "actions": {
         "remove": [
@@ -505,17 +467,6 @@
         }
       }
     },
-    ".dropbox": {
-      ".www": {
-        "^/login$": {
-          "actions": {
-            "whitelist": [
-              "cont"
-            ]
-          }
-        }
-      }
-    },
     ".duckduckgo": {
       ".external-content": {
         "^/ip\\d+/": {
@@ -583,29 +534,6 @@
       }
     },
     ".github": {
-      ".gist": {
-        "^/auth/github$": {
-          "actions": {
-            "whitelist": [
-              "return_to"
-            ]
-          }
-        },
-        "^/auth/github/callback$": {
-          "actions": {
-            "whitelist": [
-              "return_to"
-            ]
-          }
-        }
-      },
-      "^/login$": {
-        "actions": {
-          "whitelist": [
-            "return_to"
-          ]
-        }
-      },
       "actions": {
         "remove": [
           "email_token",
@@ -613,12 +541,14 @@
         ]
       }
     },
-    ".gog": {
-      "^/auth$": {
-        "actions": {
-          "whitelist": [
-            "redirect_uri"
-          ]
+    ".google": {
+      ".docs": {
+        "^/nonceSigner$": {
+          "actions": {
+            "whitelist": [
+              "continue"
+            ]
+          }
         }
       }
     },
@@ -727,18 +657,6 @@
             ]
           }
         }
-      },
-      ".login": {
-        ".": {
-          "^/(login|logout)\\.srf$": {
-            "actions": {
-              "whitelist": [
-                "ru",
-                "wreply"
-              ]
-            }
-          }
-        }
       }
     },
     ".livejournal": {
@@ -802,17 +720,6 @@
         ]
       }
     },
-    ".paypal": {
-      ".www": {
-        "/authflow/.*": {
-          "actions": {
-            "whitelist": [
-              "stsReturnUrl"
-            ]
-          }
-        }
-      }
-    },
     ".readdc": {
       "actions": {
         "remove": [
@@ -853,15 +760,6 @@
         ]
       }
     },
-    ".stackoverflow": {
-      "/users/login": {
-        "actions": {
-          "whitelist": [
-            "returnurl"
-          ]
-        }
-      }
-    },
     ".steampowered": {
       "actions": {
         "remove": [
@@ -876,6 +774,15 @@
           "sr",
           "sr_share"
         ]
+      }
+    },
+    ".theguardian": {
+      ".www": {
+        "actions": {
+          "remove": [
+            "CMP"
+          ]
+        }
       }
     },
     ".tineye": {
@@ -915,17 +822,6 @@
         ]
       }
     },
-    ".washingtonpost": {
-      ".www": {
-        "^/gdpr-consent/$": {
-          "actions": {
-            "whitelist": [
-              "next_url"
-            ]
-          }
-        }
-      }
-    },
     ".woot": {
       "actions": {
         "remove": [
@@ -941,15 +837,6 @@
       }
     },
     ".yahoo": {
-      ".guce": {
-        "^/consent$": {
-          "actions": {
-            "whitelist": [
-              "done"
-            ]
-          }
-        }
-      },
       "actions": {
         "rewrite": [
           {
@@ -972,8 +859,16 @@
         "^/accounts/": {
           "actions": {
             "whitelist": [
-              "continue",
               "pmpo"
+            ]
+          }
+        }
+      },
+      ".ads": {
+        "^/ads/preferences/": {
+          "actions": {
+            "whitelist": [
+              "continue"
             ]
           }
         }
@@ -986,10 +881,10 @@
             ]
           }
         },
-        "^/signin$": {
+        "^/history_controls$": {
           "actions": {
             "whitelist": [
-              "next"
+              "back_url"
             ]
           }
         }
@@ -1057,50 +952,6 @@
       }
     }
   },
-  ".edu": {
-    ".upc": {
-      ".biblioteca": {
-        "^/(login|connect)\\b": {
-          "actions": {
-            "whitelist": [
-              "url"
-            ]
-          }
-        }
-      },
-      ".renoir": {
-        "^/login/": {
-          "actions": {
-            "whitelist": [
-              "url"
-            ]
-          }
-        }
-      },
-      ".sso": {
-        "^/CAS/login$": {
-          "actions": {
-            "whitelist": [
-              "service"
-            ]
-          }
-        }
-      }
-    }
-  },
-  ".gitlab.io": {
-    ".kevinroebert": {
-      ".": {
-        "/ClearUrls/void/index.html": {
-          "actions": {
-            "remove": [
-              "test"
-            ]
-          }
-        }
-      }
-    }
-  },
   ".io": {
     ".shields": {
       ".img": {
@@ -1122,29 +973,26 @@
     }
   },
   ".net": {
-    ".gandi": {
-      ".admin": {
-        "^/dashboard/api/v\\d+/login$": {
-          "actions": {
-            "whitelist": [
-              "redirect"
-            ]
+    ".doubleclick": {
+      ".g": {
+        ".googleads": {
+          "^/ads/preferences/": {
+            "actions": {
+              "whitelist": [
+                "continue"
+              ]
+            }
           }
         }
-      },
-      ".id": {
-        "^/en/authorize$": {
-          "actions": {
-            "whitelist": [
-              "redirect_uri"
-            ]
-          }
-        },
-        "^/en/login$": {
-          "actions": {
-            "whitelist": [
-              "redirect"
-            ]
+      }
+    },
+    ".nocookie": {
+      ".wikia": {
+        ".slot1-images": {
+          "^/__am/\\d+/sasses/.*image%3Dhttps": {
+            "actions": {
+              "whitelist_path": true
+            }
           }
         }
       }
@@ -1258,28 +1106,6 @@
       }
     }
   },
-  ".se": {
-    ".kth": {
-      ".login": {
-        "^/login\\b": {
-          "actions": {
-            "whitelist": [
-              "service"
-            ]
-          }
-        }
-      },
-      ".www": {
-        "^/social/accounts/login/$": {
-          "actions": {
-            "whitelist": [
-              "next"
-            ]
-          }
-        }
-      }
-    }
-  },
   ".us": {
     ".disq": {
       "actions": {
@@ -1300,17 +1126,23 @@
       }
     }
   },
-  "/(openid|oauth2?)/authorize$": {
+  "/(abp|accounts?|adfs|auth(enticat(e|ion)|orize|flow)?|(gdpr.?)?consent|cookie|download|oauth2?|openid|preferences|profile|register|(log|sign)(in|off|on|out|up)|sso|shibboleth|saml(2(\\.0)?)?|subscribe|verification)\\b": {
     "actions": {
       "whitelist": [
-        "redirect_uri"
-      ]
-    }
-  },
-  "\\b(SSO|shibboleth|SAML2(\\.0)?)\\b": {
-    "actions": {
-      "whitelist": [
-        "SigAlg"
+        "back.?(ur[il])?",
+        "cont(inue)?.?(ur[il])?",
+        "done.?(ur[il])?",
+        "next.?(ur[il])?",
+        "redir(ect)?.?(ur[il])?",
+        "return(_to)?.?(ur[il])?",
+        "w?reply.?(ur[il])?",
+        "u",
+        "ru",
+        "url",
+        "openid.+",
+        "service",
+        "(sig|alg).+",
+        "parent.?(ur[il])?"
       ]
     }
   },
