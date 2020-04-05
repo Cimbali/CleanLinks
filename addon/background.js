@@ -136,7 +136,7 @@ function clean_redirect_headers({ documentUrl, originUrl, responseHeaders, statu
 
 function on_request({ documentUrl, frameAncestors, frameId, tabId, type, originUrl, url })
 {
-	if (!Prefs.values.httpall && frameId !== 0)
+	if (!Prefs.values.httpall && type !== 'main_frame')
 	{
 		log('CleanLinks enabled only for top-level requests');
 		return {};
