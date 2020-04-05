@@ -133,7 +133,7 @@ function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 
 function decode_embedded_uri(link, rules, original_string)
 {
-	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$') : null;
+	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$', 'i') : null;
 
 	// first try to find a base64-encoded link
 	for (let str of get_link_search_strings(link, skip, rules.whitelist_path))

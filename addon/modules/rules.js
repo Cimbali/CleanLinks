@@ -150,7 +150,7 @@ function recursive_find(rules, domain_bits, path)
 	{
 		// normal (regexp) path match
 		const path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
-											   .filter(key => path.match(new RegExp(key)))
+											   .filter(key => path.match(new RegExp(key, 'i')))
 
 		for (const matching_key of path_matches)
 			matches.push(...recursive_find(rules[matching_key], [], undefined))
