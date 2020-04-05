@@ -75,49 +75,40 @@ hr {
 	padding: 0 1px 0 0;
 }
 
-#history div {
+#history.hierarchy div {
     border-bottom: black thin solid;
-	border-left: grey .25em solid;
+	border-left: grey 3px solid;
 	margin: 0 1px 0 .5em;
 	padding: 0;
 	position: relative;
-}
-
-#history div:after {
-	content: '';
-	display: block;
-	background: grey;
-	width: .25em;
-	top: 0;
-	bottom: 0;
 }
 
 #history div:empty {
 	display: none;
 }
 
-#history div:before {
+#history.hierarchy div:before {
     content: '';
     display: block;
     position: absolute;
-    left: -.7em;
+	left: -8px;
 
-	width: 1.2em;
-	height: 1.2em;
-	background-size: 1.2em 1.2em;
+	width: 15px;
+	height: 15px;
+	background-size: 15px 15px;
 	background-position: center;
 	background-repeat: no-repeat;
 }
 
-#history div:before {
+#history.hierarchy div:before {
 	background-image: url('/icons/minus.svg');
 }
 
-#history div.closed:before {
+#history.hierarchy div.closed:before {
 	background-image: url('/icons/plus.svg');
 }
 
-#history p {
+#history.hierarchy p {
 	display: block;
 	position: relative;
 	width: calc(100% - 2.25em);
@@ -126,45 +117,62 @@ hr {
 	cursor: pointer;
 }
 
-#history p:first-child {
+#history.hierarchy p:first-child {
 	margin: .25em 0 .25em 1em;
 	width: calc(100% - 1em);
 }
 
-#history p:not(:first-child) {
+#history.hierarchy p:not(:first-child) {
     border-top: black thin solid;
 }
 
-#history p:not(:first-child):before {
+#history.hierarchy p:not(:first-child):before {
     content: "";
     display: block;
     width: 2em;
-    height: 0;
+    height: 3px;
     position: relative;
-	top: .5em;
+	top: 10px;
     left: -2.25em;
-    border-top: .25em solid gray;
+    background-color: grey;
 }
 
-#history p:last-child:after {
+#history.hierarchy p:last-child:after {
     content: '';
     display: block;
-    width: 1em;
+    width: 1.2em;
     position: absolute;
 	border: none;
 	background: white;
 }
 
-#history p:not(:only-child):last-child:after {
-    top: .75em;
+#history.hierarchy p:not(:only-child):last-child:after {
+    top: 13px;
     bottom: -.25em;
-    left: -2.5em;
+    left: -2.75em;
 }
 
-#history p:only-child:after {
-    top: 1.25em;
+#history.hierarchy p:only-child:after {
+    top: 15px;
     bottom: -.25em;
-    left: -1.5em;
+    left: -1.75em;
+}
+
+#history.hierarchy div p.noclean-parent {
+	background-color: #eee;
+	cursor: default;
+}
+
+#history.one-level div p.noclean-parent {
+	display: none;
+}
+
+#history.one-level p {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	border: black thin solid;
+	cursor: pointer;
 }
 
 #history p > span {
@@ -172,11 +180,6 @@ hr {
 	padding: 2px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-}
-
-#history div p.noclean-parent {
-	background-color: #eee;
-	cursor: default;
 }
 #history p.selected > span {
 	background-color: #eef;

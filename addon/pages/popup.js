@@ -153,6 +153,11 @@ async function populate_popup()
 	document.querySelector('#homepage').setAttribute('href', homepage);
 	document.querySelector('#homepage').setAttribute('title', `${title} ${_('homepage')}`);
 
+	if (Prefs.values.httpall)
+		document.querySelector('#history').classList.add('hierarchy')
+	else
+		document.querySelector('#history').classList.add('one-level')
+
 	if (!Prefs.values.cltrack)
 	{
 		document.querySelector('#history').classList.add('disabled')
@@ -183,7 +188,7 @@ async function populate_popup()
 	{
 		const history = document.getElementById('history');
 		for (const clean of response)
-			append_link(history, clean, true);
+			append_link(history, clean, Prefs.values.httpall);
 
 		if (history.lastChild)
 			history.lastChild.classList.remove('closed');
