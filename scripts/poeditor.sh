@@ -45,31 +45,6 @@ languages() {
           -F id="323337" | jq -r 'select(.response.code == "200") | .result.languages[].code'
 }
 
-badges() {
-    curl -sX POST https://api.poeditor.com/v2/languages/list \
-          -F api_token="$poeditor_api_token" \
-          -F id="323337" | jq -r 'select(.response.code == "200") | .result.languages[] | [.name, .code, .percentage] |@csv' |
-        tr -d '"' | while IFS="," read name code percentage; do
-            #printf %d 'N -> ord(N) -> %F0%9F%87%{ 0xA6 + N - ord('a') } the urlencoded ISO 3166 flag
-			# if code is language-COUNTRY, use the country not the language code
-            flag=`echo ${code#*_} | sed -E "s/^[a-z]+[_-]//;s/./\\\\\\'\\L& /g" | xargs printf "%d + 69\n"|
-				bc | xargs printf '%%F0%%9F%%87%%%02X'`
-
-            # linearly interpolate FF0000 0% -> FFFF00 50% -> 00FF00 100%
-            colors=`bc <<EOF | xargs printf '%01x%01x%01x'
-                p = (30 * $percentage) / 100
-                if (p < 15) 15 else 2 * 15 - p
-                if (p < 15) p else 15
-                0
-EOF
-            `
-			encoded_name=`echo $name | sed 's/(/%28/g;s/)/%29/g;s/ /%20/g'`
-			image="![${name}: ${percentage}%](https://img.shields.io/badge/${flag}%20$encoded_name-${percentage}%25-${colors})"
-            # delete + insert instead of change, so new images get added correctly
-			echo $image
-        done
-}
-
 download() {
     lang=$1
     printf "Updating %s:\n" "$lang"
@@ -114,9 +89,6 @@ while [ $# -gt 0 ]; do
         for lang in `languages`; do
             download $lang
         done
-    elif test "$1" = "progress"; then
-        getpass
-        badges
     else
         echo "Unrecognised command $1 use one of: upload, languages, download, progress, contributors"
         exit 1

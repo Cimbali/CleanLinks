@@ -53,11 +53,11 @@ You can improve translations or add a new language [on CleanLink’s POEditor pa
 
 This is the current status of translations:
 
-![Chinese: 22%](https://img.shields.io/badge/%F0%9F%87%A8%F0%9F%87%B3%20Chinese-22%25-f60)
-![Chinese (TW): 22%](https://img.shields.io/badge/%F0%9F%87%B9%F0%9F%87%BC%20Chinese%20%28TW%29-22%25-f60)
-![French: 92%](https://img.shields.io/badge/%F0%9F%87%AB%F0%9F%87%B7%20French-92%25-3f0)
-![German: 22%](https://img.shields.io/badge/%F0%9F%87%A9%F0%9F%87%AA%20German-22%25-f60)
-![Spanish: 22%](https://img.shields.io/badge/%F0%9F%87%AA%F0%9F%87%B8%20Spanish-22%25-f60)
+![Chinese](https://img.shields.io/poeditor/progress/323337/zh-CN?token=7a666b44c0985d16a7b59748f488275c&label=%F0%9F%87%A8%F0%9F%87%B3%20Chinese)
+![Chinese (TW)](https://img.shields.io/poeditor/progress/323337/zh-TW?token=7a666b44c0985d16a7b59748f488275c&label=%F0%9F%87%B9%F0%9F%87%BC%20Chinese%20%28TW%29)
+![French](https://img.shields.io/poeditor/progress/323337/fr?token=7a666b44c0985d16a7b59748f488275c&label=%F0%9F%87%AB%F0%9F%87%B7%20French)
+![German](https://img.shields.io/poeditor/progress/323337/de?token=7a666b44c0985d16a7b59748f488275c&label=%F0%9F%87%A9%F0%9F%87%AA%20German)
+![Spanish](https://img.shields.io/poeditor/progress/323337/es?token=7a666b44c0985d16a7b59748f488275c&label=%F0%9F%87%AA%F0%9F%87%B8%20Spanish)
 
 
 ## Why are the requested permissions required?
