@@ -48,13 +48,13 @@ function filter_from_input(opt_iterable)
 	if (opt_iterable === undefined || opt_iterable instanceof Event)
 		opt_iterable = cleaned_items_list;
 
-	for (let { page, link } of opt_iterable)
+	for (const { page, link } of opt_iterable)
 	{
 		// There is a single category per item, that must be selected,
 		// and there are a number of actions of which any one can be selected
 		let category_selected = false, action_matched = false;
 
-		for (let class_name of link.classList)
+		for (const class_name of link.classList)
 		{
 			if (class_name in filter_cat)
 				category_selected = filter_cat[class_name]
@@ -191,7 +191,10 @@ async function populate_popup()
 			append_link(history, clean, Prefs.values.httpall);
 
 		if (history.lastChild)
+		{
 			history.lastChild.classList.remove('closed');
+			filter_from_input(cleaned_items_list.filter(({ page }) => page.isSameNode(history.lastChild)))
+		}
 
 		for (input of document.querySelectorAll('.filters input'))
 			input.onchange = filter_from_input
@@ -212,16 +215,12 @@ async function add_tab_listeners(tab_id)
 
 		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id}).catch(() => {}).then(() =>
 		{
-			const page_removal = []
 			for (const { page, link } of cleaned_items_list.splice(0, count))
 				if (link.parentNode)
-				{
 					page.removeChild(link);
-					if (page_removal.findIndex(remove => page.isSameNode(remove)) === -1)
-						page_removal.push(page);
-				}
 
 			// Do not remove pages that still have links to show
+			const page_removal = Array.from(document.querySelector('#history > div'));
 			for (const { page } of cleaned_items_list)
 			{
 				const pos = page_removal.findIndex(remove => page.isSameNode(remove))
@@ -229,7 +228,7 @@ async function add_tab_listeners(tab_id)
 					page_removal.splice(pos, 1);
 			}
 
-			for (const page of parent_removal)
+			for (const page of page_removal)
 				history.removeChild(page);
 		});
 	});
