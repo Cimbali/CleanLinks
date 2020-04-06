@@ -526,10 +526,7 @@ function fetch_rule(link)
 	let rule = {...default_actions, domain: url.hostname, path: '^' + url.pathname + '$'};
 
 	if (Rules.exists(rule))
-	{
-		document.getElementById('rule_selector').value = id_rule(rule);
-		return load_rule();
-	}
+		return { rule, exists: true }
 
 	// gather and normalize the data for this rule
 	rule.parents = Rules.serialize_matching(url).reverse();
@@ -543,7 +540,21 @@ function fetch_rule(link)
 		merge_rule_actions(rule.inherited, p)
 	}
 
-	return rule;
+	return { rule, exists: false }
+}
+
+
+function handle_prepopulate(message)
+{
+	const { rule, exists } = fetch_rule(message.link);
+
+	if (exists)
+	{
+		document.getElementById('rule_selector').value = id_rule(rule);
+		load_rule();
+	}
+	else
+		insert_rule(true, rule);
 }
 
 
@@ -651,7 +662,7 @@ function add_listeners()
 	{
 		if (message.action === 'set prepopulate')
 		{
-			insert_rule(true, fetch_rule(message.link));
+			handle_prepopulate(message);
 			return browser.runtime.sendMessage({action: 'get prepopulate'}).catch(() => {});
 		}
 		else if (message.action === 'rules')
@@ -666,11 +677,6 @@ function add_listeners()
 
 apply_i18n();
 add_listeners();
-Prefs.loaded.then(populate_options).then(() =>
-	browser.runtime.sendMessage({action: 'get prepopulate'}).then(answer =>
-	{
-		if ('link' in answer)
-			insert_rule(true, fetch_rule(answer.link));
-	})
-);
+Prefs.loaded.then(populate_options).then(() => browser.runtime.sendMessage({action: 'get prepopulate'}))
+								   .then(handle_prepopulate);
 Rules.loaded.then(populate_rules);
