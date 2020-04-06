@@ -328,7 +328,7 @@ function handle_message(message, sender)
 
 			// For each preference that requires action on change, get changes.pref = 1 if enabled, 0 unchanged, -1 disabled
 			let changes = {}
-			for (let prop of ['context_menu', 'progltr', 'httpall', 'textcl', 'show_clean_count'])
+			for (let prop of ['context_menu', 'clean_headers', 'httpall', 'select_context_menu', 'show_clean_count'])
 				changes[prop] = (Prefs.values[prop] === true ? 1 : 0) - (old_pref_values[prop] === true ? 1 : 0)
 
 			if (changes.context_menu > 0)
@@ -336,21 +336,21 @@ function handle_message(message, sender)
 				{
 					id: 'copy-clean-link',
 					title: 'Copy clean link',
-					contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
+					contexts: Prefs.values.select_context_menu ? ['link', 'selection'] : ['link']
 				});
 			else if (changes.context_menu < 0)
 				browser.contextMenus.remove('copy-clean-link')
-			else if (changes.textcl !== 0)
+			else if (changes.select_context_menu !== 0)
 				browser.contextMenus.update('copy-clean-link',
 				{
 					title: 'Copy clean link',
-					contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
+					contexts: Prefs.values.select_context_menu ? ['link', 'selection'] : ['link']
 				});
 
-			if (changes.progltr > 0)
+			if (changes.clean_headers > 0)
 				browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, {urls: ['<all_urls>']},
 																 ['blocking', 'responseHeaders']);
-			else if (changes.progltr < 0)
+			else if (changes.clean_headers < 0)
 				browser.webRequest.onHeadersReceived.removeListener(clean_redirect_headers);
 
 			browser.tabs.query({}).then(tabs =>
@@ -414,7 +414,7 @@ Promise.all([Prefs.loaded, Rules.loaded, ...load_metadata()]).then(() =>
 	browser.runtime.onMessage.addListener(handle_message);
 	browser.webRequest.onBeforeRequest.addListener(on_request, { urls: ['<all_urls>'] }, ['blocking']);
 
-	if (Prefs.values.progltr)
+	if (Prefs.values.clean_headers)
 		browser.webRequest.onHeadersReceived.addListener(clean_redirect_headers, { urls: ['<all_urls>'] },
 														 ['blocking', 'responseHeaders']);
 
@@ -443,7 +443,7 @@ Promise.all([Prefs.loaded, Rules.loaded, ...load_metadata()]).then(() =>
 		browser.contextMenus.create({
 			id: 'copy-clean-link',
 			title: 'Copy clean link',
-			contexts: Prefs.values.textcl ? ['link', 'selection'] : ['link']
+			contexts: Prefs.values.select_context_menu ? ['link', 'selection'] : ['link']
 		});
 });
 
@@ -465,7 +465,13 @@ async function upgrade_options(prev_version)
 	let num_prev_version = prev_version.split('.').map(s => parseInt(s))
 	const options = (await browser.storage.sync.get({'configuration': {}})).configuration;
 
-	for (let [rename, newname] of Object.entries({'httpomr': 'httpall', 'switchToTab': 'switch_to_tab', 'cbc': 'context_menu'}))
+	for (const [rename, newname] of Object.entries({
+		'httpomr': 'httpall',
+		'switchToTab': 'switch_to_tab',
+		'cbc': 'context_menu',
+		'textcl': 'select_context_menu',
+		'progltr': 'clean_headers',
+	}))
 		if (rename in options)
 		{
 			options[newname] = options[rename];

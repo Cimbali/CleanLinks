@@ -30,11 +30,12 @@ const pref_values = {
 	highlight : true,                                          // highlight cleaned links
 	hlstyle   : 'background:rgba(252,252,0,0.6); color: #000', // style for highlighted cleaned links
 	show_clean_count: true,                                    // highlight cleaned links
-	progltr   : true,                                          // http-on-examine-response: clean links on Location: redirect headers?
+	clean_headers   : true,                                    // http-on-examine-response: clean links on Location: redirect headers?
 	httpall   : true,                                          // http capture all traffic, not just main frame
 	context_menu: true,                                        // Context menus to clean links
+	select_context_menu: true,								   // Context menus on selection, not just links
 	gotarget  : false,                                         // whether we respect target attributes on links that are being cleaned
-	textcl    : true,                                          // search for & clean links in selected text
+	text_links: false,                                         // search for & clean links in selected text
 	ignhttp   : false,                                         // ignore non-http(s?) links
 	cltrack   : true,                                          // whether we track the link cleaning
 	switch_to_tab : true,                                      // Should be a copy of the browser preference: switch to a new tab when we open a link?

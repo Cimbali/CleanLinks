@@ -202,10 +202,15 @@
 			i18n_text="Copy clean links from the context menu"></label>
 		<input type="checkbox" name="context_menu" id="context_menu" value="" />
 
-		<label for="textcl" class="not-android"
-			i18n_title="Allows cleaning non-clickable text-links to open them as normal links."
+		<label for="select_context_menu"
+			i18n_title="The context menu action cleaning and copying a link target can also be applied to selected text."
 			i18n_text="Add context menu cleaning for selected text"></label>
-		<input type="checkbox" name="textcl" id="textcl" value="" />
+		<input type="checkbox" name="select_context_menu" id="select_context_menu" value="" />
+
+		<label for="text_links" class="not-android"
+			i18n_title="Allows cleaning non-clickable text-links to open them as normal links."
+			i18n_text="Clean and open non-clickable text links by clicking them"></label>
+		<input type="checkbox" name="text_links" id="text_links" value="" />
 
 		<label for="progltr"
 			i18n_title="Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs."

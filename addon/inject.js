@@ -25,6 +25,8 @@ function highlight_link(node, remove)
 	const css_property_list = ('' + Prefs.values.hlstyle).split(';').map(r => r.split(':').map(s => s.trim()));
 	for (const [prop, val] of css_property_list)
 		node.style.setProperty(prop, remove ? '' : val, 'important');
+
+	return node;
 }
 
 
@@ -114,6 +116,72 @@ function find_click_event(node)
 }
 
 
+function find_text_link(node)
+{
+	const selection = node.ownerDocument && node.ownerDocument.defaultView.getSelection();
+
+	if (!selection || !selection.isCollapsed || selection.rangeCount !== 1)
+		return;
+
+	// A) Find node’s text content and click position therein
+
+	// sanitize node content: remove 0-space tags, replace other tags with spaces
+	let text = node.innerHTML.replace(/<\/?wbr>/ig, '').replace(/<[^>]+?>/g, ' ');
+	let pos = text.indexOf(selection.focusNode.data) + selection.focusOffset;
+
+	// Alternate/fallback with textContent (do we need this?)
+	// NB: textContent squashes tags completely, such as <br /> -- this could lead to wrong links.
+	if (pos === -1)
+	{
+		text = node.textContent;
+		pos = text.indexOf(selection.focusNode.textContent) + selection.focusOffset;
+	}
+
+	// B) Extract clicked word and verify it looks like an (absolute) URL
+	// move start of selection backwards until start of data or a boundary character
+	while (pos >= 0 && ' "\'<>\n\r\t()[]|'.indexOf(text[pos + 1]) === -1)
+		pos--;
+
+	if (pos !== -1)
+		text = text.substr(pos);
+
+	const [matched, ] = text.match(/^\s*(?:\w+:\/\/|www\.)[^\s">]{4,}/) || [];
+
+	if (!matched)
+		return;
+
+	// C) Return parsed URL and its position in the document
+	const url = matched.trim().replace(/[\ \"\'\<\>\n\r\	\(\)\[\]\|]+$/, '');
+	const protocol = matched.includes('://') ? '' : node.ownerDocument.defaultView.location.protocol + '//';
+
+	const range = new Range();
+
+	let start = pos, end = start + url.length;
+	for (const child of node.childNodes)
+	{
+		if (start === 0)
+			range.setStartBefore(child);
+		else if (start > 0 && child.textContent.length > start)
+			range.setStart(child, start);
+		else if (child.textContent.length === start)
+			range.setStartAfter(child);
+
+		if (end === 0)
+			range.setEndBefore(child);
+		else if (end > 0 && child.textContent.length > end)
+			range.setEnd(child, end);
+		else if (child.textContent.length === end)
+			range.setEndAfter(child);
+
+
+		start -= child.textContent.length;
+		end -= child.textContent.length;
+	}
+
+	return { text_link: protocol + url, range };
+}
+
+
 function on_pre_click(evt)
 {
 	const { href, node } = find_click_target(evt.target);
@@ -143,34 +211,35 @@ function on_click(evt)
 		return; // alt+click, do nothing
 
 	const { href, func, node, event_type } = { ...find_click_event(evt.target), ...find_click_target(evt.target) };
+	const { text_link, range } = Prefs.values.text_links && !node && find_text_link(evt.target) || {};
 
-	const text_link = href || func;
-	log(`click on ${node.nodeName} ${node} with URL "${text_link}" and event ${event_type}`)
+	const raw_link = href || func || text_link;
 
 	if (node && !Prefs.values.gotarget && (node.getAttribute('target') || '_self') !== '_self')
 		node.removeAttribute('target');
 
-	if (!tab_enabled || !text_link)
+	if (!tab_enabled || !raw_link)
 		return;
 
 
-	const base = (node.ownerDocument.defaultView || window).location.href;
-	let cleaned_link = tab_enabled && extract_javascript_link(text_link, base);
+	const base = (node && node.ownerDocument.defaultView || window).location.href;
+	let cleaned_link = extract_javascript_link(raw_link, base);
 
 	// report that we cleaned the javascript from the node’s href
-	if (href)
-	{
-		if (cleaned_link)
-			event_type = 'href';
+	if (href && cleaned_link)
+		event_type = 'href';
 
-		// If there is an identified javascript event (i.e. event_type defined) on a ckean link,
-		// still prevent the click event, and perform the action of activating the link manually.
-		else if (event_type)
-			try { cleaned_link = new URL(href, base); } catch {};
-	}
+	// If there is an identified javascript event (i.e. event_type defined) on a ckean link,
+	// still prevent the click event, and perform the action of activating the link manually.
+	else if (href && event_type)
+		cleaned_link = (() => { try { return new URL(href, base); } catch {} })();
+
+	else if (raw_link && !node)
+		cleaned_link = (() => { try { return new URL(raw_link, base); } catch {} })();
+
 
 	// report as cleaned links where we prevented a mousedown event
-	if (!cleaned_link && !event_type && node.isSameNode(pre_cleaned_node))
+	if (!cleaned_link && !event_type && node && node.isSameNode(pre_cleaned_node))
 		event_type = 'mousedown';
 
 
@@ -178,28 +247,34 @@ function on_click(evt)
 	let notify = Promise.resolve();
 	if (event_type)
 	{
-		log(`Cleaning javascript ${text_link} to ${cleaned_link} with event ${event_type}`)
+		console.log(`Cleaning javascript ${raw_link} to ${cleaned_link} with event ${event_type}`)
 
 		notify = browser.runtime.sendMessage({
 			action: 'notify',
 			url: cleaned_link.href,
-			orig: text_link,
+			orig: raw_link,
 			type: 'clicked',
 			parent: base,
 			cleaned: {javascript: event_type}
 		});
 
 		if (Prefs.values.highlight)
-			highlight_link(node);
+			highlight_link(node || range.commonAncestorContainer);
 	}
 	else
 	{
-		const url = (() => { try { return new URL(text_link, base).href; } catch { return text_link; } })();
+		const url = (() => { try { return new URL(raw_link, base).href; } catch { return raw_link; } })();
 
-		log(`Notifying non-javascript link ${url} clicked`)
+		console.log(`Notifying non-javascript link ${url} clicked`)
 
-		highlight_node = node;
-		notify = browser.runtime.sendMessage({action: 'highlight', link: url});
+		if (node)
+		{
+			highlight_node = node;
+			notify = browser.runtime.sendMessage({action: 'highlight', link: url});
+		}
+		// text-based link
+		else if (Prefs.values.highlight)
+			range.surroundContents(highlight_link(document.createElement('span')));
 	}
 
 	if (cleaned_link)
@@ -209,13 +284,13 @@ function on_click(evt)
 		evt.preventDefault();
 
 		notify.catch(err => console.error('Notification failed:', err));
-		notify.then(() => event_do_click(cleaned_link.href, node, evt));
+		notify.then(() => event_do_click(cleaned_link.href, node || evt.target, evt));
 	}
 }
 
 
 browser.runtime.sendMessage({action: 'check tab enabled', url: window.location.href})
-	.then(answer => ({ enabled: tab_enabled } = answer || { enabled: false }))
+	.then(answer => ({ enabled: tab_enabled } = answer || { enabled: false }))
 	.catch(() => {});
 
 
