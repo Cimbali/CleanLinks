@@ -17,10 +17,16 @@ body {
 	/* do not set width directly to avoid scrollbars when in overflow menu */
 	max-width: 800px;
 }
-hr {
-	/* nasty hack to negociate a popup as big as possible */
+/* nasty hack to negociate a popup as big as possible */
+#hr {
 	min-width: 800px;
 	height: 0px;
+	margin: 0;
+	visibility: hidden;
+}
+#hr {
+	min-height: 600px;
+	width: 0px;
 	margin: 0;
 	visibility: hidden;
 }
@@ -49,6 +55,10 @@ hr {
 	margin: 0;
 }
 #bottom {
+	background: white;
+	bottom: 0;
+	position: fixed;
+	width: calc(100% - 10px);
 	margin: 5px;
 	display: flex;
 	align-items: center;
@@ -62,7 +72,11 @@ hr {
 	margin-top: 1em;
 }
 #history {
-	height: 450px;
+	position: absolute;
+	top: calc(80px + 2em);
+	bottom: 45px;
+	left: 0;
+	right: 0;
 
 	display: block;
 	border-top: black thin solid;
@@ -119,7 +133,6 @@ hr {
 #filters {
 	display: flex;
 	align-items: center;
-	flex-wrap: wrap;
 	margin: 0;
 }
 #filter_categories {
@@ -138,7 +151,6 @@ hr {
 .filters label {
 	flex: 30px 0 1;
 	margin: 5px;
-	min-width: 22px;
 }
 .filters label img {
 	width: 100%;
@@ -215,23 +227,18 @@ input#enabled:not(:checked) ~ * .when_enabled {
 	body {
 		font-size: 2em !important;
 	}
-	hr {
+	#hr, #vr {
 		display: none;
 	}
 	#icon {
 		text-align: center !important;
 		flex: 20px 1 0 !important;
 	}
-	#bottom {
-		background: white;
-		bottom: 0;
-		position: fixed;
-		width: 100%;
-	}
 	.filters {
 		margin: 2px;
 	}
 	#history {
+		position: relative;
 		max-height: calc(100vh - 25vw - 120px) !important;
 		height: auto !important;
 	}
