@@ -328,7 +328,8 @@
       "^/embed/": {
         "actions": {
           "remove": [
-            "origin"
+            "origin",
+            ".*referrer"
           ]
         }
       },
