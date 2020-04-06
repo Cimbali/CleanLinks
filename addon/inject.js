@@ -69,7 +69,13 @@ function find_click_target(node)
 	do
 	{
 		if (node.nodeName === 'A')
-			return { node, href: node.href };
+		{
+			// only return the href if it’s not an obvious NOP
+			if (node.href === '#' || node.href.match(/^javascript:(void\(0?\)|\/\/)?$/))
+				return { node }
+			else
+				return { node, href: node.href };
+		}
 	}
 	while (['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));
 
