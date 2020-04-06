@@ -10,7 +10,7 @@ describe('find_rules', function() {
 		Rules.loaded.then(() =>
 		{
 			let result = Rules.find(so_login)
-			expect(result.whitelist).to.have.members(['returnurl'])
+			expect(result.whitelist).to.include('return(_to)?.?(ur[il])?')
 		})
 	);
 	it('should return correct "q" whitelist for google search', () =>
