@@ -226,6 +226,7 @@ input#enabled:not(:checked) ~ * .when_enabled {
 @media only screen and (max-device-width: 480px) {
 	body {
 		font-size: 2em !important;
+		max-width: none !important;
 	}
 	#hr, #vr {
 		display: none;
@@ -239,6 +240,8 @@ input#enabled:not(:checked) ~ * .when_enabled {
 	}
 	#history {
 		position: relative;
+		top: auto !important;
+		bottom: auto !important;
 		max-height: calc(100vh - 25vw - 120px) !important;
 		height: auto !important;
 	}
@@ -261,7 +264,7 @@ input#enabled:not(:checked) ~ * .when_enabled {
 	}
 	#bottom button {
 		object-fit: contain;
-		width: 11%;
-		padding-top: 11%;
+		width: 9%;
+		padding-top: 9%;
 	}
 }
