@@ -220,16 +220,9 @@ async function add_tab_listeners(tab_id)
 					page.removeChild(link);
 
 			// Do not remove pages that still have links to show
-			const page_removal = Array.from(document.querySelector('#history > div'));
-			for (const { page } of cleaned_items_list)
-			{
-				const pos = page_removal.findIndex(remove => page.isSameNode(remove))
-				if (pos !== -1)
-					page_removal.splice(pos, 1);
-			}
-
-			for (const page of page_removal)
-				history.removeChild(page);
+			for (const page of Array.from(history.children))
+				if (cleaned_items_list.find(({ page: keep }) => page.isSameNode(keep)) === undefined)
+					history.removeChild(page)
 		});
 	});
 
