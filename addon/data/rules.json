@@ -987,14 +987,10 @@
         }
       }
     },
-    ".nocookie": {
-      ".wikia": {
-        ".slot1-images": {
-          "^/__am/\\d+/sasses/.*image%3Dhttps": {
-            "actions": {
-              "whitelist_path": true
-            }
-          }
+    ".nitter": {
+      "^/(pic|gif|video)/": {
+        "actions": {
+          "whitelist_path": true
         }
       }
     },
