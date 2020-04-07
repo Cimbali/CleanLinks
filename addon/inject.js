@@ -139,13 +139,14 @@ function find_text_link(node)
 
 	// B) Extract clicked word and verify it looks like an (absolute) URL
 	// move start of selection backwards until start of data or a boundary character
-	while (pos >= 0 && ' "\'<>\n\r\t()[]|'.indexOf(text[pos + 1]) === -1)
-		pos--;
+	while (pos !== -1)
+		if (' "\'<>\n\r\t()[]|'.includes(text[pos]))
+			break;
+		else
+			pos--;
 
-	if (pos !== -1)
-		text = text.substr(pos);
 
-	const [matched, ] = text.match(/^\s*(?:\w+:\/\/|www\.)[^\s">]{4,}/) || [];
+	const [matched, ] = text.substring(pos + 1).match(/^\s*(?:\w+:\/\/|www\.)[^\s">]{4,}/) || [];
 
 	if (!matched)
 		return;
@@ -156,7 +157,7 @@ function find_text_link(node)
 
 	const range = new Range();
 
-	let start = pos, end = start + url.length;
+	let start = node.textContent.indexOf(url), end = start + url.length;
 	for (const child of node.childNodes)
 	{
 		if (start === 0)
@@ -189,7 +190,6 @@ function on_pre_click(evt)
 	// This is a valid link: cancel onmousedown trickeries by stopping the event.
 	if (tab_enabled && href)
 	{
-		console.log('Dropping mousedown event')
 		evt.stopPropagation();
 		evt.preventDefault();
 
@@ -247,7 +247,7 @@ function on_click(evt)
 	let notify = Promise.resolve();
 	if (event_type)
 	{
-		console.log(`Cleaning javascript ${raw_link} to ${cleaned_link} with event ${event_type}`)
+		log(`Cleaning javascript ${raw_link} to ${cleaned_link} with event ${event_type}`)
 
 		notify = browser.runtime.sendMessage({
 			action: 'notify',
@@ -265,7 +265,7 @@ function on_click(evt)
 	{
 		const url = (() => { try { return new URL(raw_link, base).href; } catch { return raw_link; } })();
 
-		console.log(`Notifying non-javascript link ${url} clicked`)
+		log(`Notifying non-javascript link ${url} clicked`)
 
 		if (node)
 		{
@@ -274,7 +274,12 @@ function on_click(evt)
 		}
 		// text-based link
 		else if (Prefs.values.highlight)
-			range.surroundContents(highlight_link(document.createElement('span')));
+			try
+			{
+				// no guarantees the range isn’t split across a tag so we can’t surround it properly
+				range.surroundContents(highlight_link(document.createElement('span')));
+			}
+			catch {}
 	}
 
 	if (cleaned_link)
