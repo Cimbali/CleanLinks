@@ -15,17 +15,18 @@ html, body {
 body {
 	font-size: .8em;
 	/* do not set width directly to avoid scrollbars when in overflow menu */
-	max-width: 800px;
+	max-width: 750px;
+	max-height: 500px;
 }
 /* nasty hack to negociate a popup as big as possible */
 #hr {
-	min-width: 800px;
+	min-width: 750px;
 	height: 0px;
 	margin: 0;
 	visibility: hidden;
 }
-#hr {
-	min-height: 600px;
+#vr {
+	min-height: 500px;
 	width: 0px;
 	margin: 0;
 	visibility: hidden;
