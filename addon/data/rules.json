@@ -1132,6 +1132,7 @@
       "whitelist": [
         "back.?(ur[il])?",
         "cont(inue)?.?(ur[il])?",
+        "domain",
         "done.?(ur[il])?",
         "next.?(ur[il])?",
         "redir(ect)?.?(ur[il])?",
