@@ -112,7 +112,8 @@ function clean_redirect_headers({ documentUrl, originUrl, responseHeaders, statu
 		orig: link.href,
 		type: 'header',
 		parent: current_url.href,
-		tab_id: tabId
+		tab_id: tabId,
+		cleaned: cleaning_info,
 	};
 
 	if (cleaned_link.href === current_url.href)
