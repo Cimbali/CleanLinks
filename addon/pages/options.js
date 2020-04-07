@@ -544,9 +544,12 @@ function fetch_rule(link)
 }
 
 
-function handle_prepopulate(message)
+function handle_prepopulate({ link })
 {
-	const { rule, exists } = fetch_rule(message.link);
+	if (!link)
+		return;
+
+	const { rule, exists } = fetch_rule(link);
 
 	if (exists)
 	{
