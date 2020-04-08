@@ -25,6 +25,7 @@
 	"background":
 	{
 		"scripts": [
+			"modules/browser-polyfill.js",
 			"modules/common.js",
 			"modules/punycode.js",
 			"modules/publicsuffixlist.js",
@@ -38,6 +39,7 @@
 		{
 			"matches": ["<all_urls>", "*://*/*", "file:///*"],
 			"js": [
+				"modules/browser-polyfill.js",
 				"modules/common.js",
 				"inject.js"
 			],

@@ -19,6 +19,7 @@ module.exports = config => Object.assign(config,
 		'tests/setup.js',
 
 		// The files to be tested have to be served
+		"addon/modules/browser-polyfill.js",
 		"addon/modules/common.js",
 		"addon/modules/punycode.js",
 		"addon/modules/publicsuffixlist.js",

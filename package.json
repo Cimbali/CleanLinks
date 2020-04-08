@@ -19,6 +19,7 @@
 		"karma-sinon-chrome": "^0.2.0",
 		"mocha": "^3.5.0",
 		"sinon-chrome": "^2.1.2",
-		"web-ext": "^1.6.0"
+		"web-ext": "^1.6.0",
+		"webextension-polyfill": "^0.6.0"
 	}
 }
