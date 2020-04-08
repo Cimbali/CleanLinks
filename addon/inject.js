@@ -84,9 +84,10 @@ function find_click_target(node)
 
 
 // NB: this is not great to decode obfuscated javascript codes, but at least returns if there are events
-function find_click_event(node)
+function find_click_event(node, searched_events)
 {
-	const searched_events = ['click', 'mousedown', 'touchstart', 'mouseup', 'touchend'];
+	if (searched_events === undefined)
+		searched_events = ['click', 'mousedown', 'touchstart', 'mouseup', 'touchend'];
 
 	do
 	{
@@ -116,10 +117,19 @@ function find_click_event(node)
 
 function on_pre_click(evt)
 {
+	if (!tab_enabled)
+		return;
+
 	const { href, node } = find_click_target(evt.target);
 
-	// This is a valid link: cancel onmousedown trickeries by stopping the event.
-	if (tab_enabled && href)
+	// Not a valid link: nothing to protect
+	if (!href)
+		return;
+
+	const { event_type } = find_click_event(evt.target, ['mousedown', 'touchstart']);
+
+	// Protect the link by cancelling onmousedown trickeries by stopping the event.
+	if (event_type)
 	{
 		console.log('Dropping mousedown event')
 		evt.stopPropagation();
