@@ -72,7 +72,7 @@ function find_click_target(node)
 		{
 			const href = node.getAttribute('href');
 			// only return the href if it’s not an obvious NOP
-			if (href === '#' || href.match(/^javascript:(void\(0?\)|\/\/)?$/))
+			if (href === '#' || href.match(/^javascript:(void\(0?\)|\/\/)?;?$/))
 				return { node }
 			else
 				return { node, href };
