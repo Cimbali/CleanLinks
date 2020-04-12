@@ -158,28 +158,32 @@
 			</p>
 
 
-			<label for="remove_add" i18n_text="Remove query parameters:"></label>
-			<span id="remove_itemlist" class="itemlist"></span>
-			<span id="remove_inheritlist" class="inheritlist"></span>
-			<button id="remove_add" class="add_to_list" i18n_title="Add to the list">+</button>
+			<p>
+				<label for="remove_add" i18n_text="Remove query parameters:"></label>
+				<span id="remove_itemlist" class="itemlist"></span>
+				<span id="remove_inheritlist" class="inheritlist"></span>
+				<button id="remove_add" class="add_to_list" i18n_title="Add to the list">+</button>
+			</p>
 
-			<label for="whitelist_add" i18n_text="Whitelist query parameters (prevent removing and allow embedded URL):"></label>
-			<span id="whitelist_itemlist" class="itemlist"></span>
-			<span id="whitelist_inheritlist" class="inheritlist"></span>
-			<button id="whitelist_add" class="add_to_list" i18n_title="Add to the list">+</button>
+			<p>
+				<label for="whitelist_add" i18n_text="Whitelist query parameters (prevent removing and allow embedded URL):"></label>
+				<span id="whitelist_itemlist" class="itemlist"></span>
+				<span id="whitelist_inheritlist" class="inheritlist"></span>
+				<button id="whitelist_add" class="add_to_list" i18n_title="Add to the list">+</button>
+			</p>
 
-			<label><span i18n_text="Allow URL embedded inside path"></span>
-				<input type="checkbox" name="whitelist_path" value="" />
-			</label>
+			<label i18n_text="Allow URL embedded inside path" for="whitelist_path"></label>
+			<input type="checkbox" name="whitelist_path" id="whitelist_path" value="" />
 
-			<label><span i18n_text="Allow javascript to modify links"></span>
-				<input type="checkbox" name="allow_js" value="" />
-			</label>
+			<label i18n_text="Allow javascript to modify links" for="allow_js"></label>
+			<input type="checkbox" name="allow_js" id="allow_js" value="" />
 
-			<label for="rewrite_add" i18n_text="Remove or replace in path:"></label>
-			<span id="rewrite_itemlist" class="itemlist"></span>
-			<span id="rewrite_inheritlist" class="inheritlist"></span>
-			<button id="rewrite_add" class="add_to_list" i18n_title="Add to the list">+</button>
+			<p>
+				<label for="rewrite_add" i18n_text="Remove or replace in path:"></label>
+				<span id="rewrite_itemlist" class="itemlist"></span>
+				<span id="rewrite_inheritlist" class="inheritlist"></span>
+				<button id="rewrite_add" class="add_to_list" i18n_title="Add to the list">+</button>
+			</p>
 
 		</fieldset>
 	</fieldset>
