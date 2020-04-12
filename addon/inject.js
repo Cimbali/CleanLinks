@@ -77,7 +77,7 @@ function find_click_target(node)
 			if (href === '#' || href.match(/^javascript:(void\(0?\)|\/\/)?;?$/))
 				return { node }
 			else
-				return { node, href };
+				return { node, href: node.href };
 		}
 	}
 	while (['A', 'BODY', 'HTML'].indexOf(node.nodeName) === -1 && (node = node.parentNode));

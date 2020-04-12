@@ -248,6 +248,22 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean)
 		sep = '&';
 	}
 
+	// treat hash-bank links
+	const hash_link = (() => { try { return orig.hash.startsWith('#!') && new URL(orig.hash.slice(2), orig.origin); } catch {} })();
+	if (hash_link)
+	{
+		append_normal_path(link_elem, hash_link, clean, actions_to_whitelist);
+		sep = '?';
+		for (let [key, val] of hash_link.searchParams)
+		{
+			const keyval = sep + encodeURIComponent(key) + '=' + encodeURIComponent(val);
+			append_query_param(link_elem, keyval, clean, key.match(keep), key.match(strip), actions_to_whitelist);
+			sep = '&';
+		}
+	}
+	else
+		append_decorated_text(link_elem, orig.hash)
+
 	if (suffix)
 		append_decorated_text(link_elem, suffix, 'deleted');
 
