@@ -73,7 +73,7 @@ function save_options()
 	{
 		if (typeof Prefs.values[field.name] == 'boolean')
 			options[field.name] = field.checked;
-		else if (field.name in Prefs)
+		else if (field.name in Prefs.values)
 			options[field.name] = field.value;
 	}
 
