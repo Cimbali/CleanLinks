@@ -46,7 +46,8 @@
           "hsa_cr_id",
           "sb-ci-[a-zA-Z]+",
           "rnid",
-          "tag"
+          "tag",
+          "psc"
         ],
         "rewrite": [
           {
@@ -71,7 +72,7 @@
         "remove": [
           "cvid",
           "form",
-          "qp",
+          "pq",
           "qs",
           "sc",
           "sk",
@@ -107,6 +108,13 @@
               "redirect"
             ]
           }
+        }
+      },
+      "^/photo.php$": {
+        "actions": {
+          "whitelist": [
+            "fbid"
+          ]
         }
       },
       "actions": {
@@ -249,7 +257,10 @@
     ".instagram": {
       "actions": {
         "remove": [
-          "igshid"
+          "igshid",
+          "rd",
+          "rp",
+          "source"
         ]
       }
     },
@@ -342,6 +353,17 @@
       }
     }
   },
+  ".co.uk": {
+    ".bbc": {
+      ".www": {
+        "actions": {
+          "remove": [
+            "intlink_from_url"
+          ]
+        }
+      }
+    }
+  },
   ".com": {
     ".9gag": {
       ".comment-cdn": {
@@ -363,6 +385,17 @@
         ]
       }
     },
+    ".acast": {
+      ".feeds": {
+        "^/public/streams/": {
+          "actions": {
+            "remove": [
+              "ref"
+            ]
+          }
+        }
+      }
+    },
     ".aliexpress": {
       "actions": {
         "remove": [
@@ -372,8 +405,25 @@
           "algo_pvid",
           "gps-id",
           "scm[_a-zA-Z\\-]*",
+          "scm",
+          "spm",
           "pvid"
         ]
+      }
+    },
+    ".amazon": {
+      ".aws": {
+        ".signin": {
+          ".": {
+            "/signin": {
+              "actions": {
+                "whitelist": [
+                  "redirect_uri"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     ".backcountry": {
@@ -483,6 +533,13 @@
           }
         }
       },
+      "^/$": {
+        "actions": {
+          "whitelist": [
+            "iai"
+          ]
+        }
+      },
       "^/mapkit/$": {
         "actions": {
           "whitelist": [
@@ -494,6 +551,31 @@
         "whitelist": [
           "q"
         ]
+      }
+    },
+    ".elsevierhealth": {
+      ".jbs": {
+        ".secure": {
+          "^/action/getSharedSiteSession$": {
+            "actions": {
+              "whitelist": [
+                "redirect"
+              ]
+            }
+          }
+        }
+      }
+    },
+    ".embedly": {
+      ".cdn": {
+        "^/widgets/media.html$": {
+          "actions": {
+            "whitelist": [
+              "url",
+              "image"
+            ]
+          }
+        }
       }
     },
     ".firefox": {
@@ -514,6 +596,15 @@
               "entrypoint",
               "form_type"
             ]
+          }
+        }
+      }
+    },
+    ".forbes": {
+      ".thumbor": {
+        "^/thumbor/.+/": {
+          "actions": {
+            "whitelist_path": true
           }
         }
       }
@@ -543,8 +634,17 @@
       }
     },
     ".google": {
+      ".accounts": {
+        "^/ServiceLogin$": {
+          "actions": {
+            "whitelist": [
+              "followup"
+            ]
+          }
+        }
+      },
       ".docs": {
-        "^/nonceSigner$": {
+        "^.*/nonceSigner$": {
           "actions": {
             "whitelist": [
               "continue"
@@ -619,16 +719,6 @@
             ]
           }
         }
-      },
-      ".www": {
-        "^/\\w+/\\w+/embed/captioned/$": {
-          "actions": {
-            "remove": [
-              "rd",
-              "rp"
-            ]
-          }
-        }
       }
     },
     ".lidl": {
@@ -641,6 +731,15 @@
       }
     },
     ".linkedin": {
+      ".www": {
+        "^/authwall$": {
+          "actions": {
+            "remove": [
+              "originalReferer"
+            ]
+          }
+        }
+      },
       "actions": {
         "remove": [
           "refId",
@@ -656,6 +755,30 @@
             "whitelist": [
               "ru"
             ]
+          }
+        }
+      },
+      ".login": {
+        ".": {
+          "^/(login|logout)\\.srf$": {
+            "actions": {
+              "whitelist": [
+                "ru",
+                "wreply"
+              ]
+            }
+          }
+        }
+      },
+      ".officeapps": {
+        ".powerpoint": {
+          "^/pods/ppt.aspx$": {
+            "actions": {
+              "whitelist": [
+                "wdPodsUrl",
+                "wdPopsUrl"
+              ]
+            }
           }
         }
       }
@@ -694,6 +817,26 @@
         ]
       }
     },
+    ".microfocus": {
+      ".login": {
+        "^/nidp/idff/sso$": {
+          "actions": {
+            "whitelist": [
+              "AuthnContextStatementRef"
+            ]
+          }
+        }
+      },
+      ".www": {
+        "^/(LAGBroker|nesp/app/plogin)$": {
+          "actions": {
+            "whitelist": [
+              ".+"
+            ]
+          }
+        }
+      }
+    },
     ".moosejaw": {
       "actions": {
         "remove": [
@@ -719,6 +862,19 @@
         "remove": [
           "smid"
         ]
+      }
+    },
+    ".office": {
+      ".suite": {
+        ".webshell": {
+          "^/iframe/TokenFactoryIframe$": {
+            "actions": {
+              "whitelist": [
+                "origin"
+              ]
+            }
+          }
+        }
       }
     },
     ".readdc": {
@@ -752,6 +908,13 @@
             ]
           }
         }
+      },
+      "^/oembed.json$": {
+        "actions": {
+          "whitelist": [
+            "url"
+          ]
+        }
       }
     },
     ".spotify": {
@@ -777,6 +940,13 @@
         ]
       }
     },
+    ".thalysnet": {
+      "actions": {
+        "whitelist": [
+          "url"
+        ]
+      }
+    },
     ".theguardian": {
       ".www": {
         "actions": {
@@ -792,6 +962,17 @@
           "whitelist": [
             "url"
           ]
+        }
+      }
+    },
+    ".twitter": {
+      ".platform": {
+        "^/widgets/widget_iframe\\.": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
         }
       }
     },
@@ -953,6 +1134,60 @@
       }
     }
   },
+  ".gob.es": {
+    ".sepe": {
+      ".isweb": {
+        "^/GetAccess/Saml/SSO/Init$": {
+          "actions": {
+            "whitelist": [
+              "GA_SAML_AC_CLASS_REF"
+            ]
+          }
+        }
+      }
+    }
+  },
+  ".gouv.fr": {
+    ".impots": {
+      ".idp": {
+        "^/GetContexte$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        },
+        "^/LoginAEL$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        },
+        "^/LoginAccess$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      }
+    }
+  },
+  ".info": {
+    ".ombord": {
+      ".www": {
+        "^/hotspot/hotspot.cgi$": {
+          "actions": {
+            "whitelist": [
+              "url",
+              "onerror"
+            ]
+          }
+        }
+      }
+    }
+  },
   ".io": {
     ".shields": {
       ".img": {
@@ -987,11 +1222,38 @@
         }
       }
     },
+    ".launchpad": {
+      "^/+openid-callback$": {
+        "actions": {
+          "whitelist": [
+            "starting_url",
+            "openid\\.return_to"
+          ]
+        }
+      }
+    },
     ".nitter": {
       "^/(pic|gif|video)/": {
         "actions": {
           "whitelist_path": true
         }
+      }
+    },
+    ".nocookie": {
+      ".wikia": {
+        "^/__am/\\d+/sasses/.*background-image.*": {
+          "actions": {
+            "whitelist_path": true
+          }
+        }
+      }
+    },
+    ".sourceforge": {
+      "actions": {
+        "remove": [
+          "position",
+          "source"
+        ]
       }
     },
     ".tweakers": {
@@ -1022,6 +1284,27 @@
         "/web/.*": {
           "actions": {
             "whitelist_path": true
+          }
+        },
+        "^/__wb/calendarcaptures/": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        },
+        "^/__wb/search/": {
+          "actions": {
+            "whitelist": [
+              "q"
+            ]
+          }
+        },
+        "^/__wb/sparkline$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
           }
         }
       }
@@ -1123,23 +1406,28 @@
       }
     }
   },
-  "/(abp|accounts?|adfs|auth(enticat(e|ion)|orize|flow)?|(gdpr.?)?consent|cookie|download|oauth2?|openid|preferences|profile|register|(log|sign)(in|off|on|out|up)|sso|shibboleth|saml(2(\\.0)?)?|subscribe|verification)\\b": {
+  "/(abp|accounts?|adfs|auth(enticat(e|ion)|orize|flow)?|(gdpr.?)?consent|cookie|download|oauth2?|openid|preferences|profile|register|(log|sign)(in|off|on|out|up)|sso|shibboleth|saml(2(\\.0)?)?|subscribe|verification)(\\b|_)": {
     "actions": {
       "whitelist": [
         "back.?(ur[il])?",
+        "(came_?)?from",
         "cont(inue)?.?(ur[il])?",
         "domain",
         "done.?(ur[il])?",
+        "follow(.?up)?.?(ur[il])?",
         "next.?(ur[il])?",
+        "protocol.*",
+        "provider(.?id)?",
         "redir(ect)?.?(ur[il])?",
         "return(_to)?.?(ur[il])?",
         "w?reply.?(ur[il])?",
         "u",
         "ru",
-        "url",
+        ".*ur[il]",
         "openid.+",
         "service",
         "(sig|alg).+",
+        "target.?(ur[il])?",
         "parent.?(ur[il])?"
       ]
     }
@@ -1182,6 +1470,24 @@
       "cmpid",
       "os_ehash",
       "_ga",
+      "pk_.+",
+      "recipientId",
+      "sc_(campaign|channel|cid|content|country|geo|medium|outcome)",
+      "siteId",
+      "sp(Job|Mailing|Report|User)I[dD]",
+      "trk(Campaign)?",
+      "elqTrack(Id)?",
+      "hsCtaTracking",
+      "__?hs(enc|mi|sc|tc)",
+      "itm_.+",
+      "wt_zmc",
+      "aff_(platform|trace_key)",
+      "asset(Id|Type)",
+      "Campaign",
+      "campaign_?[Ii]?d",
+      "mbid",
+      "WT\\.mc_id",
+      "c_?id",
       "__twitter_impression",
       "wt_?z?mc",
       "wtrid",
