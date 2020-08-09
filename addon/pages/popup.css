@@ -267,10 +267,10 @@ body {
 #refresh  { background-image: url("/icons/refresh.svg"); }
 #clearlist { background-image: url("/icons/trashcan.svg"); }
 #copy { background-image: url("/icons/copy.svg"); }
-#openonce { background-image: url("/icons/shield-1.svg"); }
-#whitelist { background-image: url("/icons/shield-check.svg"); }
-#blacklist { background-image: url("/icons/shield-x.svg"); }
-#open_editor { background-image: url("/icons/shield-edit.svg"); }
+#openonce { background-image: url("/icons/open-once.svg"); }
+#whitelist { background-image: url("/icons/allow-redirect.svg"); }
+#blacklist { background-image: url("/icons/remove-redirect.svg"); }
+#open_editor { background-image: url("/icons/edit-rules.svg"); }
 
 #history p span.original {
 	background-image: url("/icons/clicked.svg");

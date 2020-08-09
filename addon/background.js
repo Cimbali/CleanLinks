@@ -463,7 +463,7 @@ function import_domain_whitelist(domains_list)
 
 async function upgrade_options(prev_version)
 {
-	let num_prev_version = prev_version.split('.').map(s => parseInt(s))
+	const num_prev_version = prev_version.split('.').map(s => parseInt(s))
 	const options = (await browser.storage.sync.get({'configuration': {}})).configuration;
 
 	for (const [rename, newname] of Object.entries({
@@ -584,10 +584,26 @@ async function upgrade_options(prev_version)
 }
 
 
-browser.runtime.onInstalled.addListener(({ reason, previousVersion }) =>
+browser.runtime.onInstalled.addListener(({ reason, previousVersion, temporary }) =>
 {
+	console.log(temporary)
 	if (reason === 'update')
+	{
+		const num_prev_version = previousVersion.split('.').map(s => parseInt(s))
+		if (!temporary && (num_prev_version[0] < 4 || (num_prev_version[0] === 4 && num_prev_version[1] <= 1)))
+		{
+			const url = browser.runtime.getURL('/pages/getting_started.html?update');
+			browser.tabs.create({ url });
+		}
 		return upgrade_options(previousVersion);
+	}
 	else if (reason === 'install')
+	{
 		load_default_rules().then(data => browser.storage.sync.set({default_rules: data}));
+		if (!temporary)
+		{
+			const url = browser.runtime.getURL('/pages/getting_started.html');
+			browser.tabs.create({ url });
+		}
+	}
 });

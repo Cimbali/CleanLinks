@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="getting_started.css">
+	<title>Getting started with CleanLinks</title>
+	<script type="text/javascript" src="getting_started.js"></script>
+</head>
+
+<body>
+	<div id="left"></div>
+	<div id="content">
+	<h1>Welcome to <em>CleanLinks</em>!</h1>
+
+	<p class="update">We’ve refreshed the look-and-feel of CleanLinks!  Here is a little summary of what CleanLinks does.</p>
+
+	<div class="slide">
+	<h2>Skip redirects</h2>
+	<p>CleanLinks protects your private life and speeds up your internet experience,
+	by skipping redirect pages that track your movements on the internet.</p>
+	<img id="summary" alt="Diagram illustrating the process of shortcutting redirect links." src="summary.png">
+
+
+	<p>CleanLinks <strong>automatically detects redirect pages</strong>, by detecting links embedded in their URLs, and directs you directly to the destination page.</p>
+	</div>
+
+	<div class="slide">
+	<h2>Further cleaning</h2>
+	<ul>
+		<li>The URLs of the pages that you visit can also contain <strong>tracking parameters</strong>, such as <a href="https://en.wikipedia.org/wiki/UTM_parameters">UTM parameters</a> and many more: CleanLinks also removes those.</li>
+		<li>CleanLinks also prevents <strong>javascript modifying links</strong> as you click them.</li>
+	</ul>
+	</div>
+
+	<div class="slide">
+	<h2>See what happened</h2>
+	<p>The <strong>CleanLink popup</strong>, opened by clicking the <strong>toolbar icon</strong>, shows the addon’s activity.</p>
+	<img id="toolbar" alt="Screenshot of the toolbar with CleanLinks icon emphasized" src="toolbar.png">
+
+	<p>There you can investigate which links got modified and how.
+	This is especially useful to <strong>investigate broken links or pages</strong>.
+	You can also switch off the add-on for that tab from the popup.</p>
+	</div>
+
+	<div class="slide">
+	<h2>Adjust CleanLinks’ behaviour</h2>
+	<p>CleanLinks has a set of rules, that you can modify. This can be done mainly with the buttons at the bottom of the popup:
+	<ul class="actions">
+		<li class="allow"><strong>Allow</strong> an embedded link, for legitimate use cases such as a login pages</li>
+		<li class="remove"><strong>Delete</strong> an embedded link, to access the intermediate page without the embedded link in the URL</li>
+		<li class="allow-once"><strong>Allow once</strong>, to open the URL without any cleaning rules applied</li>
+		<li class="allow-js"><strong>Allow javascript</strong> to modify links on this page</li>
+		<li class="edit-rules"><strong>Edit rules</strong>, to open the advanced rules editor for the selected link.</li>
+	</ul>
+	</p>
+	</div>
+
+	<div class="slide">
+	<h2>The popup elements</h2>
+	<img id="popup" alt="Screenshot of the CleanLinks popup with annotations" src="popup.png">
+	<p>The CleanLinks popup mainly shows the <strong>history of cleaned links</strong>, classified by containing page and tagged with request type and type of cleaning.</p>
+
+	<p><em>Filters</em> up top allow you to reduce the number of links displayed, and selecting a link enables the <em>Actions buttons</em> at the bottom, to adjust the rules.</p>
+	</div>
+
+
+	<div class="slide">
+	<h2>Try it now!</h2>
+	<p>Click the following link, and then open the CleanLinks popup:</p>
+	<p id="test"><a title="Link testing the redirect cleaning" href="https://track.me/?dest=https%3A%2F%2Fddg.gg">https://track.me/?dest=https%3A%2F%2Fddg.gg</a></p>
+	<p>This link should take you to the frontpage of DuckDuckGo instead of the (fictional) <code>track.me</code> redirect page.</p>
+	</div>
+	</div>
+
+	<div class="after">
+	<hr />
+	<p>You can get more details <a href="https://github.com/Cimbali/CleanLinks/wiki" title="Github wiki page of CleanLinks">on the CleanLinks wiki</a> and ask questions or report issues on <a href="https://github.com/Cimbali/CleanLinks/wiki" title="Github repository of CleanLinks">the CleanLinks GitHub page</a>.</p>
+	<p class="credits">Some icons by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a>.</p>
+	</div>
+</body>
+
+</html>
