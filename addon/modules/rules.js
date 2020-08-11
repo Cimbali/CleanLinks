@@ -326,6 +326,34 @@ function serialize_rules(all_rules, url)
 }
 
 
+function diff_rules(all_rules, default_rules)
+{
+	// serialize deterministically both the default and current rules
+	const ref = serialize_rules(default_rules).map(sorted_stringify).sort();
+	const rules = serialize_rules(all_rules).map(sorted_stringify).sort();
+
+	const add = {}, del = {};
+
+	for (let i = 0, j = 0; i < rules.length || j < ref.length; )
+	{
+		if (j === ref.length || rules[i] < ref[j])
+		{
+			push_rule(add, JSON.parse(rules[i]));
+			i++;
+		}
+		else if (i === rules.length || rules[i] > ref[j])
+		{
+			push_rule(del, JSON.parse(ref[j]));
+			j++;
+		}
+		else
+			i++, j++;
+	}
+
+	return {added: add, removed: del};
+}
+
+
 function clear_rules()
 {
 	return Promise.all([
