@@ -46,7 +46,7 @@ function check_regexp(expr, error_span)
 
 function actions_differ(rule, orig_rule)
 {
-	for (let [action, val] of Object.entries(default_actions))
+	for (const [action, val] of Object.entries(default_actions))
 	{
 		if (Array.isArray(val) && orig_rule[action].length !== rule[action].length)
 			return true;
@@ -115,10 +115,10 @@ function reset_options()
 
 function populate_options()
 {
-	let values = Prefs.serialize();
-	for (let [pref, value] of Object.entries(values))
+	const values = Prefs.serialize();
+	for (const [pref, value] of Object.entries(values))
 	{
-		let input = document.querySelector(`[name=${pref}]`);
+		const input = document.querySelector(`[name=${pref}]`);
 		if (!input)
 			continue;
 
