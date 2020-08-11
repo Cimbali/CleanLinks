@@ -328,13 +328,24 @@ function serialize_rules(all_rules, url)
 
 function clear_rules()
 {
-	return browser.storage.sync.remove('rules');
+	return Promise.all([
+		browser.storage.sync.remove(['rules', 'rules_time']),
+		browser.storage.local.remove(['rules', 'rules_time']),
+	]);
 }
 
 
 function save_rules(all_rules)
 {
-	return browser.storage.sync.set({rules: all_rules})
+	// Save rules with timestamp both in sync and locally, to allow sync to failed from Exceeded Quotas, see #116
+	const time = Date.now();
+	return Promise.all([
+		browser.storage.local.set({rules: all_rules, rules_time: time}),
+		browser.storage.sync.set({rules: all_rules, rules_time: time}).catch(error =>
+		{
+			console.warn('Saving rules to sync storage failed:', error);
+		}),
+	]);
 }
 
 
@@ -347,7 +358,17 @@ function load_default_rules()
 
 function load_rules()
 {
-	return browser.storage.sync.get({'rules': null}).then(data => data.rules || load_default_rules());
+	// get most recent of sync or locally stored rules, default to sync when equal
+	return Promise.all([
+		browser.storage.sync.get({'rules': null, 'rules_time': 0}),
+		browser.storage.local.get({'rules': null, 'rules_time': 0}),
+	]).then(async ([{rules: sync_rules, rules_time: sync_time}, {rules: local_rules, rules_time: local_time}]) =>
+	{
+		if (sync_rules && local_rules)
+			return local_time > sync_time ? local_rules : sync_rules;
+		else
+			return sync_rules || local_rules || await load_default_rules();
+	});
 }
 
 
@@ -407,7 +428,8 @@ let Rules = {
 	reset: () => clear_rules().then(() => load_default_rules()).then(loaded =>
 	{
 		Rules.all_rules = loaded;
-		browser.storage.sync.set({rules: loaded, default_rules: loaded});
+		save_rules(loaded);
+		browser.storage.local.set({default_rules: loaded});
 		return loaded;
 	}),
 }

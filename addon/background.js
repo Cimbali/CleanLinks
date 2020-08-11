@@ -525,8 +525,16 @@ async function upgrade_options(prev_version)
 	else if (num_prev_version[0] >= 4)
 	{
 		// fetch the default rules from before the upgrade, from storage if version is 4.1.x otherwise from the web
-		const old_storage = await browser.storage.sync.get({'default_rules': null});
+		let old_storage;
 		let get_old_rules;
+
+		if (num_prev_version[0] == 4 && num_prev_version[1] <= 1)
+		{
+			old_storage = await browser.storage.sync.get({'default_rules': null});
+			await browser.storage.sync.remove('default_rules');
+		}
+		else
+			old_storage = await browser.storage.local.get({'default_rules': null});
 
 		if (old_storage.default_rules)
 			get_old_rules = Promise.resolve(old_storage.default_rules);
@@ -575,7 +583,7 @@ async function upgrade_options(prev_version)
 		}
 	}
 
-	await load_default_rules().then(data => browser.storage.sync.set({default_rules: data}));
+	await load_default_rules().then(data => browser.storage.local.set({default_rules: data}));
 	await browser.storage.sync.set({configuration: options});
 	await Prefs.reload();
 
@@ -586,7 +594,6 @@ async function upgrade_options(prev_version)
 
 browser.runtime.onInstalled.addListener(({ reason, previousVersion, temporary }) =>
 {
-	console.log(temporary)
 	if (reason === 'update')
 	{
 		const num_prev_version = previousVersion.split('.').map(s => parseInt(s))
@@ -599,7 +606,7 @@ browser.runtime.onInstalled.addListener(({ reason, previousVersion, temporary })
 	}
 	else if (reason === 'install')
 	{
-		load_default_rules().then(data => browser.storage.sync.set({default_rules: data}));
+		load_default_rules().then(data => browser.storage.local.set({default_rules: data}));
 		if (!temporary)
 		{
 			const url = browser.runtime.getURL('/pages/getting_started.html');

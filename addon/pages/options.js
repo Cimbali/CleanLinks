@@ -405,17 +405,17 @@ function rule_pristine()
 }
 
 
-function insert_rule(new_rule, rule)
+function insert_rule(is_new_rule, rule)
 {
 	const rule_with_defaults = {...default_actions, ...rule};
-	const opt = new Option(name_rule(rule_with_defaults), id_rule(rule_with_defaults), false, new_rule);
+	const opt = new Option(name_rule(rule_with_defaults), id_rule(rule_with_defaults), false, is_new_rule);
 	opt.setAttribute('name', id_rule(rule_with_defaults))
 
 	opt.setAttribute('rule', sorted_stringify(rule_with_defaults));
-	if (!new_rule)
+	if (!is_new_rule)
 		opt.setAttribute('orig-rule', opt.getAttribute('rule'));
 
-	if (new_rule || !Rules.is_default(rule))
+	if (is_new_rule || !Rules.is_default(rule))
 		opt.classList.add('user-rule');
 	else
 		opt.classList.add('default-rule');
