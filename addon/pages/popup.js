@@ -280,8 +280,12 @@ async function add_listeners()
 		if (!selected)
 			return;
 
-		const link = selected.firstChild.getAttribute('raw-url');
-		browser.runtime.sendMessage({action: 'set prepopulate', link })
+		// On javascript links, edit rules for parent page
+		const link = selected.classList.contains('javascript') ?
+						selected.parentNode.firstChild.textContent :
+						selected.firstChild.getAttribute('raw-url');
+
+		browser.runtime.sendMessage({ action: 'set prepopulate', link })
 			.then(() => browser.runtime.openOptionsPage())
 			.then(() => { if (!android) window.close(); });
 	});
