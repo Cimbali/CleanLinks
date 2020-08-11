@@ -680,6 +680,7 @@ function add_listeners()
 
 apply_i18n();
 add_listeners();
-Prefs.loaded.then(populate_options).then(() => browser.runtime.sendMessage({action: 'get prepopulate'}))
-								   .then(handle_prepopulate);
-Rules.loaded.then(populate_rules);
+Promise.all([
+	Prefs.loaded.then(populate_options),
+	Rules.loaded.then(populate_rules),
+]).then(() => browser.runtime.sendMessage({action: 'get prepopulate'})).then(handle_prepopulate);
