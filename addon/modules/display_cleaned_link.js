@@ -271,7 +271,7 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean)
 	clean_node.setAttribute('raw-url', clean.href);
 	clean_node.classList.add('cleaned');
 
-	link_elem.setAttribute('title', link_elem.getAttribute('title') + '\n-> ' + clean.href);
+	link_elem.setAttribute('title', `Original link:\n${link_elem.getAttribute('title')}\nCleaned to:\n${clean.href}`);
 	clean_node.append(document.createTextNode(clean.href));
 
 	if (Object.keys(actions_to_whitelist).length !== 2)

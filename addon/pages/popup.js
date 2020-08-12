@@ -124,14 +124,32 @@ function append_link(history, link, start_closed)
 		add_cleaning_action(link_elem, 'dropped');
 
 	const { embed, remove, rewrite, javascript } = link.cleaned;
+	const actions_desc = [];
 	if (embed)
+	{
 		add_cleaning_action(link_elem, 'embed');
+		if ('dropped' in link)
+			actions_desc.push('Embedded link found (request dropped)')
+		else
+			actions_desc.push('Embedded link found (request redirected)')
+	}
 	if (remove && remove.length !== 0)
+	{
 		add_cleaning_action(link_elem, 'remove');
+		actions_desc.push('Parameters removed')
+	}
 	if (rewrite)
+	{
 		add_cleaning_action(link_elem, 'rewrite');
+		actions_desc.push('URL rewritten')
+	}
 	if (javascript)
+	{
 		add_cleaning_action(link_elem, 'javascript');
+		actions_desc.push('Prevented javascript event')
+	}
+
+	link_elem.setAttribute('title', link_elem.getAttribute('title') + `\nCleaning actions taken: ${actions_desc.join(', ')}`);
 
 	link_elem.addEventListener('click', set_selected);
 
