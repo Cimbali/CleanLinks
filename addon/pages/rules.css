@@ -302,6 +302,12 @@ dd {
 #remove_rule:before {
 	content: '❌ ';
 }
+#undo_rule:before {
+	content: '⟲ ';
+}
+#redo_rule:before {
+	content: '⟳ ';
+}
 
 
 @media only screen and (max-device-width: 480px) {

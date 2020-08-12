@@ -45,9 +45,10 @@ function split_suffix(hostname)
 	if (hostname === undefined || hostname === '' || hostname === '*')
 		return ['*', '.*']
 
-	// use public domain instead of TLD
-	let suffix = hostname.endsWith('.*') ? '.*' : ('.' + PublicSuffixList.get_public_suffix(hostname));
-	let domain = hostname.substring(0, hostname.length - suffix.length)
+	// use public domain instead of TLD. PSL bugs on domains starting with .
+	const psl_host = hostname.startsWith('.') ? `subdomain${hostname}` : hostname;
+	const suffix = hostname.endsWith('.*') ? '.*' : ('.' + PublicSuffixList.get_public_suffix(psl_host));
+	const domain = hostname.substring(0, hostname.length - suffix.length)
 
 	return [domain, suffix];
 }

@@ -18,6 +18,8 @@ const Queue = {
 	chain: Promise.resolve(),
 	add: callable => { Queue.chain = Queue.chain.then(callable); }
 };
+const UndoStack = [];
+const RedoStack = [];
 
 let unsaved_changes = false;
 
@@ -97,8 +99,8 @@ function show_rule_item(list, element, elemtype)
 
 function add_rule_item(list, element, replace, flags)
 {
-	let selection = document.getElementById('rule_selector');
-	let selected_opt = selection[selection.selectedIndex];
+	const selection = document.getElementById('rule_selector');
+	const selected_opt = selection[selection.selectedIndex];
 
 	if (list === 'rewrite')
 		element = {search: element, replace: replace, flags: flags}
@@ -253,8 +255,16 @@ function erase_rule()
 
 	if (selected_opt.hasAttribute('orig-rule'))
 	{
-		Rules.remove(JSON.parse(selected_opt.getAttribute('orig-rule')))
-			.then(() => browser.runtime.sendMessage({action: 'rules'}));
+		const removed_rule = JSON.parse(selected_opt.getAttribute('orig-rule'));
+
+		Queue.add(() => Rules.remove(removed_rule));
+		Queue.add(() => browser.runtime.sendMessage({action: 'rules'}));
+
+		UndoStack.push({del: removed_rule})
+		RedoStack.splice(0);
+
+		document.getElementById('undo_rule').disabled = false;
+		document.getElementById('redo_rule').disabled = true;
 	}
 
 	let next_up = selected_opt.previousSibling;
@@ -398,15 +408,99 @@ function save_rule()
 	filter_rules();
 
 	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
+	UndoStack.push({add: rule, ...replacing ? {del: replacing} : {}})
+	RedoStack.splice(0);
+
+	document.getElementById('undo_rule').disabled = false;
+	document.getElementById('redo_rule').disabled = true;
+
 	if (replacing === null)
 		Queue.add(() => Rules.add(rule));
 	else
 		Queue.add(() => Rules.update(replacing, rule));
+
 	Queue.add(() =>
 	{
 		populate_rules();
 		browser.runtime.sendMessage({action: 'rules'}).catch(console.error);
 	});
+}
+
+
+function undo_rules_change()
+{
+	if (UndoStack.length === 0)
+		return;
+
+	const {add = null, del = null} = UndoStack.pop();
+
+	if (add === null)
+		Queue.add(() => Rules.add(del));
+	else if (del === null)
+		Queue.add(() => Rules.remove(add));
+	else
+		Queue.add(() => Rules.update(add, del));
+
+	Queue.add(() =>
+	{
+		const selection = document.getElementById('rule_selector');
+		let select_id = id_rule(del || add);
+		if (!del)
+		{
+			selection.value = select_id;
+			const selected_opt = selection[selection.selectedIndex];
+			select_id = (selected_opt.nextSibling || selected_opt.prevSibling || {value: ''}).value;
+		}
+
+		populate_rules();
+		selection.value = select_id;
+		load_rule();
+
+		browser.runtime.sendMessage({action: 'rules'}).catch(console.error);
+	});
+
+	RedoStack.push({add, del});
+
+	document.getElementById('undo_rule').disabled = UndoStack.length === 0;
+	document.getElementById('redo_rule').disabled = false;
+}
+
+
+function redo_rules_change()
+{
+	if (RedoStack.length === 0)
+		return;
+
+	const {add = null, del = null} = RedoStack.pop();
+
+	if (del === null)
+		Queue.add(() => Rules.add(add));
+	else if (add === null)
+		Queue.add(() => Rules.remove(del));
+	else
+		Queue.add(() => Rules.update(del, add));
+
+	Queue.add(() =>
+	{
+		const selection = document.getElementById('rule_selector');
+		let select_id = id_rule(add || del);
+		if (!add)
+		{
+			selection.value = select_id;
+			const selected_opt = selection[selection.selectedIndex];
+			select_id = (selected_opt.nextSibling || selected_opt.prevSibling || {value: ''}).value;
+		}
+
+		populate_rules();
+		selection.value = select_id;
+		load_rule();
+		browser.runtime.sendMessage({action: 'rules'}).catch(console.error);
+	});
+
+	UndoStack.push({add, del});
+
+	document.getElementById('redo_rule').disabled = RedoStack.length === 0;
+	document.getElementById('undo_rule').disabled = false;
 }
 
 
@@ -491,7 +585,8 @@ function handle_prepopulate({ link })
 
 function populate_rules()
 {
-	const select = document.getElementById('rule_selector'), restore_selection = select.value;
+	const select = document.getElementById('rule_selector');
+	const restore_selection = select.value;
 
 	while (select.lastChild)
 		select.lastChild.remove();
@@ -564,6 +659,8 @@ function add_listeners()
 	document.getElementById('remove_rule').onclick = erase_rule
 	document.getElementById('save_rule').onclick = save_rule
 	document.getElementById('add_rule').onclick = () => insert_rule(true)
+	document.getElementById('undo_rule').onclick = undo_rules_change;
+	document.getElementById('redo_rule').onclick = redo_rules_change;
 
 	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
 	document.querySelector('button[name="export_rules"]').onclick = export_rules
