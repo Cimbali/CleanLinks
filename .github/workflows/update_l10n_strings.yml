@@ -35,7 +35,7 @@ jobs:
 
       - name: Build
         run: |
-          sed -i 's,\.\./\(addon\|tests\)/,,g' docs/index.html
+          sed -i 's,\.\./\(addon\|tests\)/,,g' docs/*.html
           cp -rt docs/ tests/setup.js addon/manifest.json addon/modules/ addon/icons/ addon/data/
           cp addon/icons/32.png docs/favicon.png
 
