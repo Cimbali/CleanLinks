@@ -684,12 +684,7 @@ function add_listeners()
 
 	browser.runtime.onMessage.addListener(message =>
 	{
-		if (message.action === 'set prepopulate')
-		{
-			handle_prepopulate(message);
-			return browser.runtime.sendMessage({action: 'get prepopulate'}).catch(() => {});
-		}
-		else if (message.action === 'rules')
+		if (message.action === 'rules')
 			return Rules.reload().then(populate_rules);
 		else
 			return Promise.resolve('Rules page ignored unknown message ' + message.action)
@@ -700,5 +695,8 @@ function add_listeners()
 apply_i18n();
 add_listeners();
 Rules.loaded.then(populate_rules).then(() =>
-	browser.runtime.sendMessage({action: 'get prepopulate'}).then(handle_prepopulate)
-);
+{
+	const link = new URLSearchParams(window.location.search.slice(1)).get('prepopulate');
+	if (link !== null)
+		handle_prepopulate({ link });
+})

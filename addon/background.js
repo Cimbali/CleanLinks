@@ -36,8 +36,6 @@ disabled_tabs.remove = tab => disabled_tabs.splice(disabled_tabs.indexOf(tab), 1
 // Links that are whitelisted just once (rudimentary)
 const temporary_whitelist = []
 
-let prepopulate_link = undefined;
-
 
 let android = null;
 let browser_version = null;
@@ -368,20 +366,6 @@ function handle_message(message, sender)
 
 	case 'rules':
 		return Rules.reload();
-
-	case 'set prepopulate':
-		prepopulate_link = message.link;
-		return Promise.resolve({});
-
-	case 'get prepopulate':
-		if (prepopulate_link)
-		{
-			let link = prepopulate_link;
-			prepopulate_link = undefined;
-			return Promise.resolve({ link });
-		}
-		else
-			return Promise.resolve({})
 
 	default:
 		return Promise.reject('Unexpected message: ' + String(message));

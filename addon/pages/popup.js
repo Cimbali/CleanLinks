@@ -300,12 +300,11 @@ async function add_tab_listeners(tab_id)
 						selected.parentNode.firstChild.textContent :
 						selected.firstChild.getAttribute('raw-url');
 
-		browser.runtime.sendMessage({ action: 'set prepopulate', link })
-			.then(() => browser.tabs.create({
-				url: browser.runtime.getURL('/pages/rules.html'),
-				active: true,
-				...browser_version > 57 ? { openerTabId: tab_id } : {}
-			})).then(() => { if (!android) window.close(); });
+		browser.tabs.create({
+			url: browser.runtime.getURL(`/pages/rules.html?prepopulate=${encodeURIComponent(link)}`),
+			active: true,
+			...browser_version > 57 ? { openerTabId: tab_id } : {}
+		}).then(() => { if (!android) window.close(); });
 	});
 	return tab_id
 }
