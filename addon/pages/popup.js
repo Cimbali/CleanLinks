@@ -277,19 +277,6 @@ async function add_tab_listeners(tab_id)
 		}
 	});
 
-	/* Add a button to open the rules editor?
-	const browser_version = await browser.runtime.getBrowserInfo().then(info => parseFloat(info.version)).catch(() => NaN);
-
-	document.querySelector('#options').onclick = () =>
-	{
-		const extra = browser_version > 57 ? { openerTabId: tab_id } : {};
-		browser.tabs.create({...extra, url: browser.runtime.getURL('/pages/rules.html'),  active: true });
-
-		if (!android)
-			window.close();
-	}
-	*/
-
 	// last one: start appending newly cleaned links
 	browser.runtime.onMessage.addListener(message =>
 	{
@@ -299,12 +286,7 @@ async function add_tab_listeners(tab_id)
 			return Promise.resolve('Popup page ignored unknown message ' + message.action)
 	});
 
-	return tab_id
-}
-
-
-async function add_listeners()
-{
+	const browser_version = await browser.runtime.getBrowserInfo().then(info => parseFloat(info.version)).catch(() => NaN);
 	const android = (await browser.runtime.getPlatformInfo()).os === 'android';
 
 	document.querySelector('#open_editor').addEventListener('click', e =>
@@ -319,9 +301,19 @@ async function add_listeners()
 						selected.firstChild.getAttribute('raw-url');
 
 		browser.runtime.sendMessage({ action: 'set prepopulate', link })
-			.then(() => browser.runtime.openOptionsPage())
-			.then(() => { if (!android) window.close(); });
+			.then(() => browser.tabs.create({
+				url: browser.runtime.getURL('/pages/rules.html'),
+				active: true,
+				...browser_version > 57 ? { openerTabId: tab_id } : {}
+			})).then(() => { if (!android) window.close(); });
 	});
+	return tab_id
+}
+
+
+async function add_listeners()
+{
+	const android = (await browser.runtime.getPlatformInfo()).os === 'android';
 
 	document.querySelector('#options').addEventListener('click', e =>
 	{

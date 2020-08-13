@@ -545,10 +545,7 @@ function fetch_rule(link)
 	let rule = {...default_actions, domain: url.hostname, path: '^' + url.pathname + '$'};
 
 	if (Rules.exists(rule))
-	{
-		document.getElementById('rule_selector').value = id_rule(rule);
-		return load_rule();
-	}
+		return { rule, exists: true }
 
 	// gather and normalize the data for this rule
 	rule.parents = Rules.serialize_matching(url).reverse();
@@ -562,7 +559,7 @@ function fetch_rule(link)
 		merge_rule_actions(rule.inherited, p)
 	}
 
-	return rule;
+	return { rule, exists: false }
 }
 
 
@@ -681,7 +678,6 @@ function add_listeners()
 
 	document.addEventListener('beforeunload', evt =>
 	{
-		console.log('Unloading ! Unsaved changes?', unsaved_changes)
 		if (unsaved_changes)
 			evt.preventDefault();
 	});
