@@ -1,3 +1,6 @@
+html {
+	font-family: 'Roboto', 'Segeo UI', sans-serif;
+}
 .disabled, button:disabled {
 	opacity: .4;
 	background-color: #666;

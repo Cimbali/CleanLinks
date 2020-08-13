@@ -1,3 +1,6 @@
+html {
+	font-family: 'Roboto', 'Segeo UI', sans-serif;
+}
 img {
 	display: block;
 	max-width: min(60%, 580px);
@@ -71,6 +74,9 @@ h1::before {
 	height: 64px;
 	vertical-align: text-top;
 	margin: 0 16px 0 0;
+}
+h1 {
+	white-space: nowrap;
 }
 .after {
     grid-column: 1 / -1;

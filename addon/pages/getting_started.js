@@ -40,3 +40,5 @@ window.addEventListener('load', () => {
 
 	update();
 })
+
+apply_i18n();
