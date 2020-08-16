@@ -1,0 +1,19 @@
+name: ESLint linting
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: npm i eslint@latest
+
+      - name: Run linter
+        run: |
+          node ./node_modules/eslint/bin/eslint.js addon/pages/getting_started.js addon/pages/options.js addon/pages/popup.js addon/pages/rules.js addon/modules/cleanlink.js addon/modules/common.js addon/modules/display_cleaned_link.js addon/modules/rules.js
