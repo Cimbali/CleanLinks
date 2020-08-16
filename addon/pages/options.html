@@ -8,6 +8,15 @@
 
 <body>
 	<fieldset id="rules">
+		<legend i18n_text="Rules"></legend>
+
+		<p i18n_text="CleanLinks Rules can be edited on">
+			<a href="/pages/rules.html" target="_blank" i18n_text="the CleanLinks rule editing page"></a>.
+		</p>
+
+	</fieldset>
+
+	<fieldset id="cleaning">
 		<legend i18n_text="Cleaning behavior"></legend>
 
 		<label for="auto_redir" i18n_title="Automatic detection provides better privacy protection by catching more redirect pages than preset rules, but also causes more false positives − which require manual whitelisting."
@@ -23,22 +32,28 @@ However, there is no point in reloading the current document as a resource (imag
 			i18n_text="Drop resources that redirect to the current page, instead of leaving them uncleaned"></label>
 		<input type="checkbox" name="drop_leaks" id="drop_leaks" value="" />
 
-		<p i18n_text="CleanLinks rules can be edited on">
-			<a href="/pages/rules.html" target="_blank" i18n_text="the CleanLinks rule editing page"></a>.
-		</p>
+		<label for="only_http"
+			i18n_title="This options causes non-http(s) links (e.g. ftp) to be ignored when checking for nested urls on them."
+			i18n_text="Only clean http(s) links"></label>
+		<input type="checkbox" name="only_http" id="only_http" value="" />
+
+		<label for="progltr"
+			i18n_title="Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs."
+			i18n_text="Use redirect watcher, i.e. clean targets of header redirects"></label>
+		<input type="checkbox" name="progltr" id="progltr" value="" />
+
+		<label for="httpall"
+			i18n_title="All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you."
+			i18n_text="Clean all outgoing HTTP requests, instead of only top frame"></label>
+		<input type="checkbox" name="httpall" id="httpall" value="" />
 
 	</fieldset>
 
 	<fieldset id="features">
-		<legend i18n_text="Features"></legend>
-
-		<label for="ignhttp"
-			i18n_title="This options causes non-http/s links to be ignored when checking for nested urls on them."
-			i18n_text="Ignore non-http/s links"></label>
-		<input type="checkbox" name="ignhttp" id="ignhttp" value="" />
+		<legend i18n_text="Other CleanLinks Features"></legend>
 
 		<label for="switch_to_tab"
-			i18n_title="When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed at present."
+			i18n_title="When you open a link in a new tab, switch to it immediately. This copies the same-named browser preference, that can not be accessed by an extension at present."
 			i18n_text="Switch to tabs opened by clicking links?" for="switch_to_tab"></label>
 		<input type="checkbox" name="switch_to_tab" id="switch_to_tab" value="" />
 
@@ -49,23 +64,13 @@ However, there is no point in reloading the current document as a resource (imag
 
 		<label for="select_context_menu"
 			i18n_title="The context menu action cleaning and copying a link target can also be applied to selected text."
-			i18n_text="Add context menu cleaning for selected text"></label>
+			i18n_text="Add context menu cleaning for selected text (not just links)"></label>
 		<input type="checkbox" name="select_context_menu" id="select_context_menu" value="" />
 
 		<label for="text_links" class="not-android"
 			i18n_title="Allows cleaning non-clickable text-links to open them as normal links."
 			i18n_text="Clean and open non-clickable text links by clicking them"></label>
 		<input type="checkbox" name="text_links" id="text_links" value="" />
-
-		<label for="progltr"
-			i18n_title="Set up a HTTP Observer to catch 3xx redirections. For example, this should make possible to clear links hidden behind shortened URLs."
-			i18n_text="Use Redirect Watcher?"></label>
-		<input type="checkbox" name="progltr" id="progltr" value="" />
-
-		<label for="httpall"
-			i18n_title="All requests, i.e. to resources or iframes, may contain tracking information on your current page or by redirecting you."
-			i18n_text="Clean all outgoing HTTP requests, instead of only top frame"></label>
-		<input type="checkbox" name="httpall" id="httpall" value="" />
 
 		<label for="gotarget"
 			i18n_title="Whether the target attribute on links should be checked and respected."
@@ -74,7 +79,7 @@ However, there is no point in reloading the current document as a resource (imag
 
 		<label for="cltrack"
 			i18n_title="Enabling this option will perform tracking of cleaned links to easily whitelist their domains by right-clicking the toolbar button."
-			i18n_text="Link Tracking"></label>
+			i18n_text="Cleaned links history"></label>
 		<input type="checkbox" name="cltrack" id="cltrack" value="" />
 	</fieldset>
 

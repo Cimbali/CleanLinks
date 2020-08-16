@@ -15,7 +15,7 @@ legend {
 	font-weight: bold;
 	font-size: 1.2em;
 }
-#rules, #features, #display {
+#cleaning, #features, #display {
 	display: grid;
 	grid-template-columns: minmax(60%, max-content) auto;
 	align-items: center;
@@ -24,7 +24,6 @@ input[type="checkbox"] {
 	grid-column: 2 / 3;
 	justify-self: start;
 }
-#rules p,
 input[type="text"] {
     grid-column: 1 / 3;
 }
@@ -32,7 +31,6 @@ input[type="text"] {
 	display: block;
 	margin: 0 auto .75em;
 }
-
 
 @media only screen and (max-device-width: 480px) {
 	.not-android, .not-android + input {

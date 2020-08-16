@@ -474,6 +474,7 @@ async function upgrade_options(prev_version)
 		'cbc': 'context_menu',
 		'textcl': 'select_context_menu',
 		'progltr': 'clean_headers',
+		'ignhttp': 'only_http',
 	}))
 		if (rename in options)
 		{

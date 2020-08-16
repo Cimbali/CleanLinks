@@ -299,7 +299,7 @@ function clean_link(link)
 		return {};
 	}
 
-	if (Prefs.values.ignhttp && link.protocol !== 'http:' && link.protocol !== 'https:')
+	if (Prefs.values.only_http && link.protocol !== 'http:' && link.protocol !== 'https:')
 	{
 		log(`not cleaning ${link.href} : ignoring non-http(s) links`);
 		return {};

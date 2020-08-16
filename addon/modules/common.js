@@ -37,7 +37,7 @@ const pref_values = {
 	select_context_menu	: true,			// Context menus on selection, not just links
 	gotarget			: false,		// whether we respect target attributes on links that are being cleaned
 	text_links			: false,		// search for & clean links in selected text
-	ignhttp				: false,		// ignore non-http(s?) links
+	only_http			: false,		// ignore non-http(s?) links
 	cltrack				: true,			// whether we track the link cleaning
 	switch_to_tab		: true,			// Copies the browser preference: switch to a new tab when we open a link?
 	debug				: false,
