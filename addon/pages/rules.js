@@ -539,6 +539,22 @@ function reset_rules()
 }
 
 
+function reset_defaults()
+{
+	load_default_rules().then(defaults => serialize_rules(defaults)).then(defaults =>
+	{
+		for (const rule of defaults)
+			if (!Rules.exists(rule))
+				push_rule(Rules.all_rules, rule);
+
+		save_rules(Rules.all_rules).then(() => browser.runtime.sendMessage({action: 'rules'})).then(page =>
+		{
+			window.location.reload();
+		})
+	})
+}
+
+
 function fetch_rule(link)
 {
 	let url = new URL(link);
@@ -660,6 +676,7 @@ function add_listeners()
 	document.getElementById('redo_rule').onclick = redo_rules_change;
 
 	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
+	document.querySelector('button[name="reset_defaults"]').onclick = reset_defaults
 	document.querySelector('button[name="export_rules"]').onclick = export_rules
 	document.querySelector('button[name="import_rules"]').onclick = () => document.getElementById('import_rules').click()
 	document.getElementById("import_rules").onchange = import_rules
