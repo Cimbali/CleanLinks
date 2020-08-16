@@ -25,11 +25,11 @@ function skip_link_type(link)
 }
 
 
-function get_simple_link_search_strings(link, skip, whitelist_path)
+function get_simple_link_search_strings(link, test_skip_param, skip_path)
 {
 	let arr = [], vals = [];
 
-	if (!whitelist_path)
+	if (!skip_path)
 		arr.push(decodeURIComponent(link.pathname));
 
 	if (link.search)
@@ -38,7 +38,7 @@ function get_simple_link_search_strings(link, skip, whitelist_path)
 		// they need to be manually iterated.
 		for (let [key, val] of link.searchParams)
 		{
-			if (key.match(skip))
+			if (test_skip_param(key))
 				continue;
 
 			if (key)
@@ -65,9 +65,9 @@ function no_hash_url(url)
 }
 
 
-function get_link_search_strings(link, skip, whitelist_path)
+function get_link_search_strings(link, test_skip_param, skip_path)
 {
-	let arr = get_simple_link_search_strings(link, skip, whitelist_path)
+	let arr = get_simple_link_search_strings(link, test_skip_param, skip_path)
 
 	if (link.hash.startsWith('#!'))
 	{
@@ -76,7 +76,7 @@ function get_link_search_strings(link, skip, whitelist_path)
 			const hash_link = new URL(link.hash.slice(2), no_hash_url(link).href);
 			log('Parsing from hash-bang type URL: ' + hash_link.href);
 
-			arr.push(...get_simple_link_search_strings(hash_link, skip));
+			arr.push(...get_simple_link_search_strings(hash_link, test_skip_param));
 		}
 		catch (e)
 		{
@@ -133,14 +133,19 @@ function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 
 function decode_embedded_uri(link, rules, original_string)
 {
-	let skip = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$', 'i') : null;
+	const skip_whitelist = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$', 'i') : {test: str => false};
+	const is_in_redirect = 'redirect' in rules && rules.redirect.length ? new RegExp('^(' + rules.redirect.join('|') + ')$', 'i') : {test: str => false};
+
+	const test_skip_param = Prefs.values.auto_redir ? str => skip_whitelist.test(str) : str => !is_in_redirect.test(str) || skip_whitelist.test(str);
+	const skip_path = Prefs.values.auto_redir ? rules.whitelist_path : !rules.redirect_path;
 
 	// first try to find a base64-encoded link
-	for (let str of get_link_search_strings(link, skip, rules.whitelist_path))
+	for (const str of get_link_search_strings(link, test_skip_param, skip_path))
 	{
-		let [base64match] = str.match(base64_encoded_url) || [], decoded;
+		const [base64match] = str.match(base64_encoded_url) || [];
 		if (base64match)
 		{
+			let decoded;
 			try
 			{
 				decoded = decodeURIComponent(atob(base64match));
@@ -163,7 +168,7 @@ function decode_embedded_uri(link, rules, original_string)
 	let capture = undefined, matchedString, embedded_link;
 
 	// check every parsed (URL-decoded) substring in the URL
-	for (let str of get_link_search_strings(link, skip, rules.whitelist_path))
+	for (const str of get_link_search_strings(link, test_skip_param, skip_path))
 	{
 		[, capture] = str.match(decoded_scheme_url) || str.match(decoded_www_url) || [];
 		if (capture)
@@ -252,6 +257,7 @@ function filter_params_and_path(link, rules, actions_taken)
 		let params = new URLSearchParams(link.search.slice(1));
 		let strip = new RegExp('^(' + rules.remove.join('|') + ')$');
 		let keep = null;
+
 		if ('whitelist' in rules && rules.whitelist.length)
 			keep = new RegExp('^(' + rules.whitelist.join('|') + ')$')
 
@@ -302,8 +308,10 @@ function clean_link(link)
 
 		// remove parameters or rewrite again, if we redirected on an embedded URL
 		rules = Rules.find(embedded_link);
+		// TODO: Keep track of the list of successive cleaned links here?
+		// Useful for Prefs.values.drop_leaks===false, we might want the cleaned-without-redir link (erased in the next line).
 		({ link: cleaned_link, ...meta } = filter_params_and_path(embedded_link, rules, meta));
-	}
+	} // if (!Prefs.values.auto_redir)
 
 	if (cleaned_link.href === link.href)
 	{

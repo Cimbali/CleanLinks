@@ -15,7 +15,7 @@
 'use strict'
 
 
-const default_actions = {whitelist: [], remove: [], rewrite: [], whitelist_path: false, allow_js: false}
+const default_actions = {whitelist: [], remove: [], rewrite: [], redirect: [], whitelist_path: false, redirect_path: false, allow_js: false}
 
 
 function name_rule(rule)

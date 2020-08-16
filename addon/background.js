@@ -185,14 +185,20 @@ function on_request({ documentUrl, frameAncestors, tabId, type, originUrl, url }
 	// We need to cancel this request and direct the current tab to the cleaned destination URL.
 	else if (link.hostname.startsWith('www.google.') && link.pathname.startsWith('/url'))
 		cleaning_notif.type = 'promoted';
-	else
+	else // TODO: provide more details on type of request?
 		cleaning_notif.type = 'request';
 
 	// Prevent frame/script/etc. redirections back to top-level document (see 182e58e)
 	if (contains_parent_url && type !== 'main_frame')
 	{
-		handle_message({dropped: true, ...cleaning_notif});
-		return {cancel: true};
+		if (Prefs.values.drop_leaks)
+		{
+			handle_message({dropped: true, ...cleaning_notif});
+			return {cancel: true};
+		}
+		else
+			// TODO: return cleaned link without embedded-removal
+			return {};
 	}
 
 	// Allowed requests when destination is self, to protect against infinite loops (see 42106fd).

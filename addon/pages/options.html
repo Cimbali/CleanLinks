@@ -8,11 +8,25 @@
 
 <body>
 	<fieldset id="rules">
-		<legend i18n_text="Rules"></legend>
+		<legend i18n_text="Cleaning behavior"></legend>
 
-		<p i18n_text="CleanLinks Rules can be edited on">
+		<label for="auto_redir" i18n_title="Automatic detection provides better privacy protection by catching more redirect pages than preset rules, but also causes more false positives − which require manual whitelisting."
+			i18n_text="Automatically detect redirect pages, instead of only skipping redirects specified by rules">
+		</label>
+		<input type="checkbox" name="auto_redir" id="auto_redir" value="" />
+
+
+		<label for="drop_leaks"
+			i18n_title="Along with redirect pages, CleanLinks catches resources that leak your current URL.
+
+However, there is no point in reloading the current document as a resource (image, script, …) inside itself. This option decides how to handle these cases."
+			i18n_text="Drop resources that redirect to the current page, instead of leaving them uncleaned"></label>
+		<input type="checkbox" name="drop_leaks" id="drop_leaks" value="" />
+
+		<p i18n_text="CleanLinks rules can be edited on">
 			<a href="/pages/rules.html" target="_blank" i18n_text="the CleanLinks rule editing page"></a>.
 		</p>
+
 	</fieldset>
 
 	<fieldset id="features">

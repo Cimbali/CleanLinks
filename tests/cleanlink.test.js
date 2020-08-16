@@ -168,3 +168,19 @@ describe('full wrapped_cl functionality', function() {
 		)
 	);
 });
+
+describe('blacklist mode', function() {
+	before(() => { Prefs.values.auto_redir = false });
+	after(() => { Prefs.values.auto_redir = true });
+
+	it('should skip the link in the target in path', () =>
+	{
+		return Rules.loaded.then(() => expect(wrapped_cl('http://www.foobar.com/track=ftp://gnu.org')).to.be.undefined);
+	});
+
+	it('should skip the link in the arguments', () =>
+	{
+		Prefs.values.auto_redir = false;
+		return Rules.loaded.then(() => expect(wrapped_cl('http://example.com/aHR0cDovL3d3dy5nb29nbGUuY29t?arg=val')).to.be.undefined);
+	});
+});
