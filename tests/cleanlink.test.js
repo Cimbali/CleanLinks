@@ -59,7 +59,7 @@ describe('wrapped_cl', function() {
 		)
 	});
 	it('should detect unencoded embedded URLs', () =>
-		Rules.loaded.then(() => expect(wrapped_cl('https://forum.donanimhaber.com/externallinkredirect?url=https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff&sr=1-19'))
+		Rules.loaded.then(() => expect(wrapped_cl('https://forum.donanimhaber.com/externallinkredirect?url=https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV/ref=sr_1_19?fst=as%3Aoff'))
 			.to.equal('https://www.amazon.com.tr/HP-6MQ72EA-Intel-Diz%C3%BCst%C3%BC-Bilgisayar/dp/B07PYT39WV?fst=as%3Aoff')
 		)
 	);
@@ -123,7 +123,10 @@ describe('wrapped_cl', function() {
 	it('should preserve livejournal redirects', () =>
 		Rules.loaded.then(() =>
 		{
-			for (let url of ['https://www.livejournal.com/misc/get_domain_session.bml?return=https%3A%2F%2Fcomment-fic.livejournal.com%2F&sign=RANDOM_HEX_STRING&t=UNIX_TIMESTAMP', 'https://comment-fic.livejournal.com/__setdomsess?dest=https%3A%2F%2Fcomment-fic.livejournal.com%2F&k=ljdomsess.comment-fic&v=v1%3Au12345678%3As45%3AtUNIX_TIMESTAMP%3ARANDOM_HEX_STRING%2F%2F1'])
+			for (const url of [
+				'https://www.livejournal.com/misc/get_domain_session.bml?return=https%3A%2F%2Fcomment-fic.livejournal.com%2F&sign=RANDOM_HEX_STRING&t=UNIX_TIMESTAMP',
+				'https://comment-fic.livejournal.com/__setdomsess?dest=https%3A%2F%2Fcomment-fic.livejournal.com%2F&k=ljdomsess.comment-fic&v=v1%3Au12345678%3As45%3AtUNIX_TIMESTAMP%3ARANDOM_HEX_STRING%2F%2F1',
+			])
 				expect(wrapped_cl(url)).to.be.undefined;
 		})
 	);
