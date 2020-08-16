@@ -149,7 +149,7 @@ function serialize_options()
 
 function load_options()
 {
-	return browser.storage.sync.get({'configuration': {}}).then(data =>
+	return browser.storage.sync.get({configuration: {}}).then(data =>
 	{
 		for (let [param, stored] of Object.entries(data.configuration))
 		{
