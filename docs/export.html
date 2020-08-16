@@ -25,7 +25,9 @@
 function populate(rules)
 {
 	const exchange_rules = [];
-	for (const {domain, path = '', remove = [], whitelist = [], rewrite = [], whitelist_path = null, allow_js = null} of rules)
+	for (const {domain, path = '',
+				rewrite = [], whitelist = [], remove = [], redirect = [],
+				whitelist_path = null, redirect_path = null, allow_js = null} of rules)
 	{
 		// NB: rule for any domain already appears as *.* out of serialisation, so requires special handling
 		let suffix = '@' + (domain === '*.*' ? '*.*' : domain.startsWith('.') ? domain.slice(1) : `*.${domain}`)
@@ -33,21 +35,27 @@ function populate(rules)
 		if (suffix === '@*.*')
 			suffix = '';
 
-		for (const del of remove)
-			exchange_rules.push(`${del}${suffix}`);
-		for (const keep of whitelist)
-			exchange_rules.push(`!${keep}${suffix}`);
-
-		// # -> remove parameter in hash (as in #foo=bar&baz=qux),
-		// $ -> remove end of full URL (not path!) after match
-
-		// other options can not be expressed, make up our own prefix characters
+		// Express same order as in code: first rewrite, then remove, then redirect -- with whitelist always having precedence.
 		for (const { search, replace, flags } of rewrite)
 			exchange_rules.push(`%${(search || '').replace('%', '\\%')}%${(replace || '').replace('%', '\\%')}`+
 								`%${flags || ''}${suffix}`);
 
+		for (const keep of whitelist)
+			exchange_rules.push(`!${keep}${suffix}`);
+
 		if (whitelist_path)
 			exchange_rules.push(`|${suffix}`);
+
+		for (const del of remove)
+			exchange_rules.push(`${del}${suffix}`);
+
+		for (const redir of redirect)
+			exchange_rules.push(`>${redir}${suffix}`);
+
+		// Other add-ons might need a capturing-group regex here -- we’ll just ignore it and trigger our automatic detection
+		if (redirect_path)
+			exchange_rules.push(`>>${suffix}`);
+
 		if (allow_js)
 			exchange_rules.push(`+${keep}${suffix}`);
 
@@ -250,6 +258,14 @@ window.addEventListener('load', () =>
 			<dt class="improv-rule-format">+</dt>
 			<dd>Allow (whitelist) javascript to modify links at the moment (or just before) they are clicked,
 			e.g. through <code>onclick</code> and <code>onmousedown</code> events.</dd>
+			<dt class="improv-rule-format">&gt;{parameter}</dt>
+			<dd>Redirect to the page whose URL is contained in the matched parameter’s value.
+			For CleanLinks, only used in “blacklist” mode, i.e. when embedded URLs are not automatically detected.</dd>
+			Allows other extensions to manually specify what CleanLinks detects automatically,
+			or for a potiential future <a href="https://github.com/Cimbali/CleanLinks/issues/115">“blacklist mode”</a>.
+			<dt class="improv-rule-format">&gt;&gt;{matched path with capture group}</dt>
+			<dd>Redirect to the page whose URL is contained in the matched group of the current page’s URL path.
+			For CleanLinks, only used as a boolean in “blacklist” mode, i.e. when embedded URLs are not automatically detected.</dd>
 		</dl>
 
 		<p class="enabled">The suffix usually matches the domain, and CleanLinks adds optional path matching:
@@ -263,28 +279,13 @@ window.addEventListener('load', () =>
 				<li>Starting optionally with <code>*.</code> before the domain, to match any subdomain, including no subdomain
 					(e.g. <code>@*.google.com</code> matches <code>www.google.com</code>, <code>mail.google.com</code>, <code>google.com</code>, and more).</li>
 			</ul>
-			Therefore, no suffix at all is exactly the same as <code>@*.*</code>, which means any subdomain of any
-			public-suffix domain.
+			Therefore, no suffix at all is exactly the same as <code>@*.*</code>, which means <q>any subdomain of any public-suffix domain</q>.
 			</li>
 			<li>Paths match as <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">regular expressions</a>.
 				For example, to match the path <code>/login</code> exactly on the domain <code>stackoverflow.com</code>,
 				the rule suffix would be <code>@stackoverflow.com/^/login$</code>.
 			</li>
 		</ul>
-
-		<hr class="enabled" />
-		<p class="enabled">Two more rule-type identifiers can be added and reserved for future use,
-		as they are not currently used by CleanLinks.</p>
-		<dl class="enabled">
-			<dt class="improv-rule-format">&gt;{parameter}</dt>
-			<dd>Redirect to the page whose URL is contained in the matched parameter’s value.
-			Allows other extensions to manually specify what CleanLinks detects automatically,
-			or for a potiential future <a href="https://github.com/Cimbali/CleanLinks/issues/115">“blacklist mode”</a>.</dd>
-			<dt class="improv-rule-format">&gt;&gt;{matched path with capture group}</dt>
-			<dd>Redirect to the page whose URL is contained in the matched group of the current page’s URL path.
-			Allows other extensions to manually specify what CleanLinks detects automatically,
-			or for a potiential future <a href="https://github.com/Cimbali/CleanLinks/issues/115">“blacklist mode”</a>.</dd>
-		</dl>
 
 	</fieldset>
 
