@@ -15,7 +15,7 @@
 'use strict'
 
 
-const default_actions = {'whitelist': [], 'remove': [], 'rewrite': [], 'whitelist_path': false, 'allow_js': false}
+const default_actions = {whitelist: [], remove: [], rewrite: [], whitelist_path: false, allow_js: false}
 
 
 function name_rule(rule)
@@ -389,8 +389,8 @@ function load_rules()
 {
 	// get most recent of sync or locally stored rules, default to sync when equal
 	return Promise.all([
-		browser.storage.sync.get({'rules': null, 'rules_time': 0}),
-		browser.storage.local.get({'rules': null, 'rules_time': 0}),
+		browser.storage.sync.get({rules: null, rules_time: 0}),
+		browser.storage.local.get({rules: null, rules_time: 0}),
 	]).then(async ([{rules: sync_rules, rules_time: sync_time}, {rules: local_rules, rules_time: local_time}]) =>
 	{
 		if (sync_rules && local_rules)
