@@ -160,12 +160,14 @@ function no_rule_loaded()
 	document.querySelector('input[name="path"]').value = '';
 	document.querySelector('input[name="subdomains"]').checked = true;
 	document.querySelector('input[name="whitelist_path"]').checked = false;
+	document.querySelector('input[name="redirect_path"]').checked = false;
 	document.querySelector('input[name="allow_js"]').checked = false;
 
 	document.querySelector('input[name="domain"]').disabled = true;
 	document.querySelector('input[name="path"]').disabled = true;
 	document.querySelector('input[name="subdomains"]').disabled = true;
 	document.querySelector('input[name="whitelist_path"]').disabled = true;
+	document.querySelector('input[name="redirect_path"]').disabled = true;
 	document.querySelector('input[name="allow_js"]').disabled = true;
 
 	document.getElementById('remove_rule').disabled = true
@@ -207,12 +209,14 @@ function load_rule()
 	document.querySelector('input[name="subdomains"]').checked = subdomains;
 	document.querySelector('input[name="path"]').value = rule.path;
 	document.querySelector('input[name="whitelist_path"]').checked = rule.whitelist_path
+	document.querySelector('input[name="redirect_path"]').checked = rule.redirect_path
 	document.querySelector('input[name="allow_js"]').checked = rule.allow_js
 
 	document.querySelector('input[name="domain"]').disabled = false;
 	document.querySelector('input[name="path"]').disabled = false;
 	document.querySelector('input[name="subdomains"]').disabled = false;
 	document.querySelector('input[name="whitelist_path"]').disabled = false;
+	document.querySelector('input[name="redirect_path"]').disabled = false;
 	document.querySelector('input[name="allow_js"]').disabled = false;
 
 	for (const [list, action] of Object.entries(default_actions))
@@ -299,6 +303,7 @@ function parse_rule(select)
 			domain: document.querySelector('input[name="domain"]').value || '*.*',
 			path: document.querySelector('input[name="path"]').value || '',
 			whitelist_path: document.querySelector('input[name="whitelist_path"]').checked,
+			redirect_path: document.querySelector('input[name="redirect_path"]').checked,
 			allow_js: document.querySelector('input[name="allow_js"]').checked,
 		}
 	};
@@ -617,7 +622,7 @@ function populate_rules()
 	for (const rule of Rules.serialize())
 		insert_rule(false, rule)
 
-	for (const list of ['remove', 'whitelist', 'rewrite'])
+	for (const list of ['remove', 'whitelist', 'redirect', 'rewrite'])
 	{
 		const editor = document.querySelector(`#${list}_editor`);
 		const input_name = list !== 'rewrite' ? `${list}_edit` : 'search_edit';
@@ -674,6 +679,7 @@ function add_listeners()
 	document.querySelector('input[name="path"]').onkeyup = delayed_call(rule_changed)
 	document.querySelector('input[name="subdomains"]').onchange = rule_changed
 	document.querySelector('input[name="whitelist_path"]').onchange = rule_changed
+	document.querySelector('input[name="redirect_path"]').onchange = rule_changed
 	document.querySelector('input[name="allow_js"]').onchange = rule_changed
 
 	document.getElementById('rule_selector').onchange = load_rule

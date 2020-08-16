@@ -142,6 +142,17 @@
 			<button class="ok" i18n_text="Add"></button><button class="cancel" i18n_text="Cancel"></button>
 		</p>
 
+		<p class="editor" id="redirect_editor">
+			<span class="parsing_error" id="redirect_edit_error"></span>
+
+			<span class="editor_fields">
+				<label for="redirect_edit" i18n_text="Add query parameters containing redirects:"></label>
+				<input type="text" name="redirect_edit" id="redirect_edit" value="" />
+			</span>
+
+			<button class="ok" i18n_text="Add"></button><button class="cancel" i18n_text="Cancel"></button>
+		</p>
+
 		<p class="editor" id="whitelist_editor">
 			<span class="parsing_error" id="whitelist_edit_error"></span>
 
@@ -162,13 +173,23 @@
 		</p>
 
 		<p>
+			<label for="redirect_add" i18n_text="Redirect to URL found in parameters (only when automatic redirect detection is disabled):"></label>
+			<span id="redirect_itemlist" class="itemlist"></span>
+			<span id="redirect_inheritlist" class="inheritlist"></span>
+			<button id="redirect_add" class="add_to_list" i18n_title="Add to the list">+</button>
+		</p>
+
+		<p>
 			<label for="whitelist_add" i18n_text="Whitelist query parameters (prevent removing and allow embedded URL):"></label>
 			<span id="whitelist_itemlist" class="itemlist"></span>
 			<span id="whitelist_inheritlist" class="inheritlist"></span>
 			<button id="whitelist_add" class="add_to_list" i18n_title="Add to the list">+</button>
 		</p>
 
-		<label i18n_text="Allow URL embedded inside path" for="whitelist_path"></label>
+		<label i18n_html="Redirect to URL embedded inside path when found (only when automatic redirect detection is disabled)" for="redirect_path"></label>
+		<input type="checkbox" name="redirect_path" id="redirect_path" value="" />
+
+		<label i18n_text="Allow (whitelist) URL embedded inside path" for="whitelist_path"></label>
 		<input type="checkbox" name="whitelist_path" id="whitelist_path" value="" />
 
 		<label i18n_text="Allow javascript to modify links" for="allow_js"></label>
