@@ -12,14 +12,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-'use strict'
+'use strict';
+
 
 const _ = (...args) => browser.i18n.getMessage(...args) || args[0]
 
-const title = browser.runtime.getManifest().name;
-const version = browser.runtime.getManifest().version;
-const homepage = browser.runtime.getManifest().homepage_url;
-const copyright = browser.runtime.getManifest().author;
+/* exported title, version, homepage_ homepage,  copyright, same_tab, new_tab, new_window */
+const {name: title, version, homepage_url: homepage, author: copyright} = browser.runtime.getManifest();
 
 const same_tab = 0;
 const new_tab = 1;
@@ -27,20 +26,20 @@ const new_window = 2;
 
 
 const pref_values = {
-	auto_redir			: true,								// automatically detect redirections vs. rules redirections
-	drop_leaks			: true,								// drop redirects to own page or domain vs. allow them
-	highlight			: true,								// highlight cleaned links
-	hlstyle: 'background:rgba(252,252,0,0.6); color: #000',	// style for highlighted cleaned links
-	show_clean_count	: true,								// highlight cleaned links
-	clean_headers		: true,								// http-on-examine-response: clean links on Location: redirect headers?
-	httpall				: true,								// http capture all traffic, not just main frame
-	context_menu		: true,								// Context menus to clean links
-	select_context_menu	: true,								// Context menus on selection, not just links
-	gotarget			: false,							// whether we respect target attributes on links that are being cleaned
-	text_links			: false,							// search for & clean links in selected text
-	ignhttp				: false,							// ignore non-http(s?) links
-	cltrack				: true,								// whether we track the link cleaning
-	switch_to_tab		: true,								// Should be a copy of the browser preference: switch to a new tab when we open a link?
+	auto_redir			: true,			// automatically detect redirections vs. rules redirections
+	drop_leaks			: true,			// drop redirects to own page or domain vs. allow them
+	highlight			: true,			// highlight cleaned links
+	hlstyle				: 'background:rgba(252,252,0,0.6); color: #000',	// style for highlighted cleaned links
+	show_clean_count	: true,			// highlight cleaned links
+	clean_headers		: true,			// http-on-examine-response: clean links on Location: redirect headers?
+	httpall				: true,			// http capture all traffic, not just main frame
+	context_menu		: true,			// Context menus to clean links
+	select_context_menu	: true,			// Context menus on selection, not just links
+	gotarget			: false,		// whether we respect target attributes on links that are being cleaned
+	text_links			: false,		// search for & clean links in selected text
+	ignhttp				: false,		// ignore non-http(s?) links
+	cltrack				: true,			// whether we track the link cleaning
+	switch_to_tab		: true,			// Copies the browser preference: switch to a new tab when we open a link?
 	debug				: false,
 }
 
@@ -48,11 +47,12 @@ const pref_values = {
 const log = (...args) => { if (pref_values.debug) console.debug(...args); }
 
 
+/* exported delayed_call, sorted_stringify, apply_i18n, extract_javascript_link */
 // for onKeyUp: save after 400ms of inactivity
 function delayed_call(callback, delay)
 {
 	browser.alarms.onAlarm.addListener(callback);
-	return function()
+	return () =>
 	{
 		browser.alarms.clear('save');
 		browser.alarms.create('save', {when: Date.now() + (delay || 400)});
@@ -67,10 +67,10 @@ function sorted_stringify(val)
 		return JSON.stringify(val);
 
 	else if (Array.isArray(val))
-        return '[' + val.map(sorted_stringify).sort().join(',') + ']';
+        return `[${val.map(sorted_stringify).sort().join(',')  }]`;
 
 	const str_data = Object.entries(val).map(([key, value]) => `${JSON.stringify(key)}:${sorted_stringify(value)}`)
-	return '{' + str_data.sort().join(',') + '}';
+	return `{${str_data.sort().join(',')  }}`;
 }
 
 
@@ -88,20 +88,20 @@ function node_whitelist(node)
 
 function apply_i18n()
 {
-	for (let elem of document.querySelectorAll('[i18n_text]'))
+	for (const elem of document.querySelectorAll('[i18n_text]'))
 		elem.prepend(document.createTextNode(_(elem.getAttribute('i18n_text'))));
 
-	for (let elem of document.querySelectorAll('[i18n_title]'))
+	for (const elem of document.querySelectorAll('[i18n_title]'))
 		elem.setAttribute('title', _(elem.getAttribute('i18n_title')));
 
-	for (let elem of document.querySelectorAll('[i18n_placeholder]'))
+	for (const elem of document.querySelectorAll('[i18n_placeholder]'))
 		elem.setAttribute('placeholder', _(elem.getAttribute('i18n_placeholder')));
 
 	const domparser = new DOMParser();
-	for (let elem of document.querySelectorAll('[i18n_html]'))
+	for (const elem of document.querySelectorAll('[i18n_html]'))
 	{
-		const l10n_html = _(elem.getAttribute('i18n_html').trim().replace(/\s+/g, ' ')
-								.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'))
+		const l10n_html = _(elem.getAttribute('i18n_html').trim().replace(/\s+/gu, ' ')
+								.replace(/&lt;/gu, '<').replace(/&gt;/gu, '>').replace(/&quot;/gu, '"'))
 
 		// parse, sanitize, then add into tree
 		const dom = domparser.parseFromString(l10n_html, 'text/html');
@@ -116,17 +116,17 @@ function apply_i18n()
 // Here only because it needs inclusion in both background and injected scripts
 function extract_javascript_link(text_link, base_url)
 {
-	var [all, quote, cleaned_link] = text_link.match(/^(?:javascript:)?.+(["'])(.*?https?(?:\:|%3a).+?)\1/) || [];
+	const [,, cleaned_link] = text_link.match(/^(?:javascript:)?.+(?<q>["'])(?<link>.*?https?(?::|%3a).+?)\1/u) || [];
 
 	if (!cleaned_link)
 		return null;
 
-	log('matched javascript link: ' + cleaned_link)
+	log(`matched javascript link: ${cleaned_link}`)
 	try
 	{
 		return new URL(cleaned_link, base_url)
 	}
-	catch (e)
+	catch (err)
 	{
 		return null;
 	}
@@ -135,8 +135,8 @@ function extract_javascript_link(text_link, base_url)
 
 function serialize_options()
 {
-	let serialized = {};
-	for (let [param, value] of Object.entries(pref_values))
+	const serialized = {};
+	for (const [param, value] of Object.entries(pref_values))
 	{
 		if (value instanceof RegExp)
 			serialized[param] = value.source;
@@ -153,10 +153,10 @@ function load_options()
 {
 	return browser.storage.sync.get({configuration: {}}).then(data =>
 	{
-		for (let [param, stored] of Object.entries(data.configuration))
+		for (const [param, stored] of Object.entries(data.configuration))
 		{
 			if (typeof pref_values[param] === 'number')
-				pref_values[param] = parseInt(stored);
+				pref_values[param] = parseInt(stored, 10);
 			else if (typeof pref_values[param] === 'boolean')
 				pref_values[param] = [true, 'true', 'on'].includes(stored);
 			else if (typeof pref_values[param] === 'string')
@@ -165,11 +165,11 @@ function load_options()
 			{
 				try
 				{
-					pref_values[param] = new RegExp(stored || '.^');
+					pref_values[param] = new RegExp(stored || '.^', 'u');
 				}
-				catch (e)
+				catch (err)
 				{
-					log('Error parsing regex ' + (stored || '.^') + ' : ' + e.message);
+					log(`Error parsing regex ${stored || '.^'} : ${err.message}`);
 				}
 			}
 			else if (Array.isArray(pref_values[param]))

@@ -12,7 +12,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-'use strict'
+'use strict';
+
 
 let tab_enabled = false;
 let highlight_node = null;

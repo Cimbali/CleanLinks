@@ -12,6 +12,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+'use strict';
+
 
 const cleaned_items_list = [];
 
@@ -20,7 +22,7 @@ function set_selected(evt)
 	const selected = document.querySelector('#history .selected');
 	if (selected) selected.classList.remove('selected');
 
-	let target = evt.target;
+	let {target} = evt;
 	while (target && target.tagName !== 'P')
 		target = target.parentNode;
 
@@ -37,15 +39,15 @@ function set_selected(evt)
 
 function filter_from_input(opt_iterable)
 {
-	let filter_cat = {}, filter_act = {};
-	for (let input of document.querySelectorAll('#filter_categories input'))
+	const filter_cat = {}, filter_act = {};
+	for (const input of document.querySelectorAll('#filter_categories input'))
 		filter_cat[input.name] = input.checked;
 
-	for (let input of document.querySelectorAll('#filter_actions input'))
+	for (const input of document.querySelectorAll('#filter_actions input'))
 		filter_act[input.name] = input.checked;
 
 	// By default, apply to all “opt”s in #history
-	if (opt_iterable === undefined || opt_iterable instanceof Event)
+	if (typeof opt_iterable === 'undefined' || opt_iterable instanceof Event)
 		opt_iterable = cleaned_items_list;
 
 	for (const { page, link } of opt_iterable)
@@ -102,7 +104,7 @@ function link_parent(history, url)
 		return history.lastChild;
 
 	const item = document.createElement('div');
-	if (url !== undefined)
+	if (typeof url !== 'undefined')
 	{
 		item.appendChild(document.createElement('p')).appendChild(document.createTextNode(url));
 		item.firstChild.classList.add('noclean-parent');
@@ -149,7 +151,8 @@ function append_link(history, link, start_closed)
 		actions_desc.push('Prevented javascript event')
 	}
 
-	link_elem.setAttribute('title', link_elem.getAttribute('title') + `\nCleaning actions taken: ${actions_desc.join(', ')}`);
+	const prev_title = link_elem.getAttribute('title');
+	link_elem.setAttribute('title', `${prev_title}\nCleaning actions taken: ${actions_desc.join(', ')}`);
 
 	link_elem.addEventListener('click', set_selected);
 
@@ -171,6 +174,10 @@ async function populate_popup()
 	document.querySelector('#homepage').setAttribute('href', homepage);
 	document.querySelector('#homepage').setAttribute('title', `${title} ${_('homepage')}`);
 
+	const location_search = new URLSearchParams(document.location.search.substring(1));
+	const tab_id = location_search.has('tab') ? parseInt(location_search.get('tab'), 10)
+				 : await browser.tabs.query({active: true, currentWindow: true}).then(tab_list => tab_list[0].id);
+
 	if (Prefs.values.httpall)
 		document.querySelector('#history').classList.add('hierarchy')
 	else
@@ -182,24 +189,24 @@ async function populate_popup()
 		document.querySelector('button#whitelist').disabled = true;
 		document.querySelector('button#blacklist').disabled = true;
 		document.querySelector('button#clearlist').disabled = true;
-		return;
+		return tab_id;
 	}
-
-	let location_search = new URLSearchParams(document.location.search.substring(1)), resolve_tab_id;
-	if (location_search.has('tab'))
-		resolve_tab_id = Promise.resolve(parseInt(location_search.get('tab')));
-	else
-		resolve_tab_id = browser.tabs.query({active: true, currentWindow: true}).then(tab_list => tab_list[0].id)
-
-	const tab_id = await resolve_tab_id;
 
 	await browser.runtime.sendMessage({action: 'check tab enabled', tab_id: tab_id}).then(answer =>
 	{
 		const enabled = document.querySelector('input#enabled');
 		enabled.checked = answer.enabled;
 		enabled.onchange = () => browser.runtime.sendMessage({action: 'toggle', tab_id: tab_id});
-		document.querySelector('#toggle_off').addEventListener('click', e => { enabled.checked = false; enabled.onchange(); })
-		document.querySelector('#toggle_on').addEventListener('click', e => { enabled.checked = true; enabled.onchange(); })
+		document.querySelector('#toggle_off').addEventListener('click', () =>
+		{
+			enabled.checked = false;
+			enabled.onchange();
+		})
+		document.querySelector('#toggle_on').addEventListener('click', () =>
+		{
+			enabled.checked = true;
+			enabled.onchange();
+		})
 	})
 
 	await browser.runtime.sendMessage({action: 'cleaned list', tab_id: tab_id}).then(response =>
@@ -214,7 +221,7 @@ async function populate_popup()
 			filter_from_input(cleaned_items_list.filter(({ page }) => page.isSameNode(history.lastChild)))
 		}
 
-		for (input of document.querySelectorAll('.filters input'))
+		for (const input of document.querySelectorAll('.filters input'))
 			input.onchange = filter_from_input
 
 		document.querySelector('button#clearlist').disabled = response.length === 0;
@@ -226,12 +233,12 @@ async function populate_popup()
 
 async function add_tab_listeners(tab_id)
 {
-	document.querySelector('#clearlist').addEventListener('click', e =>
+	document.querySelector('#clearlist').addEventListener('click', () =>
 	{
 		const history = document.getElementById('history');
 		const count = cleaned_items_list.length;
 
-		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id}).catch(() => {}).then(() =>
+		browser.runtime.sendMessage({action: 'clearlist', tab_id: tab_id}).catch(() => null).then(() =>
 		{
 			for (const { page, link } of cleaned_items_list.splice(0, count))
 				if (link.parentNode)
@@ -239,26 +246,26 @@ async function add_tab_listeners(tab_id)
 
 			// Do not remove pages that still have links to show
 			for (const page of Array.from(history.children))
-				if (cleaned_items_list.find(({ page: keep }) => page.isSameNode(keep)) === undefined)
+				if (typeof cleaned_items_list.find(({ page: keep }) => page.isSameNode(keep)) === 'undefined')
 					history.removeChild(page)
 		});
 	});
 
-	document.querySelector('#refresh').addEventListener('click', e =>
+	document.querySelector('#refresh').addEventListener('click', () =>
 	{
 		browser.tabs.reload(tab_id);
 	});
 
-	document.querySelector('#whitelist').addEventListener('click', e =>
+	document.querySelector('#whitelist').addEventListener('click', () =>
 	{
 		Rules.add(JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'))).then(() =>
 			browser.runtime.sendMessage({action: 'rules'})
 		)
 	});
 
-	document.querySelector('#blacklist').addEventListener('click', e =>
+	document.querySelector('#blacklist').addEventListener('click', () =>
 	{
-		let rules = JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'));
+		const rules = JSON.parse(document.querySelector('#history p.selected').getAttribute('actions'));
 
 		rules.remove = rules.whitelist.slice();
 		delete rules.whitelist;
@@ -266,7 +273,7 @@ async function add_tab_listeners(tab_id)
 		Rules.add(rules).then(() => browser.runtime.sendMessage({action: 'rules'}))
 	});
 
-	document.querySelector('#openonce').addEventListener('click', e =>
+	document.querySelector('#openonce').addEventListener('click', () =>
 	{
 		const selected = document.querySelector('#history .selected');
 		if (selected)
@@ -283,22 +290,22 @@ async function add_tab_listeners(tab_id)
 		if (message.action === 'notify' && message.tab_id === tab_id)
 			append_link(document.getElementById('history'), message);
 		else
-			return Promise.resolve('Popup page ignored unknown message ' + message.action)
+			console.warn(`Popup page ignored unknown message ${message.action}`)
 	});
 
-	const browser_version = await browser.runtime.getBrowserInfo().then(info => parseFloat(info.version)).catch(() => NaN);
+	const browser_version = await browser.runtime.getBrowserInfo().then(info => parseFloat(info.version))
+																  .catch(() => NaN);
 	const android = (await browser.runtime.getPlatformInfo()).os === 'android';
 
-	document.querySelector('#open_editor').addEventListener('click', e =>
+	document.querySelector('#open_editor').addEventListener('click', () =>
 	{
 		const selected = document.querySelector('#history .selected');
 		if (!selected)
 			return;
 
 		// On javascript links, edit rules for parent page
-		const link = selected.classList.contains('javascript') ?
-						selected.parentNode.firstChild.textContent :
-						selected.firstChild.getAttribute('raw-url');
+		const link = selected.classList.contains('javascript') ? selected.parentNode.firstChild.textContent
+															   : selected.firstChild.getAttribute('raw-url');
 
 		browser.tabs.create({
 			url: browser.runtime.getURL(`/pages/rules.html?prepopulate=${encodeURIComponent(link)}`),
@@ -306,6 +313,7 @@ async function add_tab_listeners(tab_id)
 			...browser_version > 57 ? { openerTabId: tab_id } : {}
 		}).then(() => { if (!android) window.close(); });
 	});
+
 	return tab_id
 }
 
@@ -314,51 +322,51 @@ async function add_listeners()
 {
 	const android = (await browser.runtime.getPlatformInfo()).os === 'android';
 
-	document.querySelector('#options').addEventListener('click', e =>
+	document.querySelector('#options').addEventListener('click', () =>
 	{
 		browser.runtime.openOptionsPage();
 		if (!android)
 			window.close();
 	});
 
-	document.addEventListener('keyup', e =>
+	document.addEventListener('keyup', evt =>
 	{
 		const selected = document.querySelector('#history p.selected span.original');
 		const cleaned = document.querySelectorAll('#history span.original');
 		const pos = selected ? Array.from(cleaned).findIndex(p => selected.isSameNode(p)) : -1;
 
-		if (e.key === 'ArrowUp')
+		if (evt.key === 'ArrowUp')
 			cleaned[pos < 1 ? cleaned.length - 1 : pos - 1].parentNode.click();
-		else if (e.key === 'ArrowDown')
+		else if (evt.key === 'ArrowDown')
 			cleaned[(pos + 1) % cleaned.length].parentNode.click();
 		else
 			return;
 
 		document.querySelector('#history .selected').scrollIntoView(false)
-		e.stopPropagation();
-		e.preventDefault();
+		evt.stopPropagation();
+		evt.preventDefault();
 	});
 
-	document.querySelector('#copy').addEventListener('click', e =>
+	document.querySelector('#copy').addEventListener('click', () =>
 	{
 		const selected = document.querySelector('#history .selected');
 		if (selected)
 		{
-			const text = selected.querySelector('.original').getAttribute('raw-url') + '\n'
-						+ selected.querySelector('.cleaned').getAttribute('raw-url');
+			const text = `${selected.querySelector('.original').getAttribute('raw-url')}\n${
+						 selected.querySelector('.cleaned').getAttribute('raw-url')}`;
 			navigator.clipboard.writeText(text);
 		}
 	});
 
-	document.addEventListener('copy', e =>
+	document.addEventListener('copy', evt =>
 	{
 		const selected = document.querySelector('#history .selected');
 
 		if (selected)
 		{
-			e.clipboardData.setData('text/plain', selected.querySelector('.original').getAttribute('raw-url') + '\n'
-												+ selected.querySelector('.cleaned').getAttribute('raw-url'));
-			e.preventDefault();
+			evt.clipboardData.setData('text/plain', `${selected.querySelector('.original').getAttribute('raw-url')}\n${
+												 selected.querySelector('.cleaned').getAttribute('raw-url')}`);
+			evt.preventDefault();
 		}
 	});
 }

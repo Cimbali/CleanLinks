@@ -12,7 +12,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-'use strict'
+'use strict';
+
 
 const Queue = {
 	chain: Promise.resolve(),
@@ -28,14 +29,14 @@ function check_regexp(expr, error_span)
 {
 	try
 	{
-		let r = new RegExp(expr);
+		const r = new RegExp(expr, 'u');
 		error_span.innerText = '';
-		return true;
+		return Boolean(r);
 	}
-	catch (e)
+	catch (err)
 	{
-		error_span.innerText = _('Error Processing Regular expression:') + ' ' + e.message;
-		return false;
+		error_span.innerText = `${_('Error Processing Regular expression:')} ${err.message}`;
+		throw err;
 	}
 }
 
@@ -51,7 +52,7 @@ function actions_differ(rule, orig_rule)
 			orig_rule[action].sort()
 			rule[action].sort()
 
-			if (undefined !== rule[action].find((item, idx) => item !== orig_rule[action][idx]))
+			if (typeof rule[action].find((item, idx) => item !== orig_rule[action][idx]) !== 'undefined')
 				return true;
 		}
 		else if (orig_rule[action] !== rule[action])
@@ -64,11 +65,11 @@ function actions_differ(rule, orig_rule)
 
 function remove_rule_item(list, element)
 {
-	let selection = document.getElementById('rule_selector');
-	let selected_opt = selection[selection.selectedIndex];
+	const selection = document.getElementById('rule_selector');
+	const selected_opt = selection[selection.selectedIndex];
 
-	let rule = JSON.parse(selected_opt.getAttribute('rule'));
-	let pos = rule[list].indexOf(element);
+	const rule = JSON.parse(selected_opt.getAttribute('rule'));
+	const pos = rule[list].indexOf(element);
 	if (pos === -1)
 		return;
 
@@ -81,9 +82,10 @@ function remove_rule_item(list, element)
 
 function show_rule_item(list, element, elemtype)
 {
-	let span = document.createElement('span'), text = element;
+	const span = document.createElement('span');
+	let text = element;
 	if (list === 'rewrite')
-		text = element.search + ' → ' + element.replace
+		text = `${element.search} → ${element.replace}`
 
 	span.appendChild(document.createTextNode(text));
 	if (elemtype !== 'inherit')
@@ -105,8 +107,8 @@ function add_rule_item(list, element, replace, flags)
 	if (list === 'rewrite')
 		element = {search: element, replace: replace, flags: flags}
 
-	let rule = JSON.parse(selected_opt.getAttribute('rule'));
-	let pos = rule[list].indexOf(element);
+	const rule = JSON.parse(selected_opt.getAttribute('rule'));
+	const pos = rule[list].indexOf(element);
 	if (pos === -1)
 	{
 		rule[list].push(element)
@@ -120,9 +122,9 @@ function add_rule_item(list, element, replace, flags)
 
 function validate_item(list)
 {
-	let input_name = list !== 'rewrite' ? list + '_edit' : 'search_edit';
-	let input = document.querySelector(`input[name="${input_name}"]`);
-	let error_span = document.getElementById(input_name + '_error');
+	const input_name = list !== 'rewrite' ? `${list}_edit` : 'search_edit';
+	const input = document.querySelector(`input[name="${input_name}"]`);
+	const error_span = document.getElementById(`${input_name}_error`);
 
 	if (!input.value)
 	{
@@ -130,14 +132,14 @@ function validate_item(list)
 	}
 	else if (check_regexp(input.value, error_span))
 	{
-		let args = [input.value];
+		const args = [input.value];
 		input.value = '';
 
 		if (list === 'rewrite')
 		{
-			let replace = document.querySelector('input[name="replace_edit"]');
-			let flags_g = document.querySelector('input[name="rewrite_repeat"]');
-			let flags_i = document.querySelector('input[name="rewrite_icase"]');
+			const replace = document.querySelector('input[name="replace_edit"]');
+			const flags_g = document.querySelector('input[name="rewrite_repeat"]');
+			const flags_i = document.querySelector('input[name="rewrite_icase"]');
 
 			args.push(replace.value, (flags_g.checked ? 'g' : '') + (flags_i.checked ? 'i' : ''));
 
@@ -147,7 +149,7 @@ function validate_item(list)
 
 		add_rule_item(list, ...args);
 		rule_changed()
-		document.getElementById(list + '_editor').style.display = 'none';
+		document.getElementById(`${list}_editor`).style.display = 'none';
 	}
 }
 
@@ -172,7 +174,7 @@ function no_rule_loaded()
 
 function sorted_actions(arr, is_rewrite)
 {
-	const strip = s => s.replace(/[^A-Za-z0-9]+/g, '')
+	const strip = s => s.replace(/[^A-Za-z0-9]+/gu, '')
 	const cmp_str = (a, b) => strip(a || '').localeCompare(strip(b || ''));
 
 	if (!is_rewrite)
@@ -192,7 +194,10 @@ function load_rule()
 
 	const select = document.getElementById('rule_selector');
 	if (select.selectedIndex === -1)
-		return no_rule_loaded();
+	{
+		no_rule_loaded();
+		return;
+	}
 
 	const rule_defaults = {domain: '*.*', path: '', inherited: {...default_actions}}
 	const rule = {...rule_defaults, ...JSON.parse(select[select.selectedIndex].getAttribute('rule'))}
@@ -237,8 +242,8 @@ function load_rule()
 
 function filter_rules()
 {
-	const search = new RegExp(document.getElementById('rule_filter').value.replace(/\s+/, '')
-								.split('').map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*'), 'i');
+	const search = new RegExp(document.getElementById('rule_filter').value.replace(/\s+/u, '')
+								.split('').map(s => s.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')).join('.*'), 'iu');
 
 	for (const opt of document.querySelectorAll('#rule_selector option'))
 		opt.style.display = !search || opt.text.match(search) ? 'block' : 'none';
@@ -247,10 +252,10 @@ function filter_rules()
 
 function erase_rule()
 {
-	let select = document.getElementById('rule_selector');
-	let selected_opt = select[select.selectedIndex];
+	const select = document.getElementById('rule_selector');
+	const selected_opt = select[select.selectedIndex];
 
-	if (selected_opt === undefined)
+	if (typeof selected_opt === 'undefined')
 		return;
 
 	if (selected_opt.hasAttribute('orig-rule'))
@@ -288,7 +293,7 @@ function erase_rule()
 
 function parse_rule(select)
 {
-	let rule = {
+	const rule = {
 		...JSON.parse(select[select.selectedIndex].getAttribute('rule')),
 		...{
 			domain: document.querySelector('input[name="domain"]').value || '*.*',
@@ -298,26 +303,30 @@ function parse_rule(select)
 		}
 	};
 
-	if (rule.path !== '' && !check_regexp(rule.path, document.getElementById('path_error')))
-		return;
+	if (rule.path !== '')
+		check_regexp(rule.path, document.getElementById('path_error'));
 
 	if (!document.querySelector('input[name="subdomains"]').checked && rule.domain !== '.*')
-		rule.domain = '.' + rule.domain;
+		rule.domain = `.${rule.domain}`;
 
-	return rule
+	return rule;
 }
 
 
 function rule_changed()
 {
-	let select = document.getElementById('rule_selector');
+	const select = document.getElementById('rule_selector');
 	if (select.selectedIndex === -1)
-		return rule_pristine();
+	{
+		rule_pristine();
+		return;
+	}
 
-	let opt = select[select.selectedIndex];
-	let rule = {...default_actions, ...parse_rule(select)};
-	let orig_rule = opt.hasAttribute('orig-rule') ? {...default_actions, ...JSON.parse(opt.getAttribute('orig-rule'))} : null;
-	let same_node = orig_rule && (orig_rule.domain || '*.*') === rule.domain && (orig_rule.path || '') === rule.path;
+	const opt = select[select.selectedIndex];
+	const rule = {...default_actions, ...parse_rule(select)};
+	const orig_rule = opt.hasAttribute('orig-rule') ? {...default_actions, ...JSON.parse(opt.getAttribute('orig-rule'))}
+												  : null;
+	const same_node = orig_rule && (orig_rule.domain || '*.*') === rule.domain && (orig_rule.path || '') === rule.path;
 
 	if (!same_node && Rules.exists(rule))
 		document.getElementById('rule_error').innerText = _('Rule $RULE_NAME$ already exists', name_rule(rule));
@@ -355,7 +364,7 @@ function insert_rule(is_new_rule, rule)
 	else
 		opt.classList.add('default-rule');
 
-	if (rule !== undefined && 'parents' in rule)
+	if (typeof rule !== 'undefined' && 'parents' in rule)
 		opt.setAttribute('parents', JSON.stringify(rule.parents));
 
 	document.getElementById('rule_selector').appendChild(opt);
@@ -381,33 +390,32 @@ function insert_parent_rule(list, name, id)
 
 function save_rule()
 {
-	let select = document.getElementById('rule_selector');
+	const select = document.getElementById('rule_selector');
 
 	if (select.selectedIndex === -1)
 		return;
 
-	let rule = parse_rule(select);
-	let selected_opt = select[select.selectedIndex];
+	const rule = parse_rule(select);
+	const selected_opt = select[select.selectedIndex];
 
 	// Perform the update operation immediately in the DOM
 	selected_opt.replaceChild(document.createTextNode(name_rule(rule)), selected_opt.firstChild);
 	selected_opt.value = id_rule(rule);
 
-	const list = document.getElementById('parents');
 	document.getElementById('parents').lastChild.textContent = name_rule(rule);
 
 	let replacing = null;
 	if (selected_opt.hasAttribute('orig-rule'))
 		replacing = JSON.parse(selected_opt.getAttribute('orig-rule'));
 
-	let rule_str = sorted_stringify(rule);
+	const rule_str = sorted_stringify(rule);
 	selected_opt.setAttribute('rule', rule_str);
 	selected_opt.setAttribute('orig-rule', rule_str);
 
 	rule_pristine();
 	filter_rules();
 
-	// Then the same operation [old rule -> new rule] to the rule storage, the ensure operations happen in the same order
+	// Then the same operation [old rule -> new rule] to the rule storage, to ensure operations happen in the same order
 	UndoStack.push({add: rule, ...replacing ? {del: replacing} : {}})
 	RedoStack.splice(0);
 
@@ -507,8 +515,9 @@ function redo_rules_change()
 function import_rules()
 {
 	const get_json = this.files[0].text();
-	return get_json.then(data => Rules.replace(JSON.parse(data))).catch(err => console.error('Error importing rules', err))
-			.then(() => window.location.reload());
+	return get_json.then(data => Rules.replace(JSON.parse(data)))
+				   .catch(err => console.error('Error importing rules', err))
+				   .then(() => window.location.reload());
 }
 
 
@@ -516,7 +525,8 @@ function export_rules()
 {
 	return Rules.loaded.then(() =>
 	{
-		const blob = new Blob([JSON.stringify(Rules.all_rules, null, 2)], {type : 'data:application/json;charset=utf-8'})
+		const blob = new Blob([JSON.stringify(Rules.all_rules, null, 2)],
+							  {type : 'data:application/json;charset=utf-8'})
 
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
@@ -531,7 +541,7 @@ function reset_rules()
 	// clear rules storage, reload everything
 	Rules.reset().then(() =>
 	{
-		browser.runtime.sendMessage({action: 'rules'}).then(page =>
+		browser.runtime.sendMessage({action: 'rules'}).then(() =>
 		{
 			window.location.reload();
 		})
@@ -547,7 +557,7 @@ function reset_defaults()
 			if (!Rules.exists(rule))
 				push_rule(Rules.all_rules, rule);
 
-		save_rules(Rules.all_rules).then(() => browser.runtime.sendMessage({action: 'rules'})).then(page =>
+		save_rules(Rules.all_rules).then(() => browser.runtime.sendMessage({action: 'rules'})).then(() =>
 		{
 			window.location.reload();
 		})
@@ -557,8 +567,8 @@ function reset_defaults()
 
 function fetch_rule(link)
 {
-	let url = new URL(link);
-	let rule = {...default_actions, domain: url.hostname, path: '^' + url.pathname + '$'};
+	const url = new URL(link);
+	const rule = {...default_actions, domain: url.hostname, path: `^${url.pathname}$`};
 
 	if (Rules.exists(rule))
 		return { rule, exists: true }
@@ -609,23 +619,23 @@ function populate_rules()
 
 	for (const list of ['remove', 'whitelist', 'rewrite'])
 	{
-		let editor = document.querySelector(`#${list}_editor`);
-		let input_name = list !== 'rewrite' ? list + '_edit' : 'search_edit';
-		let input = document.querySelector(`input[name="${input_name}"]`);
+		const editor = document.querySelector(`#${list}_editor`);
+		const input_name = list !== 'rewrite' ? `${list}_edit` : 'search_edit';
+		const input = document.querySelector(`input[name="${input_name}"]`);
 
-		document.getElementById(list + '_add').onclick = () =>
+		document.getElementById(`${list}_add`).onclick = () =>
 		{
-			for (let item of document.querySelectorAll('.editor'))
-				item.style.display = item.id === list + '_editor' ? 'block' : 'none';
+			for (const item of document.querySelectorAll('.editor'))
+				item.style.display = item.id === `${list}_editor` ? 'block' : 'none';
 			input.select();
 		}
 
-		input.addEventListener('keyup', e =>
+		input.addEventListener('keyup', evt =>
 		{
-			if (e.key === 'Enter')
+			if (evt.key === 'Enter')
 			{
-				e.stopPropagation();
-				e.preventDefault();
+				evt.stopPropagation();
+				evt.preventDefault();
 				validate_item(list);
 			}
 		});
@@ -639,7 +649,7 @@ function populate_rules()
 			editor.style.display = 'none';
 		}
 
-		let check_val = () => check_regexp(input.value, document.getElementById(input_name + '_error'));
+		const check_val = () => check_regexp(input.value, document.getElementById(`${input_name}_error`));
 		input.onchange = check_val;
 		input.onkeyup = delayed_call(check_val);
 	}
@@ -678,17 +688,18 @@ function add_listeners()
 	document.querySelector('button[name="reset_rules"]').onclick = reset_rules
 	document.querySelector('button[name="reset_defaults"]').onclick = reset_defaults
 	document.querySelector('button[name="export_rules"]').onclick = export_rules
-	document.querySelector('button[name="import_rules"]').onclick = () => document.getElementById('import_rules').click()
+	document.querySelector('button[name="import_rules"]').onclick = () =>
+		document.getElementById('import_rules').click()
 	document.getElementById("import_rules").onchange = import_rules
 
-	document.addEventListener('keyup', e =>
+	document.addEventListener('keyup', evt =>
 	{
-		if (e.key === 'Escape')
-			for (let item of document.querySelectorAll('.editor'))
+		if (evt.key === 'Escape')
+			for (const item of document.querySelectorAll('.editor'))
 				if (item.style.display !== 'none')
 				{
-					e.stopPropagation();
-					e.preventDefault();
+					evt.stopPropagation();
+					evt.preventDefault();
 					item.style.display = 'none';
 				}
 	});
@@ -704,7 +715,7 @@ function add_listeners()
 		if (message.action === 'rules')
 			return Rules.reload().then(populate_rules);
 		else
-			return Promise.resolve('Rules page ignored unknown message ' + message.action)
+			return Promise.resolve(`Rules page ignored unknown message ${message.action}`)
 	});
 }
 

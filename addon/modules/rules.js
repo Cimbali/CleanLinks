@@ -12,12 +12,15 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-'use strict'
+'use strict';
 
 
-const default_actions = {whitelist: [], remove: [], rewrite: [], redirect: [], whitelist_path: false, redirect_path: false, allow_js: false}
+/* exported default_actions */
+const default_actions = {whitelist: [], remove: [], rewrite: [], redirect: [],
+						 whitelist_path: false, redirect_path: false, allow_js: false}
 
 
+/* exported name_rule */
 function name_rule(rule)
 {
 	let domain = rule.domain || '*.*', path = rule.path || '';
@@ -25,10 +28,10 @@ function name_rule(rule)
 	if (domain.startsWith('.'))
 		domain = domain.substring(1)
 	else if (domain !== '*.*')
-		domain = '*.' + domain
+		domain = `*.${domain}`
 
 	if (path && !path.startsWith('/'))
-		path = '/' + path
+		path = `/${path}`
 
 	return domain + path;
 }
@@ -42,12 +45,12 @@ function id_rule(rule)
 
 function split_suffix(hostname)
 {
-	if (hostname === undefined || hostname === '' || hostname === '*')
+	if (typeof hostname === 'undefined' || hostname === '' || hostname === '*')
 		return ['*', '.*']
 
 	// use public domain instead of TLD. PSL bugs on domains starting with .
 	const psl_host = hostname.startsWith('.') ? `subdomain${hostname}` : hostname;
-	const suffix = hostname.endsWith('.*') ? '.*' : ('.' + PublicSuffixList.get_public_suffix(psl_host));
+	const suffix = hostname.endsWith('.*') ? '.*' : `.${PublicSuffixList.get_public_suffix(psl_host)}`;
 	const domain = hostname.substring(0, hostname.length - suffix.length)
 
 	return [domain, suffix];
@@ -57,7 +60,7 @@ function split_suffix(hostname)
 function url_search_keys(url)
 {
 	const [domain, suffix] = split_suffix(url.hostname);
-	const domain_bits = [suffix, ...domain.split('.').map(d => '.' + d).reverse(), '.'];
+	const domain_bits = [suffix, ...domain.split('.').map(d => `.${d}`).reverse(), '.'];
 
 	return [domain_bits, url.pathname];
 }
@@ -67,7 +70,7 @@ function serialized_rule_keys(serialized_rule)
 {
 	// keys is the hierarchical position in the JSON data, as the list of keys to follow from the root node
 	const [domain, suffix] = split_suffix(serialized_rule.domain);
-	const keys = [suffix, ...domain.split('.').reverse().map(d => '.' + d)];
+	const keys = [suffix, ...domain.split('.').reverse().map(d => `.${d}`)];
 
 	while (keys.length && keys[keys.length - 1] === '.*')
 		keys.pop();
@@ -112,7 +115,7 @@ function merge_rule_actions(actions, add)
 
 		else if (Array.isArray(action))
 		{
-			const cmp_as_string = action.length !== 0 && typeof action[0] === 'object';
+			const cmp_as_string = action.length !== 0 && typeof action[0] === 'object';
 			const cmp_actions = cmp_as_string ? actions[key].map(sorted_stringify) : actions[key];
 
 			actions[key] = actions[key].concat(action.filter(val =>
@@ -136,7 +139,7 @@ function recursive_find(rules, domain_bits, path)
 
 	if (domain_bits.length !== 0)
 	{
-		let bit = domain_bits[0]
+		const [bit, ] = domain_bits;
 
 		// wildcard domain match
 		if (bit !== '.' && '.*' in rules)
@@ -147,14 +150,14 @@ function recursive_find(rules, domain_bits, path)
 			matches.push(...recursive_find(rules[bit], domain_bits.slice(1), path))
 	}
 
-	if (path !== undefined)
+	if (typeof path !== 'undefined')
 	{
 		// normal (regexp) path match
-		const path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
-											   .filter(key => path.match(new RegExp(key, 'i')))
+		const path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
+											   .filter(key => path.match(new RegExp(key, 'iu')))
 
 		for (const matching_key of path_matches)
-			matches.push(...recursive_find(rules[matching_key], [], undefined))
+			matches.push(...recursive_find(rules[matching_key], []))
 	}
 
 	return matches
@@ -167,11 +170,11 @@ function recursive_serialize(rules, serialized_rule, domain_bits, path)
 
 	if ('actions' in rules)
 	{
-		let rule = {...serialized_rule, ...rules.actions};
+		const rule = {...serialized_rule, ...rules.actions};
 		if (serialized_rule.domain.length === 0)
 			rule.domain = '*.*';
 		else if (serialized_rule.domain.length === 1)
-			rule.domain = '*' + serialized_rule.domain[0];
+			rule.domain = `*${serialized_rule.domain[0]}`;
 		else
 			rule.domain = serialized_rule.domain.join('').substr(1) // remove leading .
 
@@ -187,42 +190,45 @@ function recursive_serialize(rules, serialized_rule, domain_bits, path)
 
 
 	// No matching: recursively apply to all keys
-	if (domain_bits === undefined && path === undefined)
+	if (typeof domain_bits === 'undefined' && typeof path === 'undefined')
 	{
 		for (const [key, value] of Object.entries(rules))
 		{
 			if (key[0] === '.')
-				matches.push(...recursive_serialize(value, {...serialized_rule, domain: [key].concat(serialized_rule.domain)}))
+				matches.push(...recursive_serialize(value, {...serialized_rule,
+															domain: [key].concat(serialized_rule.domain)}))
 			else if (key !== 'actions')
 				matches.push(...recursive_serialize(value, {...serialized_rule, path: key}))
 		}
 	}
 
 	// Recursive domain match
-	if (domain_bits !== undefined && domain_bits.length !== 0)
+	if (typeof domain_bits !== 'undefined' && domain_bits.length !== 0)
 	{
-		const bit = domain_bits[0];
+		const [bit, ] = domain_bits;
 
 		// wildcard domain match
 		if (bit !== '.' && '.*' in rules)
-			matches.push(...recursive_serialize(rules['.*'], {...serialized_rule, domain: ['.*'].concat(serialized_rule.domain)},
+			matches.push(...recursive_serialize(rules['.*'],
+												{...serialized_rule, domain: ['.*'].concat(serialized_rule.domain)},
 												domain_bits.slice(1), path))
 
 		// normal (exact) domain match
 		if (bit in rules)
-			matches.push(...recursive_serialize(rules[bit], {...serialized_rule, domain: [bit].concat(serialized_rule.domain)},
+			matches.push(...recursive_serialize(rules[bit],
+												{...serialized_rule, domain: [bit].concat(serialized_rule.domain)},
 												domain_bits.slice(1), path))
 	}
 
 	// Recursive path match
-	if (path !== undefined && path !== null)
+	if (typeof path !== 'undefined' && path !== null)
 	{
 		// normal (regexp) path match
-		const path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
-											 .filter(key => path.match(new RegExp(key)))
+		const path_matches = Object.keys(rules).filter(key => !key.startsWith('.') && key !== 'actions')
+											 .filter(key => path.match(new RegExp(key, 'u')))
 
 		for (const matching_key of path_matches)
-			matches.push(...recursive_serialize(rules[matching_key], {...serialized_rule, path: matching_key}, [], null))
+			matches.push(...recursive_serialize(rules[matching_key], {...serialized_rule, path: matching_key}, []))
 	}
 
 	return matches
@@ -236,7 +242,7 @@ function pop_rule(all_rules, serialized_rule)
 	for (const key of serialized_rule_keys(serialized_rule))
 	{
 		if (!(key in node))
-			return;
+			throw new Error(`Node ${serialized_rule_keys(serialized_rule)} not found in rules: can’t pop`);
 		else
 		{
 			stack.push([node, key])
@@ -335,7 +341,7 @@ function diff_rules(all_rules, default_rules)
 
 	const add = {}, del = {};
 
-	for (let i = 0, j = 0; i < rules.length || j < ref.length; )
+	for (let i = 0, j = 0; i < rules.length || j < ref.length;)
 	{
 		if (j === ref.length || rules[i] < ref[j])
 		{
@@ -348,7 +354,10 @@ function diff_rules(all_rules, default_rules)
 			j++;
 		}
 		else
-			i++, j++;
+		{
+			i++;
+			j++;
+		}
 	}
 
 	return {added: add, removed: del};
@@ -401,7 +410,7 @@ function load_rules()
 }
 
 
-let Rules = {
+const Rules = {
 	all_rules: {},
 	default_rules: {},
 	find: url => find_rules(Rules.all_rules, url),
@@ -434,14 +443,14 @@ let Rules = {
 	},
 	update: (old_rule, new_rule) =>
 	{
-		let found = pop_rule(Rules.all_rules, old_rule)
+		const found = pop_rule(Rules.all_rules, old_rule)
 		merge_rule_actions(new_rule, found)
 		push_rule(Rules.all_rules, new_rule)
 		return save_rules(Rules.all_rules)
 	},
 	reload: () => Promise.all([
 		PublicSuffixList.loaded,
-		load_rules().then(loaded => Rules.all_rules = loaded),
+		load_rules().then(loaded => { Rules.all_rules = loaded }),
 		load_default_rules().then(loaded =>
 		{
 			Rules.default_rules = {}

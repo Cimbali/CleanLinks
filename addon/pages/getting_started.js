@@ -1,3 +1,5 @@
+'use strict';
+
 function update() {
 	for (const div of document.querySelectorAll('.slide')) {
 		if (window.scrollY + window.innerHeight > div.offsetTop) {
@@ -11,7 +13,6 @@ function update() {
 
 	const n = document.querySelectorAll('.slide.visible').length;
 	[...document.querySelectorAll('#progress a')].forEach((elt, num) => {
-		console.log(num, n)
 		if (num < n) {
 			elt.classList.add('uncovered');
 		} else {

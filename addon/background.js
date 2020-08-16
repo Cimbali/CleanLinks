@@ -12,7 +12,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-'use strict'
+'use strict';
+
 
 // Count of clean links per page, reset it at every page load
 const cleaned_per_tab = {
@@ -240,7 +241,7 @@ function handle_message(message, sender)
 	let tab_id = browser.tabs.TAB_ID_NONE;
 	if ('tab_id' in message)
 		tab_id = message.tab_id;
-	else if (sender !== undefined && 'tab' in sender)
+	else if (typeof sender !== 'undefined' && 'tab' in sender)
 		tab_id = sender.tab.id;
 
 	switch (message.action)
@@ -286,7 +287,7 @@ function handle_message(message, sender)
 									typeof data !== 'function' && data.pending_highlight === message.orig
 								) || [];
 
-			if (orig_tab !== undefined)
+			if (typeof orig_tab !== 'undefined')
 			{
 				cleaned_per_tab.get(orig_tab).pending_highlight = null;
 				return browser.tabs.sendMessage(parseInt(orig_tab), {action: 'highlight'}).catch(() => {})
@@ -294,7 +295,7 @@ function handle_message(message, sender)
 		}
 
 		// if the message was not broadcasted, do so (we won’t get it here) to alert open popups
-		if (sender === undefined)
+		if (typeof sender === 'undefined')
 			browser.runtime.sendMessage(message).catch(() => {})
 
 		return Promise.resolve({});
@@ -399,7 +400,7 @@ function copy_clean_link({ linkUrl, selectionText }, { url })
 	{
 		link = extract_javascript_link(link, url) || new URL(link, url);
 	}
-	catch (e)
+	catch (err)
 	{
 		return;
 	}
@@ -529,13 +530,11 @@ async function upgrade_options(prev_version)
 		if (!default_rules && major === 4 && minor <= 1)
 		{
 			// try falling back to sync, where we previously stored default rules
-			{default_rules} = await browser.storage.sync.get({default_rules: null});
-			await browser.storage.sync.remove('default_rules'),
+			({default_rules} = await browser.storage.sync.get({default_rules: null}));
+			await browser.storage.sync.remove('default_rules');
 		}
 		else
-		{
-			{default_rules} = await browser.storage.local.get({default_rules: null});
-		}
+			({default_rules} = await browser.storage.local.get({default_rules: null}));
 
 		// Alternately, fetch previous rules from the github releases
 		const previous_rules_url = `https://github.com/Cimbali/CleanLinks/raw/v${prev_version}/addon/data/rules.json`;

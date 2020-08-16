@@ -12,11 +12,17 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-const decoded_scheme_url = /(?:\b|=)([a-z]{2,}:\/\/.+)$/i					// {word-break or "="}[a-z]+://{more stuff}
-const decoded_www_url = /(?:^|[^\/]\/)(www\..+)$/i							// {begin or [not-slash]/}www.{more stuff}
-const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=\/]+/i					// {base64-encoded http or www.}{more valid base64 chars}
-const trailing_invalid_chars = /([^-a-z0-9~$_.+!*'(),:;@&=\/?%#]|%(?![0-9a-fA-F]{2})).*$/i
-const encoded_param_chars = [['?', encodeURIComponent('?')], ['=', encodeURIComponent('=')], ['&', encodeURIComponent('&')]];
+'use strict';
+
+const decoded_scheme_url = /(?:\b|=)(?<protocol>[a-z]{2,}:\/\/.+)$/iu	// {word-break or "="}[a-z]+://{more stuff}
+const decoded_www_url = /(?:^|[^/]\/)(?<web>www\..+)$/iu				// {begin or [not-slash]/}www.{more stuff}
+const base64_encoded_url = /\b(?:aHR0|d3d3)[A-Z0-9+=/]+/iu				// {base64-encoded http or www.}{base64 data}
+const trailing_invalid_chars = /(?:[^-a-z0-9~$_.+!*'(),:;@&=/?%#]|%(?![0-9a-fA-F]{2})).*$/iu
+const encoded_param_chars = [
+	['?', encodeURIComponent('?')],
+	['=', encodeURIComponent('=')],
+	['&', encodeURIComponent('&')],
+];
 
 
 function skip_link_type(link)
@@ -27,7 +33,7 @@ function skip_link_type(link)
 
 function get_simple_link_search_strings(link, test_skip_param, skip_path)
 {
-	let arr = [], vals = [];
+	const arr = [], vals = [];
 
 	if (!skip_path)
 		arr.push(decodeURIComponent(link.pathname));
@@ -36,7 +42,7 @@ function get_simple_link_search_strings(link, test_skip_param, skip_path)
 	{
 		// NB searchParams.values() does not work reliably, probably because URLSearchParams are some kind of generator:
 		// they need to be manually iterated.
-		for (let [key, val] of link.searchParams)
+		for (const [key, val] of link.searchParams)
 		{
 			if (test_skip_param(key))
 				continue;
@@ -51,7 +57,7 @@ function get_simple_link_search_strings(link, test_skip_param, skip_path)
 
 	// look again with double decoding if nothing was found
 	for (const token of arr.slice())
-		try { arr.push(decodeURIComponent(token)); } catch (e) {}
+		try { arr.push(decodeURIComponent(token)); } catch (err) {}
 
 	return arr;
 }
@@ -67,18 +73,18 @@ function no_hash_url(url)
 
 function get_link_search_strings(link, test_skip_param, skip_path)
 {
-	let arr = get_simple_link_search_strings(link, test_skip_param, skip_path)
+	const arr = get_simple_link_search_strings(link, test_skip_param, skip_path)
 
 	if (link.hash.startsWith('#!'))
 	{
 		try
 		{
 			const hash_link = new URL(link.hash.slice(2), no_hash_url(link).href);
-			log('Parsing from hash-bang type URL: ' + hash_link.href);
+			log(`Parsing from hash-bang type URL: ${hash_link.href}`);
 
 			arr.push(...get_simple_link_search_strings(hash_link, test_skip_param));
 		}
-		catch (e)
+		catch (err)
 		{
 			return arr.push(link.hash.slice(1));
 		}
@@ -100,20 +106,20 @@ function get_base_href(base)
 		if (base)
 			return no_hash_url(new URL(base));
 	}
-	catch (e) {}
+	catch (err) {}
 
 	// fall back on window.location if it exists
 	if (typeof window !== 'undefined')
 		return no_hash_url(new URL(window.location));
 
-	return undefined;
+	return null;
 }
 
 
 function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 {
 	// get embedded_link.origin + username the way it is in the raw string
-	let substr = [0, embedded_link.origin.length + (embedded_link.username ? 1 + embedded_link.username.length : 0)];
+	const substr = [0, embedded_link.origin.length + (embedded_link.username ? 1 + embedded_link.username.length : 0)];
 
 	if (!matched_protocol)
 	{
@@ -123,7 +129,7 @@ function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 		substr[1] += 1;
 	}
 
-	let raw_pos = haystack.indexOf(embedded_link.href.slice(...substr));
+	const raw_pos = haystack.indexOf(embedded_link.href.slice(...substr));
 	if (raw_pos === -1)
 		return null;
 
@@ -133,10 +139,15 @@ function find_raw_embedded_link(haystack, embedded_link, matched_protocol)
 
 function decode_embedded_uri(link, rules, original_string)
 {
-	const skip_whitelist = 'whitelist' in rules && rules.whitelist.length ? new RegExp('^(' + rules.whitelist.join('|') + ')$', 'i') : {test: str => false};
-	const is_in_redirect = 'redirect' in rules && rules.redirect.length ? new RegExp('^(' + rules.redirect.join('|') + ')$', 'i') : {test: str => false};
+	const skip_whitelist = 'whitelist' in rules && rules.whitelist.length
+		? new RegExp(`^(${rules.whitelist.join('|')})$`, 'iu')
+		: {test: () => false};
+	const is_in_redirect = 'redirect' in rules && rules.redirect.length
+		? new RegExp(`^(${rules.redirect.join('|')})$`, 'iu')
+		: {test: () => false};
 
-	const test_skip_param = Prefs.values.auto_redir ? str => skip_whitelist.test(str) : str => !is_in_redirect.test(str) || skip_whitelist.test(str);
+	const test_skip_param = Prefs.values.auto_redir ? str => skip_whitelist.test(str)
+													: str => !is_in_redirect.test(str) || skip_whitelist.test(str);
 	const skip_path = Prefs.values.auto_redir ? rules.whitelist_path : !rules.redirect_path;
 
 	// first try to find a base64-encoded link
@@ -153,19 +164,19 @@ function decode_embedded_uri(link, rules, original_string)
 					continue;
 
 				if (decoded.startsWith('www.'))
-					decoded = link.protocol + '//' + decoded;
+					decoded = `${link.protocol}//${decoded}`;
 
 				// found? return it, this is pretty much unambiguous
 				return new URL(decoded);
 			}
-			catch (e)
+			catch (err)
 			{
-				log(`Invalid base64 data in link ${link} : ${decoded} -- error is ${e}`);
+				log(`Invalid base64 data in link ${link} : ${decoded} -- error is ${err.message}`);
 			}
 		}
 	}
 
-	let capture = undefined, matchedString, embedded_link;
+	let capture, matchedString, embedded_link;
 
 	// check every parsed (URL-decoded) substring in the URL
 	for (const str of get_link_search_strings(link, test_skip_param, skip_path))
@@ -174,22 +185,22 @@ function decode_embedded_uri(link, rules, original_string)
 		if (capture)
 		{
 			// got the new link!
-			embedded_link = new URL((capture.startsWith('www.') ? link.protocol + '//' : '') + capture);
-			log(`decoded URI Component = ${capture} → ${embedded_link.origin} + `
-				+ embedded_link.href.slice(embedded_link.origin.length))
+			embedded_link = new URL((capture.startsWith('www.') ? `${link.protocol}//` : '') + capture);
+			log(`decoded URI Component = ${capture} → ${embedded_link.origin} + ${
+				 embedded_link.href.slice(embedded_link.origin.length)}`)
 			matchedString = str;
 			break;
 		}
 	}
 
-	if (capture === undefined)
+	if (typeof capture === 'undefined')
 		return link;
 
 	// check if the embedded URL appears unencoded or partially encoded in the containing URL
 	let raw_url = find_raw_embedded_link(original_string.slice(link.origin.length), embedded_link,
 										 capture.startsWith(embedded_link.protocol))
 
-	// No unencoded occurrence of the embedded URL in the parent URL: encoding was done correctly. 99% of the cases here.
+	// No unencoded occurrence of the embedded URL in the parent URL: encoding was done correctly. 99% of cases here.
 	if (raw_url === null)
 	{
 		// Trim of any non-link parts of the "capture" string, that appear after decoding the URI component,
@@ -198,10 +209,10 @@ function decode_embedded_uri(link, rules, original_string)
 		if (!capture.startsWith(embedded_link.protocol))
 			prefix_length -= embedded_link.protocol.length + 2;
 
-			log(`decoded URI Component = ${capture.substring(0, prefix_length)} → ${embedded_link.origin} + `
-				+ capture.substring(prefix_length))
+			log(`decoded URI Component = ${capture.substring(0, prefix_length)} → ${embedded_link.origin} + ${
+				 capture.substring(prefix_length)}`)
 		return new URL(embedded_link.origin +
-						capture.substring(prefix_length).replace(trailing_invalid_chars, '').replace(/&amp;/g, '&'));
+						capture.substring(prefix_length).replace(trailing_invalid_chars, '').replace(/&amp;/gu, '&'));
 	}
 	else
 		log('raw url:', raw_url)
@@ -213,7 +224,7 @@ function decode_embedded_uri(link, rules, original_string)
 
 	// => if we find indications that the encoding is indeed partial, return embedded_link
 	let semi_encoded = false;
-	for (let [dec, enc] of encoded_param_chars)
+	for (const [dec, enc] of encoded_param_chars)
 		if (matchedString.includes(dec) && raw_url.includes(enc))
 			semi_encoded = true;
 
@@ -221,28 +232,29 @@ function decode_embedded_uri(link, rules, original_string)
 		return embedded_link;
 
 	// => Otherwise, use "raw_url" as the URL string. Use some heuristics on & and ? to remove garbage from the result.
-	log('using raw URL: ' + raw_url)
-	let qmark_pos = raw_url.indexOf('?')
-	let qmark_end = raw_url.lastIndexOf('?')
-	let amp_pos = raw_url.indexOf('&')
+	log(`using raw URL: ${raw_url}`)
+	const qmark_pos = raw_url.indexOf('?')
+	const qmark_end = raw_url.lastIndexOf('?')
+	const amp_pos = raw_url.indexOf('&')
 
 	if (amp_pos >= 0 && qmark_pos < 0)
 		raw_url = raw_url.slice(0, amp_pos)
 	else if (qmark_pos >= 0 && qmark_pos < qmark_end)
 		raw_url = raw_url.slice(0, qmark_end)
 
-	return new URL((raw_url.startsWith('www.') ? embedded_link.protocol + '//' : '') + raw_url);
+	return new URL((raw_url.startsWith('www.') ? `${embedded_link.protocol}//` : '') + raw_url);
 }
 
 
 function filter_params_and_path(link, rules, actions_taken)
 {
-	let { rewrite, remove } = { rewrite: false, remove: [], ...actions_taken };
+	const { remove, ...other } = { rewrite: false, remove: [], ...actions_taken };
+	let { rewrite } = other;
 
 	if ('rewrite' in rules && rules.rewrite.length)
 	{
-		let pathname = link.pathname;
-		for (let {search, replace, flags} of rules.rewrite)
+		let {pathname} = link;
+		for (const {search, replace, flags} of rules.rewrite)
 			pathname = pathname.replace(new RegExp(search, flags), replace)
 
 		if (link.pathname !== pathname)
@@ -254,15 +266,14 @@ function filter_params_and_path(link, rules, actions_taken)
 
 	if ('remove' in rules && rules.remove.length && link.search.length > 1)
 	{
-		let params = new URLSearchParams(link.search.slice(1));
-		let strip = new RegExp('^(' + rules.remove.join('|') + ')$');
-		let keep = null;
+		const params = new URLSearchParams(link.search.slice(1));
+		const strip = new RegExp(`^(${rules.remove.join('|')})$`, 'u');
+		const keep = 'whitelist' in rules && rules.whitelist.length
+			? new RegExp(`^(${rules.whitelist.join('|')})$`, 'u')
+			: {test: () => false};
 
-		if ('whitelist' in rules && rules.whitelist.length)
-			keep = new RegExp('^(' + rules.whitelist.join('|') + ')$')
-
-		for (let [key, val] of link.searchParams.entries())
-			if ((!keep || !key.match(keep)) && key.match(strip))
+		for (const [key, ] of link.searchParams.entries())
+			if (!keep.test(key) && strip.test(key))
 			{
 				remove.push(key);
 				params.delete(key)
@@ -279,6 +290,7 @@ function filter_params_and_path(link, rules, actions_taken)
 }
 
 
+/* exported clean_link */
 function clean_link(link)
 {
 	if (!link || skip_link_type(link))
@@ -297,7 +309,7 @@ function clean_link(link)
 	let rules = Rules.find(cleaned_link);
 	let nesting = -1;
 	let meta = {};
-	let previous_cleaned_links = [];
+	const previous_cleaned_links = [];
 
 	// first remove parameters or rewrite
 	({ link: cleaned_link, ...meta } = filter_params_and_path(cleaned_link, rules));
@@ -325,7 +337,7 @@ function clean_link(link)
 		return {};
 	}
 
-	log('cleaning ' + link.href + ' : ' + cleaned_link.href)
+	log(`cleaning ${link.href} : ${cleaned_link.href}`)
 
 	return { cleaned_link, embed: nesting, previous_cleaned_links, ...meta };
 }

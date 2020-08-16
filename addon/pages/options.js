@@ -12,12 +12,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-'use strict'
-
-const Queue = {
-	chain: Promise.resolve(),
-	add: callable => { Queue.chain = Queue.chain.then(callable); }
-};
+'use strict';
 
 
 function update_page(options)
@@ -28,10 +23,10 @@ function update_page(options)
 
 function save_options()
 {
-	let options = {}
-	for (let field of Array.from(document.querySelectorAll('input')))
+	const options = {}
+	for (const field of Array.from(document.querySelectorAll('input')))
 	{
-		if (typeof Prefs.values[field.name] == 'boolean')
+		if (typeof Prefs.values[field.name] === 'boolean')
 			options[field.name] = field.checked;
 		else if (field.name in Prefs.values)
 			options[field.name] = field.value;
@@ -70,7 +65,7 @@ function populate_options()
 		if (!input)
 			continue;
 
-		if (typeof value == 'boolean')
+		if (typeof value === 'boolean')
 			input.checked = value;
 		else
 			input.value = value;
@@ -92,7 +87,7 @@ function add_listeners()
 		if (message.action === 'reload options')
 			return Prefs.reload().then(populate_options());
 		else
-			return Promise.resolve('Options page ignored unknown message ' + message.action)
+			return Promise.resolve(`Options page ignored unknown message ${message.action}`)
 	});
 }
 
