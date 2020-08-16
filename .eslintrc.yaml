@@ -108,7 +108,7 @@ rules:
   no-extra-bind: error
   no-extra-label: error
   no-implied-eval: error
-  no-invalid-this: error
+  no-invalid-this: warn # apparently we trigger this with working code (?)
   no-iterator: error
   no-labels: error
   no-lone-blocks: error
