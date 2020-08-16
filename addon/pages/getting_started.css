@@ -89,7 +89,7 @@ h2 {
 #test {
 	text-align: center;
 }
-.update {
+.new-user, .update {
 	display: none;
 }
 #left {
@@ -119,3 +119,19 @@ h2 {
 	opacity: 1;
 }
 
+#vigor-display {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	align-items: top;
+}
+#vigor-display input[type="range"] {
+    grid-column: 1 / 4;
+	margin: 0 15%;
+}
+#vigor-display label {
+	text-align: center;
+	font-size: .8em;
+}
+#vigor-display label:first-line {
+	font-size: 1.2em;
+}

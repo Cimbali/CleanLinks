@@ -1208,6 +1208,15 @@
       }
     }
   },
+  ".me": {
+    ".track": {
+      "actions": {
+        "redirect": [
+          "dest"
+        ]
+      }
+    }
+  },
   ".net": {
     ".doubleclick": {
       ".g": {

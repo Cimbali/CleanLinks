@@ -8,7 +8,7 @@
 </head>
 
 <body>
-	<div id="left"></div>
+	<div id="left"><p id="progress"></p></div>
 	<div id="content">
 	<h1 i18n_html="Welcome to &lt;em&gt;CleanLinks&lt;/em&gt;!"></h1>
 
@@ -16,73 +16,87 @@
 			  Here is a little summary of what CleanLinks does."></p>
 
 	<div class="slide">
-	<h2 i18n_text="Skip redirects"></h2>
-	<p i18n_text="CleanLinks protects your private life and speeds up your internet experience,
-				  by skipping redirect pages that track your movements on the internet."></p>
+		<h2 i18n_text="Skip redirects"></h2>
+		<p i18n_text="CleanLinks protects your private life and speeds up your internet experience,
+					  by skipping redirect pages that track your movements on the internet."></p>
 
-	<img id="summary" i18n_alt="Diagram illustrating the process of shortcutting redirect links." src="summary.svg">
+		<img id="summary" i18n_alt="Diagram illustrating the process of shortcutting redirect links." src="summary.svg">
 
-	<p i18n_html="CleanLinks &lt;strong&gt;automatically detects redirect pages&lt;/strong&gt;,
-				  by detecting links embedded in their URLs, and directs you directly to the destination page."></p>
+		<p i18n_html="CleanLinks &lt;strong&gt;can automatically detect redirect pages&lt;/strong&gt;,
+					  by detecting links embedded in their URLs, and directs you directly to the destination page."></p>
 	</div>
 
 	<div class="slide">
-	<h2 i18n_text="Further cleaning"></h2>
-	<ul>
-		<li i18n_html="The URLs of the pages that you visit can also contain &lt;strong&gt;tracking parameters&lt;/strong&gt;,
-					such as &lt;a href=&quot;https://en.wikipedia.org/wiki/UTM_parameters&quot;&gt;UTM parameters&lt;/a&gt;
-					and many more: CleanLinks also removes those."></li>
-		<li i18n_html="CleanLinks also prevents &lt;strong&gt;javascript modifying links&lt;/strong&gt; as you click them."></li>
-	</ul>
+		<h2 i18n_text="Further cleaning"></h2>
+		<ul>
+			<li i18n_html="The URLs of the pages that you visit can also contain &lt;strong&gt;tracking parameters&lt;/strong&gt;,
+						such as &lt;a href=&quot;https://en.wikipedia.org/wiki/UTM_parameters&quot;&gt;UTM parameters&lt;/a&gt;
+						and many more: CleanLinks also removes those."></li>
+			<li i18n_html="CleanLinks also prevents &lt;strong&gt;javascript modifying links&lt;/strong&gt; as you click them."></li>
+		</ul>
+	</div>
+
+	<div class="slide new-user">
+		<h2 i18n_text="Select CleanLinks’ cleaning vigor"></h2>
+		<p i18n_text="A higher value will protect your privacy better, at the cost of requiring more manual whitelisting."></p>
+
+		<p id="vigor-display">
+			<input type="range" id="vigor" min="0" max="2" step="1" value="1" />
+			<label for="vigor" value="0">Minimal<br />Clean only page URLs (no resources), using rules only</label>
+			<label for="vigor" value="1">Intermediate<br />Clean all requests, using rules only</label>
+			<label for="vigor" value="2">Maximal<br />Clean all requests, detect automatically</label>
+		</p>
+
+		<p i18n_html="You’ll be able to later adjust with finer settings in the CleanLinks preferences."></p>
 	</div>
 
 	<div class="slide">
-	<h2 i18n_text="See what happened"></h2>
-	<p i18n_html="The &lt;strong&gt;CleanLink popup&lt;/strong&gt;, opened by clicking the &lt;strong&gt;toolbar icon&lt;/strong&gt;, shows the addon’s activity."></p>
-	<img id="toolbar" i18n_alt="Screenshot of the toolbar with CleanLinks icon emphasized" src="toolbar.png">
+		<h2 i18n_text="See what happened"></h2>
+		<p i18n_html="The &lt;strong&gt;CleanLink popup&lt;/strong&gt;, opened by clicking the &lt;strong&gt;toolbar icon&lt;/strong&gt;, shows the addon’s activity."></p>
+		<img id="toolbar" i18n_alt="Screenshot of the toolbar with CleanLinks icon emphasized" src="toolbar.png">
 
-	<p i18n_html="There you can investigate which links got modified and how.
-	This is especially useful to &lt;strong&gt;investigate broken links or pages&lt;/strong&gt;.
-	You can also switch off the add-on for that tab from the popup."></p>
+		<p i18n_html="There you can investigate which links got modified and how.
+		This is especially useful to &lt;strong&gt;investigate broken links or pages&lt;/strong&gt;.
+		You can also switch off the add-on for that tab from the popup."></p>
 	</div>
 
 	<div class="slide">
-	<h2 i18n_text="Adjust CleanLinks’ behaviour"></h2>
-	<p>
-		<span i18n_text="CleanLinks has a set of rules, that you can modify.
-						 This can be done mainly with the buttons at the bottom of the popup:"></span>
-	<ul class="actions">
-		<li class="allow" i18n_html="&lt;strong&gt;Allow&lt;/strong&gt; an embedded link,
-									for legitimate use cases such as a login pages"></li>
-		<li class="remove" i18n_html="&lt;strong&gt;Delete&lt;/strong&gt; an embedded link,
-									to access the intermediate page without the embedded link in the URL"></li>
-		<li class="allow-once" i18n_html="&lt;strong&gt;Allow once&lt;/strong&gt;,
-										to open the URL without any cleaning rules applied"></li>
-		<li class="allow-js" i18n_html="&lt;strong&gt;Allow javascript&lt;/strong&gt; to modify links on this page"></li>
-		<li class="edit-rules" i18n_html="&lt;strong&gt;Edit rules&lt;/strong&gt;,
-										to open the advanced rules editor for the selected link."></li>
-	</ul>
-	</p>
+		<h2 i18n_text="Adjust CleanLinks’ behaviour"></h2>
+		<p>
+			<span i18n_text="CleanLinks has a set of rules, that you can modify.
+							 This can be done mainly with the buttons at the bottom of the popup:"></span>
+		<ul class="actions">
+			<li class="allow" i18n_html="&lt;strong&gt;Allow&lt;/strong&gt; an embedded link,
+										for legitimate use cases such as a login pages"></li>
+			<li class="remove" i18n_html="&lt;strong&gt;Delete&lt;/strong&gt; an embedded link,
+										to access the intermediate page without the embedded link in the URL"></li>
+			<li class="allow-once" i18n_html="&lt;strong&gt;Allow once&lt;/strong&gt;,
+											to open the URL without any cleaning rules applied"></li>
+			<li class="allow-js" i18n_html="&lt;strong&gt;Allow javascript&lt;/strong&gt; to modify links on this page"></li>
+			<li class="edit-rules" i18n_html="&lt;strong&gt;Edit rules&lt;/strong&gt;,
+											to open the advanced rules editor for the selected link."></li>
+		</ul>
+		</p>
 	</div>
 
 	<div class="slide">
-	<h2 i18n_text="The popup elements"></h2>
-	<img id="popup" i18n_alt="Screenshot of the CleanLinks popup with annotations" src="popup.svg">
-	<p i18n_html="The CleanLinks popup mainly shows the &lt;strong&gt;history of cleaned links&lt;/strong&gt;,
-				classified by containing page and tagged with request type and type of cleaning."></p>
+		<h2 i18n_text="The popup elements"></h2>
+		<img id="popup" i18n_alt="Screenshot of the CleanLinks popup with annotations" src="popup.svg">
+		<p i18n_html="The CleanLinks popup mainly shows the &lt;strong&gt;history of cleaned links&lt;/strong&gt;,
+					classified by containing page and tagged with request type and type of cleaning."></p>
 
-	<p i18n_html="&lt;em&gt;Filters&lt;/em&gt; up top allow you to reduce the number of links displayed,
-			and selecting a link enables the &lt;em&gt;Actions buttons&lt;/em&gt; at the bottom, to adjust the rules."></p>
+		<p i18n_html="&lt;em&gt;Filters&lt;/em&gt; up top allow you to reduce the number of links displayed,
+				and selecting a link enables the &lt;em&gt;Actions buttons&lt;/em&gt; at the bottom, to adjust the rules."></p>
 	</div>
 
 
 	<div class="slide">
-	<h2 i18n_text="Try it now!"></h2>
-	<p i18n_text="Click the following link, and then open the CleanLinks popup:"></p>
-	<p id="test"><a i18n_title="Link testing the redirect cleaning" href="https://track.me/?dest=https%3A%2F%2Fddg.gg"
-																	>https://track.me/?dest=https%3A%2F%2Fddg.gg</a></p>
-	<p i18n_html="This link should take you to the frontpage of DuckDuckGo
-				  instead of the (fictional) &lt;code&gt;track.me&lt;/code&gt; redirect page."></p>
+		<h2 i18n_text="Try it now!"></h2>
+		<p i18n_text="Click the following link, and then open the CleanLinks popup:"></p>
+		<p id="test"><a i18n_title="Link testing the redirect cleaning" href="https://track.me/?dest=https%3A%2F%2Fddg.gg"
+																		>https://track.me/?dest=https%3A%2F%2Fddg.gg</a></p>
+		<p i18n_html="This link should take you to the frontpage of DuckDuckGo
+					  instead of the (fictional) &lt;code&gt;track.me&lt;/code&gt; redirect page."></p>
 	</div>
 	</div>
 
