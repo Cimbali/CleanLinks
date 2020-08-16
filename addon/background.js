@@ -447,8 +447,9 @@ function import_domain_whitelist(domains_list)
 
 async function upgrade_options(prev_version)
 {
-	const num_prev_version = prev_version.split('.').map(s => parseInt(s))
-	const options = (await browser.storage.sync.get({'configuration': {}})).configuration;
+	const [major, minor, patch] = prev_version.split('.').map(s => parseInt(s))
+	const options = (await browser.storage.sync.get({configuration: {}})).configuration;
+	await Rules.loaded;
 
 	for (const [rename, newname] of Object.entries({
 		'httpomr': 'httpall',
@@ -463,7 +464,7 @@ async function upgrade_options(prev_version)
 			delete options[rename];
 		}
 
-	if (num_prev_version[0] < 4)
+	if (major < 4)
 	{
 		const skipdoms = options.skipdoms.split(',').map(s => s.trim()).filter(s => s.length !== 0);
 
@@ -484,7 +485,6 @@ async function upgrade_options(prev_version)
 
 		let actions = {whitelist: ['.*'], whitelist_path: true};
 
-		await Rules.loaded
 		for (let fqdn of skipdoms)
 			await Rules.add({domain: fqdn, ...actions})
 
@@ -506,42 +506,40 @@ async function upgrade_options(prev_version)
 
 		await Rules.add({domain: '*.*', remove: remove})
 	}
-	else if (num_prev_version[0] >= 4)
+	else if (major >= 4)
 	{
 		// fetch the default rules from before the upgrade, from storage if version is 4.1.x otherwise from the web
-		let old_storage;
-		let get_old_rules;
-
-		if (num_prev_version[0] == 4 && num_prev_version[1] <= 1)
+		let default_rules;
+		if (!default_rules && major === 4 && minor <= 1)
 		{
-			old_storage = await browser.storage.sync.get({'default_rules': null});
+			// try falling back to sync, where we previously stored default rules
+			({default_rules} = await browser.storage.sync.get({default_rules: null}));
 			await browser.storage.sync.remove('default_rules');
 		}
 		else
-			old_storage = await browser.storage.local.get({'default_rules': null});
+			({default_rules} = await browser.storage.local.get({default_rules: null}));
 
-		if (old_storage.default_rules)
-			get_old_rules = Promise.resolve(old_storage.default_rules);
-		else
-		{
-			const previous_rules_url = `https://github.com/Cimbali/CleanLinks/raw/v${prev_version}/addon/data/rules.json`;
-			get_old_rules = fetch(new Request(previous_rules_url)).then(r => r.text()).then(data => JSON.parse(data));
-		}
+		// Alternately, fetch previous rules from the github releases
+		const previous_rules_url = `https://github.com/Cimbali/CleanLinks/raw/v${prev_version}/addon/data/rules.json`;
+		if (!default_rules)
+			default_rules = await fetch(new Request(previous_rules_url)).then(r => r.text())
+																		.then(data => JSON.parse(data)).catch(() => null);
 
-		// fall back to the user’s current rules
-		let fallback = false;
-		get_old_rules.catch(() =>
-		{
-			fallback = true;
-			return Rules.all_rules;
-		});
+		// If none worked, use current user rules, but without erasing from it
+		const fallback = !Boolean(default_rules) || Object.entries(default_rules).length === 0;
+		if (fallback)
+			default_rules = Rules.all_rules;
 
-		// serialize deterministically both the previous rules and the new default rules
-		const old_defaults = serialize_rules(await get_old_rules).map(sorted_stringify).sort();
+		// v4.2.0 release accidentally deleted all default rules (!) presumably due to a missing github release,
+		// this will cause all new defaults to be added back in.
+		if (major === 4 && minor === 2 && patch === 0)
+			default_rules = {};
+
+		// serialize deterministically both the previous default rules and the new default rules
+		const old_defaults = serialize_rules(default_rules).map(sorted_stringify).sort();
 		const new_defaults = serialize_rules(await load_default_rules()).map(sorted_stringify).sort();
 
-		let i = 0, j = 0;
-		while (i < new_defaults.length)
+		for (let i = 0, j = 0; i < new_defaults.length || j < old_defaults.length; )
 		{
 			if (j === old_defaults.length || new_defaults[i] < old_defaults[j])
 			{
@@ -549,21 +547,15 @@ async function upgrade_options(prev_version)
 				Rules.add(JSON.parse(new_defaults[i]));
 				i++;
 			}
-			else if (new_defaults[i] > old_defaults[j])
+			else if (i === new_defaults.length || new_defaults[i] > old_defaults[j])
 			{
 				// NB: removing only removes the parameters passed in, not additional ones
 				if (!fallback)
 					Rules.remove(JSON.parse(old_defaults[j]));
 				j++;
 			}
-			else
+			else // i < old_defaults.length && j < new_defaults.length && new_defaults[i] === old_defaults[i]
 				i++, j++;
-		}
-
-		while (!fallback && j < old_defaults.length)
-		{
-			Rules.remove(JSON.parse(old_defaults[j]));
-			j++;
 		}
 	}
 
@@ -583,6 +575,7 @@ browser.runtime.onInstalled.addListener(({ reason, previousVersion, temporary })
 		const num_prev_version = previousVersion.split('.').map(s => parseInt(s))
 		if (!temporary && (num_prev_version[0] < 4 || (num_prev_version[0] === 4 && num_prev_version[1] <= 1)))
 		{
+			// Only when updating from 4.1.x or less
 			const url = browser.runtime.getURL('/pages/getting_started.html?update');
 			browser.tabs.create({ url });
 		}
