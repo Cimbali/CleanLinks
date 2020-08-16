@@ -99,7 +99,8 @@ function clean_redirect_headers({ documentUrl, originUrl, responseHeaders, statu
 		return {}
 
 	const current_url = (documentUrl || originUrl) ? new URL(documentUrl || originUrl) : {};
-	const link = new URL(loc.value, url), { cleaned_link, ...cleaning_info } = clean_link(link);
+	const link = new URL(loc.value, url);
+	const { cleaned_link, ...cleaning_info } = clean_link(link);
 
 	if (!cleaned_link)
 		return {};
@@ -161,14 +162,23 @@ function on_request({ documentUrl, frameAncestors, tabId, type, originUrl, url }
 		return {};
 	}
 
-	const { cleaned_link, ...cleaning_info } = clean_link(link);
+	let { cleaned_link, previous_cleaned_links, ...cleaning_info } = clean_link(link);
 
 	if (!cleaned_link)
 		return {};
 
 	// Check whether we have found an embedded link that is the current document
-	const contains_parent_url = cleaning_info.embed !== 0 && cleaned_link.host === current_url.host &&
+	let contains_parent_url = cleaning_info.embed !== 0 && cleaned_link.host === current_url.host &&
+							(cleaned_link.pathname === current_url.pathname || cleaned_link.pathname === '/');
+
+	// If we allow self-links, get back to previous link
+	if (!Prefs.values.drop_leaks && type !== 'main_frame')
+		while (previous_cleaned_links.length !== 0 && contains_parent_url)
+		{
+			[{ cleaned_link, ...cleaning_info }] = previous_cleaned_links.splice(0, 1);
+			contains_parent_url = cleaning_info.embed !== 0 && cleaned_link.host === current_url.host &&
 								(cleaned_link.pathname === current_url.pathname || cleaned_link.pathname === '/');
+		}
 
 	let cleaning_notif = {
 		action: 'notify',

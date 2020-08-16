@@ -293,7 +293,11 @@ function clean_link(link)
 		return {};
 	}
 
-	let cleaned_link = new URL(link.href), rules = Rules.find(cleaned_link), nesting = -1, meta = {};
+	let cleaned_link = new URL(link.href);
+	let rules = Rules.find(cleaned_link);
+	let nesting = -1;
+	let meta = {};
+	let previous_cleaned_links = [];
 
 	// first remove parameters or rewrite
 	({ link: cleaned_link, ...meta } = filter_params_and_path(cleaned_link, rules));
@@ -304,12 +308,14 @@ function clean_link(link)
 		if (embedded_link.href === cleaned_link.href)
 			break;
 
+		// Keep track of the list of successive cleaned links here.
+		// Useful for Prefs.values.drop_leaks===false, to get cleaned-without-redir link
+		previous_cleaned_links.push({ cleaned_link, embed: nesting, ...meta });
+
 		// NB/TODO: before fetching new rules, apply post-cleaning rules here?
 
 		// remove parameters or rewrite again, if we redirected on an embedded URL
 		rules = Rules.find(embedded_link);
-		// TODO: Keep track of the list of successive cleaned links here?
-		// Useful for Prefs.values.drop_leaks===false, we might want the cleaned-without-redir link (erased in the next line).
 		({ link: cleaned_link, ...meta } = filter_params_and_path(embedded_link, rules, meta));
 	} // if (!Prefs.values.auto_redir)
 
@@ -321,5 +327,5 @@ function clean_link(link)
 
 	log('cleaning ' + link.href + ' : ' + cleaned_link.href)
 
-	return { cleaned_link, embed: nesting, ...meta };
+	return { cleaned_link, embed: nesting, previous_cleaned_links, ...meta };
 }
