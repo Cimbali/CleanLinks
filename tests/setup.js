@@ -7,7 +7,7 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined')
 // sinon-chrome does not get the manifest
 browser.runtime = {
 	getManifest: () => ({
-		"name": "Clean Links",
+		"name": "CleanLinks",
 		"description": "Converts obfuscated/nested links to genuine clean links",
 		"author": "Cimbali (maintainer), \nDiego Casorran (historic creator), \nEduard Braun (German translation), \nSimon Chan (Chinese and Taiwanese translations)",
 		"version": "tests",

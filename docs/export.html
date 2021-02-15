@@ -75,7 +75,7 @@ window.addEventListener('load', () =>
 	{
 		const manifest = JSON.parse(await json.text());
 		const h1 = document.getElementsByTagName('h1')[0];
-		h1.textContent = h1.textContent.replace('Clean Links', 'Clean Links v' + manifest.version);
+		h1.textContent = h1.textContent.replace('CleanLinks', 'CleanLinks v' + manifest.version);
 	});
 });
 </script>
@@ -210,7 +210,7 @@ window.addEventListener('load', () =>
 	</style>
 </head>
 <body>
-	<h1>Export Clean Links default rules in NeatURL-like format</h1>
+	<h1>Export CleanLinks default rules in NeatURL-like format</h1>
 
 	<p class="topo">Rules are in the following format: <code>{rule type identifier}{rule matching}[@{domain}[/{path}]]</code></p>
 
