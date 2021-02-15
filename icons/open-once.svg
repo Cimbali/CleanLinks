@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32"
+   height="32"
+   viewBox="0 0 32.000001 31.999999"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="allow-once.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     id="namedview6"
+     showgrid="false"
+     inkscape:zoom="4"
+     inkscape:cx="-44.666631"
+     inkscape:cy="50.34733"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:document-rotation="0" />
+  <path
+     d="M 5.1469048,7.4006715 14.763727,4.515625 v 23.080374 c -2.3215,0 -9.6168222,-4.773791 -9.6168222,-11.511336 z"
+     id="path2"
+     inkscape:connector-curvature="0"
+     style="stroke-width:0.06125;fill:#ff9400;fill-opacity:1" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18.4684px;line-height:15.9347px;font-family:'Source Serif Pro';-inkscape-font-specification:'Source Serif Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.06125px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="26.14683"
+     y="29.263884"
+     id="text819-8"><tspan
+       sodipodi:role="line"
+       id="tspan817-1"
+       x="26.14683"
+       y="29.263884"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18.4684px;font-family:'Source Serif Pro';-inkscape-font-specification:'Source Serif Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.06125px">1</tspan></text>
+  <path
+     inkscape:connector-curvature="0"
+     d="M 14.844082,1.3 2.1040819,4.975 v 11.062241 c 0,8.580878 9.6628011,14.662759 12.7400001,14.662759 1.45236,0 4.37472,-1.356319 7.056001,-3.692641 l 0.04505,-2.157282 c -2.17952,1.85612 -5.927004,3.889922 -7.101044,3.889922 -2.60288,0 -10.7800001,-5.2724 -10.7800001,-12.708638 V 6.445 L 14.844082,3.2599998 25.624082,6.445 v 8.985309 c 0,0.25088 0.05395,0.138544 0.03631,0.383544 L 27.500147,15.325049 27.584083,4.975 Z"
+     id="path821"
+     style="stroke-width:0.06125;fill:#ff9400;fill-opacity:1"
+     sodipodi:nodetypes="ccssccsscccscccc" />
+  <rect
+     style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#ff9400;stroke-width:0.969694;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;stop-opacity:1"
+     id="rect886"
+     width="31.030304"
+     height="31.030304"
+     x="0.48484802"
+     y="0.48484802"
+     ry="2.4279165" />
+</svg>

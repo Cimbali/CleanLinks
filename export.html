@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Export rules in NeatURL-like format</title>
+	<link rel="icon" href="favicon.png" />
+
+	<!-- Mock browser object so cleanLink can be loaded -->
+	<script>
+	function getURL(url) {
+		return ('' + url.replace(/^\/+/, ''));
+	}
+	var browser = { runtime: { getURL }, i18n: { getMessage: () => null }, storage: {} };
+	</script>
+	<script src="setup.js"></script>
+
+	<!-- Embed the actual clean_link script -->
+	<script src="modules/common.js"></script>
+	<script src="modules/punycode.js"></script>
+	<script src="modules/publicsuffixlist.js"></script>
+	<script src="modules/rules.js"></script>
+
+	<!-- Inner workings of this page -->
+	<script>
+function populate(rules)
+{
+	const exchange_rules = [];
+	for (const {domain, path = '',
+				rewrite = [], whitelist = [], remove = [], redirect = [],
+				whitelist_path = null, redirect_path = null, allow_js = null} of rules)
+	{
+		// NB: rule for any domain already appears as *.* out of serialisation, so requires special handling
+		let suffix = '@' + (domain === '*.*' ? '*.*' : domain.startsWith('.') ? domain.slice(1) : `*.${domain}`)
+						 + (path === '' ? '' : `/${path}`);
+		if (suffix === '@*.*')
+			suffix = '';
+
+		// Express same order as in code: first rewrite, then remove, then redirect -- with whitelist always having precedence.
+		for (const { search, replace, flags } of rewrite)
+			exchange_rules.push(`%${(search || '').replace('%', '\\%')}%${(replace || '').replace('%', '\\%')}`+
+								`%${flags || ''}${suffix}`);
+
+		for (const keep of whitelist)
+			exchange_rules.push(`!${keep}${suffix}`);
+
+		if (whitelist_path)
+			exchange_rules.push(`|${suffix}`);
+
+		for (const del of remove)
+			exchange_rules.push(`${del}${suffix}`);
+
+		for (const redir of redirect)
+			exchange_rules.push(`>${redir}${suffix}`);
+
+		// Other add-ons might need a capturing-group regex here -- we’ll just ignore it and trigger our automatic detection
+		if (redirect_path)
+			exchange_rules.push(`>>${suffix}`);
+
+		if (allow_js)
+			exchange_rules.push(`+${keep}${suffix}`);
+
+		exchange_rules.push('');
+	}
+
+	return exchange_rules;
+}
+
+window.addEventListener('load', () =>
+{
+	Rules.loaded.then(() => Rules.serialize()).then(populate).then(rules_arr =>
+		document.getElementsByTagName('pre')[0].textContent = rules_arr.join('\n')
+	)
+
+	fetch(browser.runtime.getURL('manifest.json')).then(async json =>
+	{
+		const manifest = JSON.parse(await json.text());
+		const h1 = document.getElementsByTagName('h1')[0];
+		h1.textContent = h1.textContent.replace('CleanLinks', 'CleanLinks v' + manifest.version);
+	});
+});
+</script>
+
+	<!-- Styling for the page -->
+	<style>
+	h1{
+		text-align: center;
+	}
+	dt {
+		font-family: 'Courier sans', monospace;
+	}
+	dt .normal-font {
+		font-family: initial;
+	}
+
+	#rule_legend {
+		margin-left: 1em;
+	}
+	#rule_buttons, #rule_legend {
+		display: flex;
+		align-items: flex-end;
+	}
+	#rule_buttons button {
+		flex-grow: 1;
+		text-align: center;
+		margin: 0 1em;
+	}
+	#rule_filter {
+		flex-grow: 1;
+		width: auto;
+		margin-left: 1em;
+	}
+	#user_rule_hide, #default_rule_hide {
+		display: none;
+	}
+	#rule_legend fieldset legend {
+		font-weight: normal;
+	}
+	#rule_legend fieldset {
+		border-radius: 5px;
+	}
+	.rule_filter_toggle {
+		padding: .25em;
+		border-radius: 3px;
+		display: inline !important;
+		cursor: pointer;
+	}
+	#rule_legend label[for="default_rule_hide"], #rule_selector option.default-rule {
+		color: darkblue;
+	}
+	#rule_legend label[for="user_rule_hide"], #rule_selector option.user-rule {
+		color: darkred;
+	}
+	#user_rule_hide:checked ~ #rule_legend label[for="user_rule_hide"],
+	#default_rule_hide:checked ~ #rule_legend label[for="default_rule_hide"] {
+		opacity: 0.2;
+	}
+	#user_rule_hide:checked ~ #rule_selector option.user-rule,
+	#default_rule_hide:checked ~ #rule_selector option.default-rule {
+		display: none !important;
+	}
+	#rule_selector {
+		height: 15em;
+	}
+	legend {
+		font-weight: bold;
+		font-size: 1.2em;
+	}
+
+	label.show_legend_button {
+		display: inline-block;
+		position: relative;
+		top: -0.5em;
+		font-size: 80%;
+		background: #eee;
+		border: black thin solid;
+		padding: 1px 4px;
+		box-shadow: 2px 4px #aaa;
+		border-radius: 5px;
+	}
+	.show_legend {
+		display: none;
+	}
+
+	fieldset p, fieldset ul {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	.URL {
+		white-space: nowrap;
+		font-family: monospace;
+	}
+	.protocol { color: palevioletred; }
+	.subdomain { color: cornflowerblue; }
+	.domain { color: blue; }
+	.suffix { color: indigo; }
+	.fqdn { color: darkslateblue; }
+	.path { color: green; }
+	.query { color: orange; }
+	.parameter { color: red; }
+
+	/* Any siblings having or containing .enabled or .disabled will be visible based on the .toggle input value */
+	input.toggle:not(:checked) ~ .enabled, input.toggle:not(:checked) ~ * .enabled {
+		display: none;
+	}
+	input.toggle:checked ~ .disabled, input.toggle:checked ~ * .disabled {
+		display: none;
+	}
+
+	.unused-rule-format {
+		color: grey;
+		font-style: oblique;
+	}
+	.improv-rule-format {
+		color: darkgreen;
+		font-weight: bold;
+	}
+
+	.topo, pre {
+		max-width: 80%;
+		margin: 1em auto;
+		padding: .5em;
+	}
+	pre {
+		border: black thin solid;
+		background-color: white;
+		max-height: 50vh;
+		overflow: auto;
+	}
+	</style>
+</head>
+<body>
+	<h1>Export CleanLinks default rules in NeatURL-like format</h1>
+
+	<p class="topo">Rules are in the following format: <code>{rule type identifier}{rule matching}[@{domain}[/{path}]]</code></p>
+
+	<pre id="exported_rules"></pre>
+
+	<fieldset class="format">
+		<input type="checkbox" id="show_format" class="show_legend toggle noautosave" />
+
+		<legend>Summary of the Neat-URL rules format with CleanLinks-specific additions
+		<label class="show_legend_button" for="show_format">
+			<span class="enabled">Hide more</span>
+			<span class="disabled">Show more</span>
+		</label></legend>
+
+		<p>The rule format is as follows:
+			<code>{rule type identifier}{rule matching}[@{domain}<span class="improv-rule-format">[/{path}]</span>]</code>
+		</p>
+		<ul>
+			<li>The <em>rule type identifier</em> defines the action to be taken,</li>
+			<li>the <em>rule matching</em> matches the element on which to act, and</li>
+			<li>the <em>domain/path suffix</em> is optional and restrains the rule to some URLs only.</li>
+		</ul>
+		<p>The original format is explained <a href="https://github.com/Smile4ever/Neat-URL#parameter-rules">on the Neat-URL
+			github page</a>, and this page adds special colours for rules that are <span class="unused-rule-format">unused</span>
+			or <span class="improv-rule-format">added</span>.
+		</p>
+
+		<dl class="enabled">
+			<dt>{parameter}<span class="normal-font"> (i.e. no rule type identifier)</span></dt>
+			<dd>Delete matched parameter</dd>
+			<dt>!{parameter}</dt>
+			<dd>Whitelist (i.e. keep even if matched by other rules) matched parameter</dd>
+			<dt class="unused-rule-format">${path section}</dt>
+			<dd>Remove all URL contents after matched path section (when no query parameters remain)</dd>
+			<dt class="unused-rule-format">$${path section}</dt>
+			<dd>Remove all URL contents after matched path section (including path parameters)</dd>
+			<dt class="unused-rule-format">#{anchor tag}</dt>
+			<dd>Remove anchor tag (needs to include parameter and value) for hashtag-part of URL</dd>
+			<dt class="unused-rule-format">#?{anchor tag}</dt>
+			<dd>Promote anchor tag from hashtag-part of URL to query-part</dd>
+			<dt class="improv-rule-format">%{search}%{replace}%{flags}</dt>
+			<dd>Search and replace on the URL. Useful e.g. for tripadvisor which URL-encodes embedded URLs with <code>__2F__</code> instead of <code>%2F</code>, but also provides more generic versions of the <code>$</code> rules. For example, the example <code>$/ref@amazon.*</code> becomes <code>%/ref=[^/]*%%@amazon.*</code></dd>
+			<dt class="improv-rule-format">|</dt>
+			<dd>Allow (whitelist) URLs embedded in path, to avoid redirecting to embedded links that are in the URL path instead of a parameter: e.g.: <code>https://web.archive.org/web/20200725040621/https://twitter.com/elonmusk/status/1286866843307737088</code>. (The <code>!</code> rule can be used to allow embedded links in the URL.)</dd>
+			<dt class="improv-rule-format">+</dt>
+			<dd>Allow (whitelist) javascript to modify links at the moment (or just before) they are clicked,
+			e.g. through <code>onclick</code> and <code>onmousedown</code> events.</dd>
+			<dt class="improv-rule-format">&gt;{parameter}</dt>
+			<dd>Redirect to the page whose URL is contained in the matched parameter’s value.
+			For CleanLinks, only used in “blacklist” mode, i.e. when embedded URLs are not automatically detected.</dd>
+			Allows other extensions to manually specify what CleanLinks detects automatically,
+			or for a potiential future <a href="https://github.com/Cimbali/CleanLinks/issues/115">“blacklist mode”</a>.
+			<dt class="improv-rule-format">&gt;&gt;{matched path with capture group}</dt>
+			<dd>Redirect to the page whose URL is contained in the matched group of the current page’s URL path.
+			For CleanLinks, only used as a boolean in “blacklist” mode, i.e. when embedded URLs are not automatically detected.</dd>
+		</dl>
+
+		<p class="enabled">The suffix usually matches the domain, and CleanLinks adds optional path matching:
+		<code>@domain<span class="improv-rule-format">[/path_matching]</span></code></p>
+		<ul class="enabled">
+			<li>Domains match as plain text, with 2 exceptions:
+			<ul>
+				<li>Ending with <code>.*</code> to match any public-suffix domain (e.g. <code>@google.*</code> for
+					<code>google.com</code>, <code>google.fr</code>, <code>google.co.uk</code>, etc.).
+				</li>
+				<li>Starting optionally with <code>*.</code> before the domain, to match any subdomain, including no subdomain
+					(e.g. <code>@*.google.com</code> matches <code>www.google.com</code>, <code>mail.google.com</code>, <code>google.com</code>, and more).</li>
+			</ul>
+			Therefore, no suffix at all is exactly the same as <code>@*.*</code>, which means <q>any subdomain of any public-suffix domain</q>.
+			</li>
+			<li>Paths match as <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">regular expressions</a>.
+				For example, to match the path <code>/login</code> exactly on the domain <code>stackoverflow.com</code>,
+				the rule suffix would be <code>@stackoverflow.com/^/login$</code>.
+			</li>
+		</ul>
+
+	</fieldset>
+
+
+	<fieldset class="example">
+		<input type="checkbox" id="show_URL_legend" class="show_legend toggle noautosave" />
+
+		<legend>URL example <label for="show_URL_legend" class="show_legend_button">
+				<span class="enabled">Hide legend</span>
+				<span class="disabled">Show legend</span>
+		</label></legend>
+
+		<p class="URL"><span class="protocol" title="Protocol">https</span>://<span class="subdomain" title="Subdomain">addons.</span><span class="domain" title="Domain name">mozilla.<span class="suffix" title="Public suffix">org</span></span><span class="path" title="Path">/en-GB/firefox/addon/clean-links-webext/reviews/</span><span class="query" title="Query">?<span class="parameter" title="Parameter">score</span>=5</span>
+		</p>
+
+		<dl class="enabled">
+			<dt class="protocol">https</dt> <dd>Protocol</dd>
+			<dt class="suffix">org</dt>
+			<dd><a i18n_text="Public suffix" href="https://publicsuffix.org/"></a>
+				<span>(usually same as top-level domain)</span></dd>
+			<dt class="domain">mozilla.org</dt> <dd>Domain name</dd>
+			<dt class="subdomain">addons.</dt> <dd>Subdomain</dd>
+			<dt class="fqdn">addons.mozilla.org</dt> <dd>Fully-Qualified Domain Name (FQDN)</dd>
+			<dt class="path">/en-GB/firefox/addon/clean-links-webext/reviews/</dt> <dd>Path</dd>
+			<dt class="query">?score=5</dt> <dd>Query</dd>
+			<dt class="parameter">score</dt> <dd>Parameter</dd>
+		</dl>
+	</fieldset>
+
+</body>
+</html>

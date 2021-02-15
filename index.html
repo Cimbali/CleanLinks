@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Test cleaning links with CleanLinks defaults rules</title>
+	<link rel="icon" href="favicon.png" />
+
+	<!-- Mock browser object so cleanLink can be loaded -->
+	<script>
+	var browser =
+	{
+		runtime:
+		{
+			getURL: url => ('' + url.replace(/^\/+/, '')),
+		},
+		i18n:
+		{
+			getMessage: () => null
+		},
+		storage: {}
+	}
+	</script>
+	<script src="setup.js"></script>
+
+	<!-- Embed the actual clean_link script -->
+	<script src="modules/common.js"></script>
+	<script src="modules/punycode.js"></script>
+	<script src="modules/publicsuffixlist.js"></script>
+	<script src="modules/rules.js"></script>
+	<script src="modules/cleanlink.js"></script>
+	<script src="modules/display_cleaned_link.js"></script>
+
+	<!-- Inner workings of this page -->
+	<script>
+	function test_cleaning()
+	{
+		let link = document.querySelector('#paste_link input').value;
+		if (link)
+			Rules.loaded.then(() =>
+			{
+				const url = new URL(link);
+				const clean = (clean_link(url).cleaned_link || url).href;
+				const li = cleaned_link_item(document.createElement('li'), link, clean, []);
+				document.querySelector('ul#clean_history').prepend(li);
+				document.querySelector('#paste_link input').value = '';
+			})
+			.catch(console.error)
+	}
+
+	window.addEventListener('load', () =>
+	{
+		document.querySelector('#paste_link button').addEventListener('click', test_cleaning);
+		document.querySelector('#paste_link input').addEventListener('keyup', e =>
+		{
+			if (e.key === 'Enter')
+			{
+				e.stopPropagation();
+				e.preventDefault();
+				test_cleaning();
+			}
+		});
+
+		fetch(browser.runtime.getURL('manifest.json')).then(async json =>
+		{
+			const manifest = JSON.parse(await json.text());
+			const h1 = document.getElementsByTagName('h1')[0];
+			h1.textContent = h1.textContent + ' v' + manifest.version;
+		});
+
+		document.querySelector('#paste_link input').focus();
+	});
+	</script>
+
+	<!-- Styling for the page -->
+	<style>
+	h1{
+		text-align: center;
+	}
+	p#paste_link {
+		width: 100%;
+		display: inline-flex;
+		align-items: baseline;
+	}
+	p#paste_link input {
+		width: 5em;
+		margin: 0 1em;
+		flex-grow: 1;
+	}
+	ul#clean_history {
+		list-style: none;
+		padding: 0;
+		overflow-wrap: break-word;
+		word-break: break-all;
+	}
+	ul#clean_history li {
+		margin: 10px 0;
+		padding: 0 10px;
+		border: black thin solid;
+		border-radius: 10px;
+	}
+	ul#clean_history li > span {
+		display: block;
+		padding: 5px 0;
+	}
+	ul#clean_history li span.cleaned::before {
+		content: '→';
+		position: relative;
+		left: -5px;
+		padding-bottom: 10px;
+	}
+	.del {
+		text-decoration: line-through;
+		color: red;
+	}
+	.ins {
+		text-decoration: underline;
+		color: green;
+	}
+	.keep {
+		background-color: rgba(230, 230, 230, 0.5);
+	}
+	.url {
+		text-decoration: underline overline;
+		color: #339;
+	}
+	</style>
+</head>
+
+<body>
+	<h1>Test cleaning with default rules of CleanLinks</h1>
+	<p id="paste_link">Link:&nbsp;<input type="text" />&nbsp;<button>Clean it!</button></p>
+	<ul id="clean_history"></ul>
+</body>
+
+</html>
