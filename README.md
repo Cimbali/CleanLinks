@@ -2,6 +2,8 @@
 
 [![Install it from addons.mozilla.org][get_addon_image]][addon]
 
+CleanLinks was initially a webextension rewrite and is now a fork of [@DiegoCR](https://github.com/diegocr)’s original [XUL/XPCOM CleanLinks extension](https://github.com/diegocr/CleanLinks).
+
 
 ## What does it do?
 CleanLinks protects your private life, by automatically detecting and skipping redirect pages, that track you on your way to the link you really wanted. Tracking parameters (e.g. utm\_\* or fbclid) are also removed.
