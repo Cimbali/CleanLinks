@@ -185,35 +185,41 @@ function append_normal_path({link_elem, orig, clean}, actions_to_whitelist)
 }
 
 
-function append_query_param({link_elem, keyval, clean}, keep, strip, actions_to_whitelist)
+function append_query_param({link_elem, key, val, sep, clean}, keep, strip, actions_to_whitelist)
 {
-	let decorate, embed_start, embed_end;
+	let decorate, embed_start, embed_end, embed_found = false;
 
 	if (keep)
-		decorate = 'whitelist'
+		decorate = 'whitelist';
 	else if (strip)
 	{
 		decorate = 'deleted';
 		link_elem.classList.add('remove');
 	}
-	else
-		[embed_start, embed_end] = embed_url_pos(keyval, clean);
 
-	if (typeof embed_start !== 'undefined' && typeof embed_end !== 'undefined')
+	for (const [pre, string] of [[sep, key], ['=', val]])
 	{
-		append_decorated_text(link_elem, keyval.substring(0, embed_start))
-		append_decorated_text(link_elem, keyval.substring(embed_start, embed_end), 'embedded')
-		append_decorated_text(link_elem, keyval.substring(embed_end))
+		const [embed_start, embed_end] = embed_url_pos(string, clean);
 
+		if (typeof decorate === 'undefined' && typeof embed_start !== 'undefined')
+		{
+			append_decorated_text(link_elem, `${pre}${string.substring(0, embed_start)}`)
+			append_decorated_text(link_elem, string.substring(embed_start, embed_end), 'embedded')
+			append_decorated_text(link_elem, string.substring(embed_end))
+			embed_found = true;
+
+			link_elem.classList.add('embed');
+		}
+		else
+			append_decorated_text(link_elem, `${pre}${string}`, decorate)
+	}
+
+	if (embed_found) {
 		if (!('whitelist' in actions_to_whitelist))
 			actions_to_whitelist.whitelist = []
 
-		actions_to_whitelist.whitelist.push(keyval.substring(1, keyval.indexOf('='))
-												  .replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'));
-		link_elem.classList.add('embed');
+		actions_to_whitelist.whitelist.push(key.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'));
 	}
-	else
-		append_decorated_text(link_elem, keyval, decorate)
 }
 
 
@@ -248,8 +254,7 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean)
 
 	for (const [key, val] of orig.searchParams)
 	{
-		const keyval = `${sep}${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
-		append_query_param({link_elem, keyval, clean}, key.match(keep), key.match(strip), actions_to_whitelist);
+		append_query_param({link_elem, key, val, sep, clean}, key.match(keep), key.match(strip), actions_to_whitelist);
 		sep = '&';
 	}
 
@@ -265,8 +270,7 @@ function cleaned_link_item(link_elem, raw_orig, raw_clean)
 		sep = '?';
 		for (const [key, val] of hash_link.searchParams)
 		{
-			const keyval = `${sep}${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
-			append_query_param({link_elem, keyval, clean}, key.match(keep), key.match(strip), actions_to_whitelist);
+			append_query_param({link_elem, key, val, sep, clean}, key.match(keep), key.match(strip), actions_to_whitelist);
 			sep = '&';
 		}
 	}
