@@ -101,7 +101,7 @@ function clean_redirect_headers({ documentUrl, originUrl, responseHeaders, statu
 
 	const current_url = (documentUrl || originUrl) ? new URL(documentUrl || originUrl) : {};
 	const link = new URL(loc.value, url);
-	const { cleaned_link, ...cleaning_info } = clean_link(link);
+	const { cleaned_link, previous_cleaned_links, ...cleaning_info } = clean_link(link);
 
 	if (!cleaned_link)
 		return {};
