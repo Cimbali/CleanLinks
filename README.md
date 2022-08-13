@@ -38,7 +38,7 @@ Those can not be detected automatically, so CleanLinks has a set of rules (the s
 
 Be part of the open-source community that helps each other browse safer and more privately !
 
-Bing part of a community means being respectful of everyone and keeping this environment friendly, welcoming, and harrasment-free.
+Being part of a community means being respectful of everyone and keeping this environment friendly, welcoming, and harrasment-free.
 Abusive behaviour will not be tolerated, and can be reported by email at me@cimba.li − wrongdoers may be permanently banned from interacting with CleanLinks.
 
 ### You can help by reporting issues!
