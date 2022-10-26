@@ -110,7 +110,7 @@
           }
         }
       },
-      "^/photo.php$": {
+      "^/photo$": {
         "actions": {
           "whitelist": [
             "fbid"
