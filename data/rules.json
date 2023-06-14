@@ -1,0 +1,1511 @@
+{
+  ".*": {
+    ".*": {
+      ".proxy": {
+        ".": {
+          "^/$": {
+            "actions": {
+              "whitelist": [
+                "mortyurl"
+              ]
+            }
+          }
+        }
+      }
+    },
+    ".amazon": {
+      "actions": {
+        "remove": [
+          "pf_rd_[a-zA-Z]",
+          "qid",
+          "sr",
+          "srs",
+          "pd_rd_[a-zA-Z]*",
+          "__mk_[a-zA-Z]{1,3}_[a-zA-Z]{1,3}",
+          "spIA",
+          "ms3_c",
+          "[a-zA-Z%0-9]*ie",
+          "refRID",
+          "colid",
+          "coliid",
+          "[^a-zA-Z%0-9]adId",
+          "qualifier",
+          "_encoding",
+          "smid",
+          "field-lbr_brands_browse-bin",
+          "ref_?",
+          "th",
+          "sprefix",
+          "crid",
+          "keywords",
+          "cv_ct_[a-zA-Z]+",
+          "linkCode",
+          "creativeASIN",
+          "ascsubtag",
+          "aaxitk",
+          "hsa_cr_id",
+          "sb-ci-[a-zA-Z]+",
+          "rnid",
+          "tag",
+          "psc"
+        ],
+        "rewrite": [
+          {
+            "flags": "",
+            "replace": "",
+            "search": "/ref=[^/]*"
+          }
+        ]
+      }
+    },
+    ".bbc": {
+      "actions": {
+        "remove": [
+          "at_\\w+",
+          "ns_\\w+",
+          "ocid"
+        ]
+      }
+    },
+    ".bing": {
+      "actions": {
+        "remove": [
+          "cvid",
+          "form",
+          "pq",
+          "qs",
+          "sc",
+          "sk",
+          "sp"
+        ],
+        "whitelist": [
+          "q"
+        ]
+      }
+    },
+    ".ebay": {
+      ".signin": {
+        "actions": {
+          "whitelist": [
+            "ru"
+          ]
+        }
+      },
+      "actions": {
+        "remove": [
+          "_trkparms",
+          "_trksid",
+          "_from",
+          "hash"
+        ]
+      }
+    },
+    ".facebook": {
+      ".m": {
+        "^/comment/edit/": {
+          "actions": {
+            "whitelist": [
+              "redirect"
+            ]
+          }
+        }
+      },
+      "^/photo$": {
+        "actions": {
+          "whitelist": [
+            "fbid"
+          ]
+        }
+      },
+      "actions": {
+        "remove": [
+          "hc_[a-zA-Z_%\\[\\]0-9]*",
+          "[a-zA-Z]*ref[a-zA-Z]*",
+          "__tn__",
+          "eid",
+          "__xts__%5B[0-9]%5D",
+          "__xts__\\[[0-9]\\]",
+          "comment_tracking",
+          "dti",
+          "app",
+          "video_source",
+          "ftentidentifier",
+          "pageid",
+          "padding",
+          "ls_ref",
+          "action_history",
+          "fbid",
+          "comment_id"
+        ]
+      }
+    },
+    ".google": {
+      ".accounts": {
+        "actions": {
+          "whitelist": [
+            "continue"
+          ]
+        }
+      },
+      ".consent": {
+        "actions": {
+          "whitelist": [
+            "continue",
+            "origin"
+          ]
+        }
+      },
+      ".contacts": {
+        "^/widget/hovercard/": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        }
+      },
+      ".myaccount": {
+        "actions": {
+          "whitelist": [
+            "continue"
+          ]
+        }
+      },
+      ".ogs": {
+        "^/u/0/widget/app$": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        }
+      },
+      ".translate": {
+        "/translate.*": {
+          "actions": {
+            "whitelist": [
+              "rurl",
+              "q",
+              "u"
+            ]
+          }
+        }
+      },
+      ".www": {
+        "/search": {
+          "actions": {
+            "whitelist": [
+              "q"
+            ]
+          }
+        },
+        "^/recaptcha/api2/anchor$": {
+          "actions": {
+            "whitelist": [
+              "co"
+            ]
+          }
+        }
+      },
+      "/searchbyimage": {
+        "actions": {
+          "whitelist": [
+            "image_url"
+          ]
+        }
+      },
+      "actions": {
+        "remove": [
+          "ved",
+          "bi[a-zA-Z]*",
+          "gfe_[a-zA-Z]*",
+          "ei",
+          "source",
+          "gs_[a-zA-Z]*",
+          "site",
+          "oq",
+          "esrc",
+          "uact",
+          "cd",
+          "cad",
+          "gws_[a-zA-Z]*",
+          "atyp",
+          "vet",
+          "zx",
+          "_u",
+          "je",
+          "dcr",
+          "ie",
+          "sei",
+          "sa",
+          "dpr",
+          "btn[a-zA-Z]*",
+          "sa",
+          "usg",
+          "cd",
+          "cad",
+          "uact",
+          "aqs",
+          "sourceid",
+          "sxsrf",
+          "rlz",
+          "i-would-rather-use-firefox",
+          "referrer"
+        ]
+      }
+    },
+    ".instagram": {
+      "actions": {
+        "remove": [
+          "igshid",
+          "rd",
+          "rp",
+          "source"
+        ]
+      }
+    },
+    ".netflix": {
+      "actions": {
+        "remove": [
+          "trackId",
+          "tctx",
+          "jb[a-zA-Z]*"
+        ]
+      }
+    },
+    ".tripadvisor": {
+      "/ShowUrl.*-a_urlKey": {
+        "actions": {
+          "rewrite": [
+            {
+              "flags": "g",
+              "replace": "%$1",
+              "search": "__([0-9A-F]{2})__"
+            },
+            {
+              "flags": "",
+              "replace": "",
+              "search": "-a_urlKey\\.\\d.*"
+            }
+          ]
+        }
+      }
+    },
+    ".twitch": {
+      "actions": {
+        "remove": [
+          "tt_medium",
+          "tt_content"
+        ]
+      }
+    },
+    ".twitter": {
+      "actions": {
+        "remove": [
+          "(ref_?)?src",
+          "s",
+          "cn",
+          "ref_url"
+        ]
+      }
+    },
+    ".yandex": {
+      "^/images/search$": {
+        "actions": {
+          "whitelist": [
+            "url"
+          ]
+        }
+      },
+      "actions": {
+        "remove": [
+          "lr",
+          "redircnt"
+        ],
+        "whitelist": [
+          "text"
+        ]
+      }
+    },
+    ".youtube": {
+      ".consent": {
+        "actions": {
+          "whitelist": [
+            "continue",
+            "origin"
+          ]
+        }
+      },
+      "^/embed/": {
+        "actions": {
+          "remove": [
+            "origin",
+            ".*referrer"
+          ]
+        }
+      },
+      "actions": {
+        "remove": [
+          "feature",
+          "gclid",
+          "kw"
+        ]
+      }
+    }
+  },
+  ".co.uk": {
+    ".bbc": {
+      ".www": {
+        "actions": {
+          "remove": [
+            "intlink_from_url"
+          ]
+        }
+      }
+    }
+  },
+  ".com": {
+    ".9gag": {
+      ".comment-cdn": {
+        "/comment-list.json$": {
+          "actions": {
+            "remove": [
+              "origin"
+            ],
+            "whitelist": [
+              "url",
+              "ref"
+            ]
+          }
+        }
+      },
+      "actions": {
+        "remove": [
+          "ref"
+        ]
+      }
+    },
+    ".acast": {
+      ".feeds": {
+        "^/public/streams/": {
+          "actions": {
+            "remove": [
+              "ref"
+            ]
+          }
+        }
+      }
+    },
+    ".aliexpress": {
+      "actions": {
+        "remove": [
+          "ws_ab_test",
+          "btsid",
+          "algo_expid",
+          "algo_pvid",
+          "gps-id",
+          "scm[_a-zA-Z\\-]*",
+          "scm",
+          "spm",
+          "pvid"
+        ]
+      }
+    },
+    ".amazon": {
+      ".aws": {
+        ".signin": {
+          ".": {
+            "/signin": {
+              "actions": {
+                "whitelist": [
+                  "redirect_uri"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    ".backcountry": {
+      "actions": {
+        "remove": [
+          "CMP_SKU",
+          "MER",
+          "mr:trackingCode",
+          "mr:device",
+          "mr:adType",
+          "iv_",
+          "CMP_ID",
+          "k_clickid",
+          "rmatt",
+          "INT_ID",
+          "ti",
+          "fl",
+          "mr:referralID"
+        ]
+      }
+    },
+    ".bandcamp": {
+      "^/EmbeddedPlayer.html": {
+        "actions": {
+          "rewrite": [
+            {
+              "replace": "",
+              "search": "/ref=[^/]+"
+            }
+          ]
+        }
+      }
+    },
+    ".boredpanda": {
+      "actions": {
+        "remove": [
+          "h"
+        ]
+      }
+    },
+    ".cnet": {
+      "actions": {
+        "remove": [
+          "ftag"
+        ]
+      }
+    },
+    ".dailycodingproblem": {
+      "actions": {
+        "remove": [
+          "email"
+        ]
+      }
+    },
+    ".dailymotion": {
+      ".www": {
+        "^/embed/video/\\w+": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        },
+        "^/player/metadata/video/": {
+          "actions": {
+            "remove": [
+              "embedder",
+              "referer"
+            ]
+          }
+        }
+      }
+    },
+    ".diepresse": {
+      "actions": {
+        "remove": [
+          "from",
+          "xtor",
+          "xt_at"
+        ]
+      }
+    },
+    ".disqus": {
+      "/embed/comments": {
+        "actions": {
+          "remove": [
+            "t_i"
+          ],
+          "whitelist": [
+            "t_u"
+          ]
+        }
+      }
+    },
+    ".duckduckgo": {
+      ".external-content": {
+        "^/ip\\d+/": {
+          "actions": {
+            "whitelist_path": true
+          }
+        },
+        "^/iu/$": {
+          "actions": {
+            "whitelist": [
+              "u"
+            ]
+          }
+        }
+      },
+      "^/$": {
+        "actions": {
+          "whitelist": [
+            "iai"
+          ]
+        }
+      },
+      "^/mapkit/$": {
+        "actions": {
+          "whitelist": [
+            "https.+"
+          ]
+        }
+      },
+      "actions": {
+        "whitelist": [
+          "q"
+        ]
+      }
+    },
+    ".elsevierhealth": {
+      ".jbs": {
+        ".secure": {
+          "^/action/getSharedSiteSession$": {
+            "actions": {
+              "whitelist": [
+                "redirect"
+              ]
+            }
+          }
+        }
+      }
+    },
+    ".embedly": {
+      ".cdn": {
+        "^/widgets/media.html$": {
+          "actions": {
+            "whitelist": [
+              "url",
+              "image"
+            ]
+          }
+        }
+      }
+    },
+    ".firefox": {
+      ".": {
+        "actions": {
+          "remove": [
+            "context",
+            "entrypoint",
+            "form_type"
+          ]
+        }
+      },
+      ".accounts": {
+        ".": {
+          "actions": {
+            "remove": [
+              "context",
+              "entrypoint",
+              "form_type"
+            ]
+          }
+        }
+      }
+    },
+    ".forbes": {
+      ".thumbor": {
+        "^/thumbor/.+/": {
+          "actions": {
+            "whitelist_path": true
+          }
+        }
+      }
+    },
+    ".ft": {
+      ".www": {
+        "^/__origami/service/image/v2/images/raw/": {
+          "actions": {
+            "whitelist_path": true
+          }
+        }
+      }
+    },
+    ".giphy": {
+      "actions": {
+        "remove": [
+          "ref"
+        ]
+      }
+    },
+    ".github": {
+      "actions": {
+        "remove": [
+          "email_token",
+          "email_source"
+        ]
+      }
+    },
+    ".google": {
+      ".accounts": {
+        "^/ServiceLogin$": {
+          "actions": {
+            "whitelist": [
+              "followup"
+            ]
+          }
+        }
+      },
+      ".docs": {
+        "^.*/nonceSigner$": {
+          "actions": {
+            "whitelist": [
+              "continue"
+            ]
+          }
+        }
+      }
+    },
+    ".googleusercontent": {
+      ".translate": {
+        "/translate.*": {
+          "actions": {
+            "whitelist": [
+              "rurl",
+              "u"
+            ]
+          }
+        }
+      },
+      ".webcache": {
+        "/search.*": {
+          "actions": {
+            "whitelist": [
+              "q"
+            ]
+          }
+        }
+      }
+    },
+    ".gravatar": {
+      ".www": {
+        "^/avatar/": {
+          "actions": {
+            "whitelist": [
+              "d"
+            ]
+          }
+        }
+      }
+    },
+    ".healio": {
+      "actions": {
+        "remove": [
+          "ecp",
+          "m_bt"
+        ]
+      }
+    },
+    ".imdb": {
+      "actions": {
+        "remove": [
+          "ref_",
+          "pf_rd_[a-zA-Z]*"
+        ]
+      }
+    },
+    ".indeed": {
+      "actions": {
+        "remove": [
+          "from",
+          "alid",
+          "[a-zA-Z]*tk"
+        ]
+      }
+    },
+    ".instagram": {
+      ".api": {
+        "^/oembed/$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      }
+    },
+    ".lidl": {
+      ".newsletter": {
+        "actions": {
+          "remove": [
+            "x"
+          ]
+        }
+      }
+    },
+    ".linkedin": {
+      ".www": {
+        "^/authwall$": {
+          "actions": {
+            "remove": [
+              "originalReferer"
+            ]
+          }
+        }
+      },
+      "actions": {
+        "remove": [
+          "refId",
+          "trk",
+          "li[a-zA-Z]{2}"
+        ]
+      }
+    },
+    ".live": {
+      ".account": {
+        ".": {
+          "actions": {
+            "whitelist": [
+              "ru"
+            ]
+          }
+        }
+      },
+      ".login": {
+        ".": {
+          "^/(login|logout)\\.srf$": {
+            "actions": {
+              "whitelist": [
+                "ru",
+                "wreply"
+              ]
+            }
+          }
+        }
+      },
+      ".officeapps": {
+        ".powerpoint": {
+          "^/pods/ppt.aspx$": {
+            "actions": {
+              "whitelist": [
+                "wdPodsUrl",
+                "wdPopsUrl"
+              ]
+            }
+          }
+        }
+      }
+    },
+    ".livejournal": {
+      ".www": {
+        ".": {
+          "/misc/get_domain_session.bml$": {
+            "actions": {
+              "whitelist": [
+                "return"
+              ]
+            }
+          }
+        }
+      },
+      "/__setdomsess": {
+        "actions": {
+          "whitelist": [
+            "dest"
+          ]
+        }
+      }
+    },
+    ".medium": {
+      "^/m/global-identity$": {
+        "actions": {
+          "whitelist": [
+            "redirectUrl"
+          ]
+        }
+      },
+      "actions": {
+        "remove": [
+          "source"
+        ]
+      }
+    },
+    ".microfocus": {
+      ".login": {
+        "^/nidp/idff/sso$": {
+          "actions": {
+            "whitelist": [
+              "AuthnContextStatementRef"
+            ]
+          }
+        }
+      },
+      ".www": {
+        "^/(LAGBroker|nesp/app/plogin)$": {
+          "actions": {
+            "whitelist": [
+              ".+"
+            ]
+          }
+        }
+      }
+    },
+    ".moosejaw": {
+      "actions": {
+        "remove": [
+          "cm_lm",
+          "cm_mmc",
+          "webUserId",
+          "spMailingID",
+          "spUserID",
+          "spJobID",
+          "spReportId"
+        ]
+      }
+    },
+    ".nypost": {
+      "actions": {
+        "remove": [
+          "__twitter_impression"
+        ]
+      }
+    },
+    ".nytimes": {
+      "actions": {
+        "remove": [
+          "smid"
+        ]
+      }
+    },
+    ".office": {
+      ".suite": {
+        ".webshell": {
+          "^/iframe/TokenFactoryIframe$": {
+            "actions": {
+              "whitelist": [
+                "origin"
+              ]
+            }
+          }
+        }
+      }
+    },
+    ".readdc": {
+      "actions": {
+        "remove": [
+          "ref"
+        ]
+      }
+    },
+    ".shutterstock": {
+      "actions": {
+        "remove": [
+          "src"
+        ]
+      }
+    },
+    ".snapchat": {
+      "actions": {
+        "remove": [
+          "sc_referrer",
+          "sc_ua"
+        ]
+      }
+    },
+    ".soundcloud": {
+      ".w": {
+        "^/player/$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      },
+      "^/oembed.json$": {
+        "actions": {
+          "whitelist": [
+            "url"
+          ]
+        }
+      }
+    },
+    ".spotify": {
+      "actions": {
+        "remove": [
+          "si"
+        ]
+      }
+    },
+    ".steampowered": {
+      "actions": {
+        "remove": [
+          "snr"
+        ]
+      }
+    },
+    ".techcrunch": {
+      "actions": {
+        "remove": [
+          "ncid",
+          "sr",
+          "sr_share"
+        ]
+      }
+    },
+    ".thalysnet": {
+      "actions": {
+        "whitelist": [
+          "url"
+        ]
+      }
+    },
+    ".theguardian": {
+      ".www": {
+        "actions": {
+          "remove": [
+            "CMP"
+          ]
+        }
+      }
+    },
+    ".tineye": {
+      "^/search$": {
+        "actions": {
+          "whitelist": [
+            "url"
+          ]
+        }
+      }
+    },
+    ".twitter": {
+      ".platform": {
+        "^/widgets/widget_iframe\\.": {
+          "actions": {
+            "remove": [
+              "origin"
+            ]
+          }
+        }
+      }
+    },
+    ".vitamix": {
+      "actions": {
+        "remove": [
+          "_requestid",
+          "cid",
+          "dl",
+          "di",
+          "sd",
+          "bi"
+        ]
+      }
+    },
+    ".vivaldi": {
+      "actions": {
+        "remove": [
+          "pk_campaign",
+          "pk_kwd"
+        ]
+      }
+    },
+    ".walmart": {
+      "actions": {
+        "remove": [
+          "u1",
+          "ath[a-zA-Z]*"
+        ]
+      }
+    },
+    ".woot": {
+      "actions": {
+        "remove": [
+          "ref_?"
+        ]
+      }
+    },
+    ".wps": {
+      "actions": {
+        "remove": [
+          "from"
+        ]
+      }
+    },
+    ".yahoo": {
+      "actions": {
+        "rewrite": [
+          {
+            "flags": "",
+            "replace": "",
+            "search": "/R[KS]=\\d.*$"
+          }
+        ]
+      }
+    },
+    ".youku": {
+      "actions": {
+        "remove": [
+          "tpa"
+        ]
+      }
+    },
+    ".youtube": {
+      ".accounts": {
+        "^/accounts/": {
+          "actions": {
+            "whitelist": [
+              "pmpo"
+            ]
+          }
+        }
+      },
+      ".ads": {
+        "^/ads/preferences/": {
+          "actions": {
+            "whitelist": [
+              "continue"
+            ]
+          }
+        }
+      },
+      ".www": {
+        "^/get_video_info$": {
+          "actions": {
+            "remove": [
+              "eurl"
+            ]
+          }
+        },
+        "^/history_controls$": {
+          "actions": {
+            "whitelist": [
+              "back_url"
+            ]
+          }
+        }
+      }
+    },
+    ".zoho": {
+      "actions": {
+        "remove": [
+          "iref"
+        ]
+      }
+    }
+  },
+  ".com.my": {
+    ".lazada": {
+      "actions": {
+        "remove": [
+          "ad_src",
+          "did",
+          "pa",
+          "mp",
+          "impsrc",
+          "cid",
+          "pos"
+        ]
+      }
+    }
+  },
+  ".cz": {
+    ".prvnizpravy": {
+      "actions": {
+        "remove": [
+          "xid"
+        ]
+      }
+    }
+  },
+  ".de": {
+    ".bahn": {
+      "actions": {
+        "remove": [
+          "dbkanal_[0-9]{3}"
+        ]
+      }
+    },
+    ".spiegel": {
+      "actions": {
+        "remove": [
+          "b"
+        ]
+      }
+    },
+    ".swp": {
+      "actions": {
+        "remove": [
+          "source"
+        ]
+      }
+    },
+    ".tchibo": {
+      "actions": {
+        "remove": [
+          "wbdcd"
+        ]
+      }
+    }
+  },
+  ".gob.es": {
+    ".sepe": {
+      ".isweb": {
+        "^/GetAccess/Saml/SSO/Init$": {
+          "actions": {
+            "whitelist": [
+              "GA_SAML_AC_CLASS_REF"
+            ]
+          }
+        }
+      }
+    }
+  },
+  ".gouv.fr": {
+    ".impots": {
+      ".idp": {
+        "^/GetContexte$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        },
+        "^/LoginAEL$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        },
+        "^/LoginAccess$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      }
+    }
+  },
+  ".info": {
+    ".ombord": {
+      ".www": {
+        "^/hotspot/hotspot.cgi$": {
+          "actions": {
+            "whitelist": [
+              "url",
+              "onerror"
+            ]
+          }
+        }
+      }
+    }
+  },
+  ".io": {
+    ".shields": {
+      ".img": {
+        "actions": {
+          "whitelist": [
+            ".*"
+          ]
+        }
+      }
+    }
+  },
+  ".it": {
+    ".net-parade": {
+      "actions": {
+        "remove": [
+          "pl"
+        ]
+      }
+    }
+  },
+  ".me": {
+    ".track": {
+      "actions": {
+        "redirect": [
+          "dest"
+        ]
+      }
+    }
+  },
+  ".net": {
+    ".doubleclick": {
+      ".g": {
+        ".googleads": {
+          "^/ads/preferences/": {
+            "actions": {
+              "whitelist": [
+                "continue"
+              ]
+            }
+          }
+        }
+      }
+    },
+    ".launchpad": {
+      "^/+openid-callback$": {
+        "actions": {
+          "whitelist": [
+            "starting_url",
+            "openid\\.return_to"
+          ]
+        }
+      }
+    },
+    ".nitter": {
+      "^/(pic|gif|video)/": {
+        "actions": {
+          "whitelist_path": true
+        }
+      }
+    },
+    ".nocookie": {
+      ".wikia": {
+        "^/__am/\\d+/sasses/.*background-image.*": {
+          "actions": {
+            "whitelist_path": true
+          }
+        }
+      }
+    },
+    ".sourceforge": {
+      "actions": {
+        "remove": [
+          "position",
+          "source"
+        ]
+      }
+    },
+    ".tweakers": {
+      "actions": {
+        "remove": [
+          "nb",
+          "u"
+        ]
+      }
+    }
+  },
+  ".nl": {
+    ".ns": {
+      ".nstrein": {
+        ".www": {
+          "actions": {
+            "whitelist": [
+              "loginurl"
+            ]
+          }
+        }
+      }
+    }
+  },
+  ".org": {
+    ".archive": {
+      ".web": {
+        "/web/.*": {
+          "actions": {
+            "whitelist_path": true
+          }
+        },
+        "^/__wb/calendarcaptures/": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        },
+        "^/__wb/search/": {
+          "actions": {
+            "whitelist": [
+              "q"
+            ]
+          }
+        },
+        "^/__wb/sparkline$": {
+          "actions": {
+            "whitelist": [
+              "url"
+            ]
+          }
+        }
+      }
+    },
+    ".mozilla": {
+      ".": {
+        "actions": {
+          "remove": [
+            "as"
+          ]
+        }
+      },
+      ".support": {
+        ".": {
+          "actions": {
+            "remove": [
+              "as"
+            ]
+          }
+        }
+      },
+      "actions": {
+        "remove": [
+          "src",
+          "platform",
+          "redirect_source"
+        ]
+      }
+    },
+    ".mozillazine": {
+      "actions": {
+        "remove": [
+          "sid"
+        ]
+      }
+    },
+    ".norml": {
+      "actions": {
+        "remove": [
+          "link_id",
+          "can_id",
+          "source",
+          "email_referrer",
+          "email_subject"
+        ]
+      }
+    }
+  },
+  ".pl": {
+    ".allegro": {
+      "actions": {
+        "remove": [
+          "reco_id",
+          "sid"
+        ]
+      }
+    }
+  },
+  ".ru": {
+    ".hh": {
+      "actions": {
+        "remove": [
+          "vss",
+          "t",
+          "swnt",
+          "grpos",
+          "ptl",
+          "stl",
+          "exp",
+          "plim"
+        ]
+      }
+    },
+    ".ozon": {
+      "actions": {
+        "remove": [
+          "partner"
+        ]
+      }
+    }
+  },
+  ".us": {
+    ".disq": {
+      "actions": {
+        "remove": [
+          "cuid"
+        ]
+      }
+    },
+    ".zoom": {
+      ".us04web": {
+        "^/signup$": {
+          "actions": {
+            "whitelist": [
+              "pre"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "/(abp|accounts?|adfs|auth(enticat(e|ion)|orize|flow)?|(gdpr.?)?consent|cookie|download|oauth2?|openid|preferences|profile|register|(log|sign)(in|off|on|out|up)|sso|shibboleth|saml(2(\\.0)?)?|subscribe|verification)(\\b|_)": {
+    "actions": {
+      "whitelist": [
+        "back.?(ur[il])?",
+        "(came_?)?from",
+        "cont(inue)?.?(ur[il])?",
+        "domain",
+        "done.?(ur[il])?",
+        "follow(.?up)?.?(ur[il])?",
+        "next.?(ur[il])?",
+        "protocol.*",
+        "provider(.?id)?",
+        "redir(ect)?.?(ur[il])?",
+        "return(_to)?.?(ur[il])?",
+        "w?reply.?(ur[il])?",
+        "u",
+        "ru",
+        ".*ur[il]",
+        "openid.+",
+        "service",
+        "(sig|alg).+",
+        "target.?(ur[il])?",
+        "parent.?(ur[il])?"
+      ]
+    }
+  },
+  "^/autocompleter$": {
+    "actions": {
+      "whitelist": [
+        "url"
+      ]
+    }
+  },
+  "^/image_proxy$": {
+    "actions": {
+      "whitelist": [
+        "url"
+      ]
+    }
+  },
+  "actions": {
+    "remove": [
+      "utm(_[a-zA-Z]*)?",
+      "ga_[a-zA-Z_]+",
+      "yclid",
+      "_openstat",
+      "fb_action_ids",
+      "fb_action_types",
+      "fb_source",
+      "fb_ref",
+      "fbclid",
+      "action_object_map",
+      "action_type_map",
+      "action_ref_map",
+      "gs_l",
+      "mkt_tok",
+      "hmb_campaign",
+      "hmb_medium",
+      "hmb_source",
+      "gclid",
+      "otm_[a-zA-Z_]*",
+      "cmpid",
+      "os_ehash",
+      "_ga",
+      "pk_.+",
+      "recipientId",
+      "sc_(campaign|channel|cid|content|country|geo|medium|outcome)",
+      "siteId",
+      "sp(Job|Mailing|Report|User)I[dD]",
+      "trk(Campaign)?",
+      "elqTrack(Id)?",
+      "hsCtaTracking",
+      "__?hs(enc|mi|sc|tc)",
+      "itm_.+",
+      "wt_zmc",
+      "aff_(platform|trace_key)",
+      "asset(Id|Type)",
+      "Campaign",
+      "campaign_?[Ii]?d",
+      "mbid",
+      "WT\\.mc_id",
+      "c_?id",
+      "__twitter_impression",
+      "wt_?z?mc",
+      "wtrid",
+      "[a-zA-Z]?mc",
+      "dclid",
+      "Echobox",
+      "spm",
+      "vn(_[a-zA-Z]*)+",
+      "(merchant|pogramme|media)ID"
+    ]
+  }
+}
